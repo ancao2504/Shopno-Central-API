@@ -7,11 +7,11 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception; 
+// use PHPMailer\PHPMailer\PHPMailer;
+// use PHPMailer\PHPMailer\SMTP;
+// use PHPMailer\PHPMailer\Exception; 
 
-require("../vendor/autoload.php");
+// require("../vendor/autoload.php");
     if(array_key_exists('agentId', $_GET) && array_key_exists('sender', $_GET) && array_key_exists('ref', $_GET) 
         && array_key_exists('receiver', $_GET) && array_key_exists('way', $_GET) && array_key_exists('method', $_GET) 
         && array_key_exists('transactionId', $_GET) && array_key_exists('amount', $_GET) && array_key_exists('staffId', $_GET)){
@@ -46,10 +46,10 @@ require("../vendor/autoload.php");
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["depositId"]); 
                 $number= (int)$outputString + 1;
-                $DepositId = "FWD$number"; 								
+                $DepositId = "STD$number"; 								
             }
         } else {
-            $DepositId ="FWD1000";
+            $DepositId ="STD1000";
         }
 
       
@@ -146,7 +146,7 @@ require("../vendor/autoload.php");
                     
             // if no error caused, continue ....
             if(!isset($errorMSG)){
-                $attachment = "https://flyway.api.flyfarint.com/asset/Agent/$agentId/Deposit/$renameFile";
+                $attachment = $renameFile;
                 
                 $sql = "INSERT INTO `deposit_request`(
                 `agentId`,
@@ -186,886 +186,888 @@ require("../vendor/autoload.php");
 
 
           $html;
-          if($way=='bankTransfer'){
-            $html = '<tr>
-            <td
-              align="center"
-              valign="top"
-              style="
-                border-collapse: collapse;
-                border-spacing: 0;
-                color: #000000;
-                font-family: sans-serif;
-                text-align: left;
-                padding-left: 20px;
-                font-weight: bold;
-                padding-top: 20px;
-                font-size: 13px;
-                line-height: 18px;
-                color: #929090;
-                padding-top: 10px;
-                width: 100%;
-                background-color: white;
+//           if($way=='bankTransfer'){
+//             $html = '<tr>
+//             <td
+//               align="center"
+//               valign="top"
+//               style="
+//                 border-collapse: collapse;
+//                 border-spacing: 0;
+//                 color: #000000;
+//                 font-family: sans-serif;
+//                 text-align: left;
+//                 padding-left: 20px;
+//                 font-weight: bold;
+//                 padding-top: 20px;
+//                 font-size: 13px;
+//                 line-height: 18px;
+//                 color: #929090;
+//                 padding-top: 10px;
+//                 width: 100%;
+//                 background-color: white;
        
-              "
-            >
-               Send by:  <span style="color: #dc143c">'.$sender.'</span> 
-            </td>
-          </tr>
-       
-       
-          <tr>
-          <td
-            align="center"
-            valign="top"
-            style="
-              border-collapse: collapse;
-              border-spacing: 0;
-              color: #000000;
-              font-family: sans-serif;
-              text-align: left;
-              padding-left: 20px;
-              font-weight: bold;
-              padding-top: 20px;
-              font-size: 13px;
-              line-height: 18px;
-              color: #929090;
-              padding-top: 10px;
-              width: 100%;
-              background-color: white;
-       
-            "
-          >
-             Receive By:  <span style="color: #dc143c">'.$reciever.'</span> 
-          </td>
-        </tr>';
-          } else if($way=='Cheque'){
-            $html = '<tr>
-            <td
-              align="center"
-              valign="top"
-              style="
-                border-collapse: collapse;
-                border-spacing: 0;
-                color: #000000;
-                font-family: sans-serif;
-                text-align: left;
-                padding-left: 20px;
-                font-weight: bold;
-                padding-top: 20px;
-                font-size: 13px;
-                line-height: 18px;
-                color: #929090;
-                padding-top: 10px;
-                width: 100%;
-                background-color: white;
-       
-              "
-            >
-               Check Number:  <span style="color: #dc143c">'.$transactionId.'</span> 
-            </td>
-          </tr>
+//               "
+//             >
+//                Send by:  <span style="color: #dc143c">'.$sender.'</span> 
+//             </td>
+//           </tr>
        
        
-          <tr>
-          <td
-            align="center"
-            valign="top"
-            style="
-              border-collapse: collapse;
-              border-spacing: 0;
-              color: #000000;
-              font-family: sans-serif;
-              text-align: left;
-              padding-left: 20px;
-              font-weight: bold;
-              padding-top: 20px;
-              font-size: 13px;
-              line-height: 18px;
-              color: #929090;
-              padding-top: 10px;
-              width: 100%;
-              background-color: white;
+//           <tr>
+//           <td
+//             align="center"
+//             valign="top"
+//             style="
+//               border-collapse: collapse;
+//               border-spacing: 0;
+//               color: #000000;
+//               font-family: sans-serif;
+//               text-align: left;
+//               padding-left: 20px;
+//               font-weight: bold;
+//               padding-top: 20px;
+//               font-size: 13px;
+//               line-height: 18px;
+//               color: #929090;
+//               padding-top: 10px;
+//               width: 100%;
+//               background-color: white;
        
-            "
-          >
-             Bank Name:  <span style="color: #dc143c">'.$method.'</span> 
-          </td>
-        </tr>
+//             "
+//           >
+//              Receive By:  <span style="color: #dc143c">'.$reciever.'</span> 
+//           </td>
+//         </tr>';
+//           } else if($way=='Cheque'){
+//             $html = '<tr>
+//             <td
+//               align="center"
+//               valign="top"
+//               style="
+//                 border-collapse: collapse;
+//                 border-spacing: 0;
+//                 color: #000000;
+//                 font-family: sans-serif;
+//                 text-align: left;
+//                 padding-left: 20px;
+//                 font-weight: bold;
+//                 padding-top: 20px;
+//                 font-size: 13px;
+//                 line-height: 18px;
+//                 color: #929090;
+//                 padding-top: 10px;
+//                 width: 100%;
+//                 background-color: white;
+       
+//               "
+//             >
+//                Check Number:  <span style="color: #dc143c">'.$transactionId.'</span> 
+//             </td>
+//           </tr>
+       
+       
+//           <tr>
+//           <td
+//             align="center"
+//             valign="top"
+//             style="
+//               border-collapse: collapse;
+//               border-spacing: 0;
+//               color: #000000;
+//               font-family: sans-serif;
+//               text-align: left;
+//               padding-left: 20px;
+//               font-weight: bold;
+//               padding-top: 20px;
+//               font-size: 13px;
+//               line-height: 18px;
+//               color: #929090;
+//               padding-top: 10px;
+//               width: 100%;
+//               background-color: white;
+       
+//             "
+//           >
+//              Bank Name:  <span style="color: #dc143c">'.$method.'</span> 
+//           </td>
+//         </tr>
         
-        <tr>
-        <td
-          align="center"
-          valign="top"
-          style="
-            border-collapse: collapse;
-            border-spacing: 0;
-            color: #000000;
-            font-family: sans-serif;
-            text-align: left;
-            padding-left: 20px;
-            font-weight: bold;
-            padding-top: 20px;
-            font-size: 13px;
-            line-height: 18px;
-            color: #929090;
-            padding-top: 10px;
-            width: 100%;
-            background-color: white;
+//         <tr>
+//         <td
+//           align="center"
+//           valign="top"
+//           style="
+//             border-collapse: collapse;
+//             border-spacing: 0;
+//             color: #000000;
+//             font-family: sans-serif;
+//             text-align: left;
+//             padding-left: 20px;
+//             font-weight: bold;
+//             padding-top: 20px;
+//             font-size: 13px;
+//             line-height: 18px;
+//             color: #929090;
+//             padding-top: 10px;
+//             width: 100%;
+//             background-color: white;
        
-          "
-        >
-           Check Issue Date:  <span style="color: #dc143c">'.$ckDate.'</span> 
-        </td>
-       </tr>
-        ';
-          }
+//           "
+//         >
+//            Check Issue Date:  <span style="color: #dc143c">'.$ckDate.'</span> 
+//         </td>
+//        </tr>
+//         ';
+//           }
        
-          else if($way=='Cash'){
-            $html = '
-          <tr>
-          <td
-            align="center"
-            valign="top"
-            style="
-              border-collapse: collapse;
-              border-spacing: 0;
-              color: #000000;
-              font-family: sans-serif;
-              text-align: left;
-              padding-left: 20px;
-              font-weight: bold;
-              padding-top: 20px;
-              font-size: 13px;
-              line-height: 18px;
-              color: #929090;
-              padding-top: 10px;
-              width: 100%;
-              background-color: white;
+//           else if($way=='Cash'){
+//             $html = '
+//           <tr>
+//           <td
+//             align="center"
+//             valign="top"
+//             style="
+//               border-collapse: collapse;
+//               border-spacing: 0;
+//               color: #000000;
+//               font-family: sans-serif;
+//               text-align: left;
+//               padding-left: 20px;
+//               font-weight: bold;
+//               padding-top: 20px;
+//               font-size: 13px;
+//               line-height: 18px;
+//               color: #929090;
+//               padding-top: 10px;
+//               width: 100%;
+//               background-color: white;
        
-            "
-          >
-             Sender Name:  <span style="color: #dc143c">'.$sender.'</span> 
-          </td>
-        </tr>
+//             "
+//           >
+//              Sender Name:  <span style="color: #dc143c">'.$sender.'</span> 
+//           </td>
+//         </tr>
         
-        <tr>
-        <td
-          align="center"
-          valign="top"
-          style="
-            border-collapse: collapse;
-            border-spacing: 0;
-            color: #000000;
-            font-family: sans-serif;
-            text-align: left;
-            padding-left: 20px;
-            font-weight: bold;
-            padding-top: 20px;
-            font-size: 13px;
-            line-height: 18px;
-            color: #929090;
-            padding-top: 10px;
-            width: 100%;
-            background-color: white;
+//         <tr>
+//         <td
+//           align="center"
+//           valign="top"
+//           style="
+//             border-collapse: collapse;
+//             border-spacing: 0;
+//             color: #000000;
+//             font-family: sans-serif;
+//             text-align: left;
+//             padding-left: 20px;
+//             font-weight: bold;
+//             padding-top: 20px;
+//             font-size: 13px;
+//             line-height: 18px;
+//             color: #929090;
+//             padding-top: 10px;
+//             width: 100%;
+//             background-color: white;
        
-          "
-        >
-           Receiver Name:  <span style="color: #dc143c">'.$reciever.'</span> 
-        </td>
-       </tr>
-        ';}   else if($way=='mobileTransfer'){
-          $html = '
-        <tr>
-        <td
-          align="center"
-          valign="top"
-          style="
-            border-collapse: collapse;
-            border-spacing: 0;
-            color: #000000;
-            font-family: sans-serif;
-            text-align: left;
-            padding-left: 20px;
-            font-weight: bold;
-            padding-top: 20px;
-            font-size: 13px;
-            line-height: 18px;
-            color: #929090;
-            padding-top: 10px;
-            width: 100%;
-            background-color: white;
+//           "
+//         >
+//            Receiver Name:  <span style="color: #dc143c">'.$reciever.'</span> 
+//         </td>
+//        </tr>
+//         ';}   else if($way=='mobileTransfer'){
+//           $html = '
+//         <tr>
+//         <td
+//           align="center"
+//           valign="top"
+//           style="
+//             border-collapse: collapse;
+//             border-spacing: 0;
+//             color: #000000;
+//             font-family: sans-serif;
+//             text-align: left;
+//             padding-left: 20px;
+//             font-weight: bold;
+//             padding-top: 20px;
+//             font-size: 13px;
+//             line-height: 18px;
+//             color: #929090;
+//             padding-top: 10px;
+//             width: 100%;
+//             background-color: white;
        
-          "
-        >
-           Payment Method:  <span style="color: #dc143c">'.$method.'</span> 
-        </td>
-       </tr>
+//           "
+//         >
+//            Payment Method:  <span style="color: #dc143c">'.$method.'</span> 
+//         </td>
+//        </tr>
        
-       <tr>
-       <td
-        align="center"
-        valign="top"
-        style="
-          border-collapse: collapse;
-          border-spacing: 0; 
-          color: #000000;
-          font-family: sans-serif;
-          text-align: left;
-          padding-left: 20px;
-          font-weight: bold;
-          padding-top: 20px;
-          font-size: 13px;
-          line-height: 18px;
-          color: #929090;
-          padding-top: 10px;
-          width: 100%;
-          background-color: white;
+//        <tr>
+//        <td
+//         align="center"
+//         valign="top"
+//         style="
+//           border-collapse: collapse;
+//           border-spacing: 0; 
+//           color: #000000;
+//           font-family: sans-serif;
+//           text-align: left;
+//           padding-left: 20px;
+//           font-weight: bold;
+//           padding-top: 20px;
+//           font-size: 13px;
+//           line-height: 18px;
+//           color: #929090;
+//           padding-top: 10px;
+//           width: 100%;
+//           background-color: white;
        
-        "
-       >
-       Pay Using Account Number:  <span style="color: #dc143c">'.$sender.'</span> 
-       </td>
-       </tr>
-       ';}
+//         "
+//        >
+//        Pay Using Account Number:  <span style="color: #dc143c">'.$sender.'</span> 
+//        </td>
+//        </tr>
+//        ';}
 
 
- $agentMail ='
- <!DOCTYPE html>
- <html lang="en">
-   <head>
-     <meta charset="UTF-8" />
-     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-     <title>Deposit Request</title>
-   </head>
-   <body>
-     <div class="div" style="width: 650px; height: 100vh; margin: 0 auto">
-       <div style="width: 650px; height: 150px; background: #c5e0ff;
-       border-radius: 10px;">
-         <table
-           border="0"
-           cellpadding="0"
-           cellspacing="0"
-           align="center"
-           style="
-             border-collapse: collapse;
-             border-spacing: 0;
-             padding: 0;
-             width: 650px;
-             border-radius: 10px;
-           "
-         >
-           <tr>
-             <td
-               align="center"
-               valign="top"
-               style="
-                 border-collapse: collapse;
-                 border-spacing: 0;
-                 color: #000000;
-                 font-family: sans-serif;
-                 font-weight: bold;
-                 font-size: 20px;
-                 line-height: 38px;
-                 padding-top: 20px;
-                 padding-bottom: 10px;
-               "
-             >
-             <img src="https://flyway.api.flyfarint.com/asset/ownerlogo/Logo.png" width="100" height="80" />
-             </td>
-           </tr>
-         </table>
+//  $agentMail ='
+//  <!DOCTYPE html>
+//  <html lang="en">
+//    <head>
+//      <meta charset="UTF-8" />
+//      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+//      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+//      <title>Deposit Request</title>
+//    </head>
+//    <body>
+//      <div class="div" style="width: 650px; height: 100vh; margin: 0 auto">
+//        <div style="width: 650px; height: 150px; background: #c5e0ff;
+//        border-radius: 10px;">
+//          <table
+//            border="0"
+//            cellpadding="0"
+//            cellspacing="0"
+//            align="center"
+//            style="
+//              border-collapse: collapse;
+//              border-spacing: 0;
+//              padding: 0;
+//              width: 650px;
+//              border-radius: 10px;
+//            "
+//          >
+//            <tr>
+//              <td
+//                align="center"
+//                valign="top"
+//                style="
+//                  border-collapse: collapse;
+//                  border-spacing: 0;
+//                  color: #000000;
+//                  font-family: sans-serif;
+//                  font-weight: bold;
+//                  font-size: 20px;
+//                  line-height: 38px;
+//                  padding-top: 20px;
+//                  padding-bottom: 10px;
+//                "
+//              >
+//              <img src="https://flyway.api.flyfarint.com/asset/ownerlogo/Logo.png" width="100" height="80" />
+//              </td>
+//            </tr>
+//          </table>
  
-         <table
-           border="0"
-           cellpadding="0"
-           cellspacing="0"
-           align="center"
-           bgcolor="white"
-           style="
-             border-collapse: collapse;
-             border-spacing: 0;
-             padding: 0;
-             width: 550px;
-           "
-         >
-           <tr>
-             <td
-               align="center"
-               valign="top"
-               style="
-                 border-collapse: collapse;
-                 border-spacing: 0;
-                 color: #000000;
-                 font-family: sans-serif;
-                 text-align: left;
-                 padding-left: 20px;
-                 font-weight: bold;
-                 font-size: 19px;
-                 line-height: 38px;
-                 padding-top: 15px;
-                 background-color: white;
-               "
-             >
-               New Deposit Request
-             </td>
-           </tr>
-           <tr>
-             <td
-               align="center"
-               valign="top"
-               style="
-                 border-collapse: collapse;
-                 border-spacing: 0;
-                 font-family: sans-serif;
-                 text-align: left;
-                 padding-left: 20px;
-                 font-weight: bold;
-                 padding-top: 10px;
-                 font-size: 12px;
-                 line-height: 18px;
-                 color: #929090;
-                 padding-right: 20px;
-                 background-color: white;
-               "
-             >
-               Dear Flyway International, We Send you new deposit request amount
-               of '.$amount.' BDT.
-             </td>
-           </tr>
+//          <table
+//            border="0"
+//            cellpadding="0"
+//            cellspacing="0"
+//            align="center"
+//            bgcolor="white"
+//            style="
+//              border-collapse: collapse;
+//              border-spacing: 0;
+//              padding: 0;
+//              width: 550px;
+//            "
+//          >
+//            <tr>
+//              <td
+//                align="center"
+//                valign="top"
+//                style="
+//                  border-collapse: collapse;
+//                  border-spacing: 0;
+//                  color: #000000;
+//                  font-family: sans-serif;
+//                  text-align: left;
+//                  padding-left: 20px;
+//                  font-weight: bold;
+//                  font-size: 19px;
+//                  line-height: 38px;
+//                  padding-top: 15px;
+//                  background-color: white;
+//                "
+//              >
+//                New Deposit Request
+//              </td>
+//            </tr>
+//            <tr>
+//              <td
+//                align="center"
+//                valign="top"
+//                style="
+//                  border-collapse: collapse;
+//                  border-spacing: 0;
+//                  font-family: sans-serif;
+//                  text-align: left;
+//                  padding-left: 20px;
+//                  font-weight: bold;
+//                  padding-top: 10px;
+//                  font-size: 12px;
+//                  line-height: 18px;
+//                  color: #929090;
+//                  padding-right: 20px;
+//                  background-color: white;
+//                "
+//              >
+//                Dear Flyway International, We Send you new deposit request amount
+//                of '.$amount.' BDT.
+//              </td>
+//            </tr>
  
-           <tr>
-             <td
-               align="center"
-               valign="top"
-               style="
-                 border-collapse: collapse;
-                 border-spacing: 0;
-                 color: #000000;
-                 font-family: sans-serif;
-                 text-align: left;
-                 padding-left: 20px;
-                 font-weight: bold;
-                 padding-top: 20px;
-                 font-size: 13px;
-                 line-height: 18px;
-                 color: #929090;
-                 padding-top: 20px;
-                 width: 100%;
-               "
-             >
-               Deposit ID:
-               <a style="color: #2564b8" href="http://" target="_blank"
-                 >'.$DepositId.'</a
-               >
-             </td>
-           </tr>
+//            <tr>
+//              <td
+//                align="center"
+//                valign="top"
+//                style="
+//                  border-collapse: collapse;
+//                  border-spacing: 0;
+//                  color: #000000;
+//                  font-family: sans-serif;
+//                  text-align: left;
+//                  padding-left: 20px;
+//                  font-weight: bold;
+//                  padding-top: 20px;
+//                  font-size: 13px;
+//                  line-height: 18px;
+//                  color: #929090;
+//                  padding-top: 20px;
+//                  width: 100%;
+//                "
+//              >
+//                Deposit ID:
+//                <a style="color: #2564b8" href="http://" target="_blank"
+//                  >'.$DepositId.'</a
+//                >
+//              </td>
+//            </tr>
  
-           <tr>
-             <td
-               align="center"
-               valign="top"
-               style="
-                 border-collapse: collapse;
-                 border-spacing: 0;
-                 color: #000000;
-                 font-family: sans-serif;
-                 text-align: left;
-                 padding-left: 20px;
-                 font-weight: bold;
-                 padding-top: 20px;
-                 font-size: 12px;
-                 line-height: 18px;
-                 color: #929090;
-                 padding-top: 20px;
-                 width: 100%;
-                 background-color: white;
-               "
-             >
-               Sincerely,
-             </td>
-           </tr>
+//            <tr>
+//              <td
+//                align="center"
+//                valign="top"
+//                style="
+//                  border-collapse: collapse;
+//                  border-spacing: 0;
+//                  color: #000000;
+//                  font-family: sans-serif;
+//                  text-align: left;
+//                  padding-left: 20px;
+//                  font-weight: bold;
+//                  padding-top: 20px;
+//                  font-size: 12px;
+//                  line-height: 18px;
+//                  color: #929090;
+//                  padding-top: 20px;
+//                  width: 100%;
+//                  background-color: white;
+//                "
+//              >
+//                Sincerely,
+//              </td>
+//            </tr>
  
-           <tr>
-             <td
-               align="center"
-               valign="top"
-               style="
-                 border-collapse: collapse;
-                 border-spacing: 0;
-                 color: #000000;
-                 font-family: sans-serif;
-                 text-align: left;
-                 padding-left: 20px;
-                 font-weight: bold;
-                 font-size: 12px;
-                 line-height: 18px;
-                 color: #929090;
-                 width: 100%;
-                 background-color: white;
-                 padding-bottom: 20px;
-               "
-             >
-              '.$companyname.'
-             </td>
-           </tr>
-         </table>
-       </div>
-     </div>
-   </body>
- </html>
+//            <tr>
+//              <td
+//                align="center"
+//                valign="top"
+//                style="
+//                  border-collapse: collapse;
+//                  border-spacing: 0;
+//                  color: #000000;
+//                  font-family: sans-serif;
+//                  text-align: left;
+//                  padding-left: 20px;
+//                  font-weight: bold;
+//                  font-size: 12px;
+//                  line-height: 18px;
+//                  color: #929090;
+//                  width: 100%;
+//                  background-color: white;
+//                  padding-bottom: 20px;
+//                "
+//              >
+//               '.$companyname.'
+//              </td>
+//            </tr>
+//          </table>
+//        </div>
+//      </div>
+//    </body>
+//  </html>
  
-'; 
+// '; 
             
                           
-                $mail = new PHPMailer();
+//                 $mail = new PHPMailer();
 
-                try {
-                    $mail->isSMTP();                                    
-                    $mail->Host       = 'mail.flyfarint.net';                     
-                    $mail->SMTPAuth   = true;                                  
-                    $mail->Username   = 'deposit@flywaytravel.com.bd';                    
-                    $mail->Password   = '123Next2$';                        
-                    $mail->SMTPSecure = 'ssl'; 
-                    $mail->Port       = 465;
+//                 try {
+//                     $mail->isSMTP();                                    
+//                     $mail->Host       = 'mail.flyfarint.net';                     
+//                     $mail->SMTPAuth   = true;                                  
+//                     $mail->Username   = 'deposit@flywaytravel.com.bd';                    
+//                     $mail->Password   = '123Next2$';                        
+//                     $mail->SMTPSecure = 'ssl'; 
+//                     $mail->Port       = 465;
                                  
 
-                    //Recipients
-                    $mail->setFrom('deposit@flywaytravel.com.bd', "Flyway International");
-                    //$mail->addAddress("reservation@flywayint.com", "AgentId : $agentId");
-                    $mail->addAddress("afridi@flyfarint.com", "AgentId : $agentId");
-                    $mail->addCC('habib@flyfarint.com');
+//                     //Recipients
+//                     $mail->setFrom('deposit@flywaytravel.com.bd', "Flyway International");
+//                     //$mail->addAddress("reservation@flywayint.com", "AgentId : $agentId");
+//                     $mail->addAddress("afridi@flyfarint.com", "AgentId : $agentId");
+//                     $mail->addCC('habib@flyfarint.com');
 
                    
-                    $mail->isHTML(true);                                  
-                    $mail->Subject = "Deposit Request Confirmation - $companyname";
-                    $mail->Body    = $agentMail;
-                    $mail->addAttachment($attach);
+//                     $mail->isHTML(true);                                  
+//                     $mail->Subject = "Deposit Request Confirmation - $companyname";
+//                     $mail->Body    = $agentMail;
+//                     $mail->addAttachment($attach);
 
 
-                    if(!$mail->Send()) {
-                        echo "Mailer Error: " . $mail->ErrorInfo;
-                    }
+//                     if(!$mail->Send()) {
+//                         echo "Mailer Error: " . $mail->ErrorInfo;
+//                     }
                                                                          
-                }catch (Exception $e) {
-                    $response['status']="error";
-                    $response['message']="Mail Doesn't Send"; 
-                } 
+//                 }catch (Exception $e) {
+//                     $response['status']="error";
+//                     $response['message']="Mail Doesn't Send"; 
+//                 } 
                 
-         $OwnerMail ='
-         <!DOCTYPE html>
-         <html lang="en">
-           <head>
-             <meta charset="UTF-8" />
-             <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-             <title>Deposit Request</title>
-           </head>
-           <body>
-             <div class="div" style="width: 650px; height: 100vh; margin: 0 auto">
-               <div
-                 style="
-                   width: 650px;
-                   height: 150px;
-                   background: #c5e0ff;
-                   border-radius: 10px;
-                 "
-               >
-               <table
-               border="0"
-               cellpadding="0"
-               cellspacing="0"
-               align="center"
-               style="
-                 border-collapse: collapse;
-                 border-spacing: 0;
-                 padding: 0;
-                 width: 650px;
-                 border-radius: 10px;
-               "
-             >
-               <tr>
-                 <td
-                   align="center"
-                   valign="top"
-                   style="
-                     border-collapse: collapse;
-                     border-spacing: 0;
-                     color: #000000;
-                     font-family: sans-serif;
-                     font-weight: bold;
-                     font-size: 20px;
-                     line-height: 38px;
-                     padding-top: 20px;
-                     padding-bottom: 10px;
+//          $OwnerMail ='
+//          <!DOCTYPE html>
+//          <html lang="en">
+//            <head>
+//              <meta charset="UTF-8" />
+//              <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+//              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+//              <title>Deposit Request</title>
+//            </head>
+//            <body>
+//              <div class="div" style="width: 650px; height: 100vh; margin: 0 auto">
+//                <div
+//                  style="
+//                    width: 650px;
+//                    height: 150px;
+//                    background: #c5e0ff;
+//                    border-radius: 10px;
+//                  "
+//                >
+//                <table
+//                border="0"
+//                cellpadding="0"
+//                cellspacing="0"
+//                align="center"
+//                style="
+//                  border-collapse: collapse;
+//                  border-spacing: 0;
+//                  padding: 0;
+//                  width: 650px;
+//                  border-radius: 10px;
+//                "
+//              >
+//                <tr>
+//                  <td
+//                    align="center"
+//                    valign="top"
+//                    style="
+//                      border-collapse: collapse;
+//                      border-spacing: 0;
+//                      color: #000000;
+//                      font-family: sans-serif;
+//                      font-weight: bold;
+//                      font-size: 20px;
+//                      line-height: 38px;
+//                      padding-top: 20px;
+//                      padding-bottom: 10px;
          
-                   "
-                 >
-                 <img src="https://flyway.api.flyfarint.com/asset/ownerlogo/Logo.png" width="100" height="80" />
+//                    "
+//                  >
+//                  <img src="https://flyway.api.flyfarint.com/asset/ownerlogo/Logo.png" width="100" height="80" />
         
-                 </td>
-               </tr>
-             </table>
+//                  </td>
+//                </tr>
+//              </table>
          
-                 <table
-                   border="0"
-                   cellpadding="0"
-                   cellspacing="0"
-                   align="center"
-                   bgcolor="white"
-                   style="
-                     border-collapse: collapse;
-                     border-spacing: 0;
-                     padding: 0;
-                     width: 550px;
-                   "
-                 >
-                   <tr>
-                     <td
-                       align="center"
-                       valign="top"
-                       style="
-                         border-collapse: collapse;
-                         border-spacing: 0;
-                         color: #000000;
-                         font-family: sans-serif;
-                         text-align: left;
-                         padding-left: 20px;
-                         font-weight: bold;
-                         font-size: 19px;
-                         line-height: 38px;
-                         padding-top: 10px;
-                         background-color: white;
-                       "
-                     >
-                       Deposit Request Confirmation 
-                     </td>
-                   </tr>
-                   <tr>
-                     <td
-                       align="center"
-                       valign="top"
-                       style="
-                         border-collapse: collapse;
-                         border-spacing: 0;
-                         font-family: sans-serif;
-                         text-align: left;
-                         padding-left: 20px;
-                         font-weight: bold;
-                         padding-top: 15px;
-                         font-size: 12px;
-                         line-height: 18px;
-                         color: #929090;
-                         padding-right: 20px;
-                         background-color: white;
-                       "
-                     >
-                       Dear '.$companyname.', Your new deposit request amount of '.$amount.' BDT has been placed, please wait for while, for added your deposit amount into your wallet.
-                     </td>
-                   </tr>
+//                  <table
+//                    border="0"
+//                    cellpadding="0"
+//                    cellspacing="0"
+//                    align="center"
+//                    bgcolor="white"
+//                    style="
+//                      border-collapse: collapse;
+//                      border-spacing: 0;
+//                      padding: 0;
+//                      width: 550px;
+//                    "
+//                  >
+//                    <tr>
+//                      <td
+//                        align="center"
+//                        valign="top"
+//                        style="
+//                          border-collapse: collapse;
+//                          border-spacing: 0;
+//                          color: #000000;
+//                          font-family: sans-serif;
+//                          text-align: left;
+//                          padding-left: 20px;
+//                          font-weight: bold;
+//                          font-size: 19px;
+//                          line-height: 38px;
+//                          padding-top: 10px;
+//                          background-color: white;
+//                        "
+//                      >
+//                        Deposit Request Confirmation 
+//                      </td>
+//                    </tr>
+//                    <tr>
+//                      <td
+//                        align="center"
+//                        valign="top"
+//                        style="
+//                          border-collapse: collapse;
+//                          border-spacing: 0;
+//                          font-family: sans-serif;
+//                          text-align: left;
+//                          padding-left: 20px;
+//                          font-weight: bold;
+//                          padding-top: 15px;
+//                          font-size: 12px;
+//                          line-height: 18px;
+//                          color: #929090;
+//                          padding-right: 20px;
+//                          background-color: white;
+//                        "
+//                      >
+//                        Dear '.$companyname.', Your new deposit request amount of '.$amount.' BDT has been placed, please wait for while, for added your deposit amount into your wallet.
+//                      </td>
+//                    </tr>
          
-                   <tr>
-                     <td
-                       align="center"
-                       valign="top"
-                       style="
-                         border-collapse: collapse;
-                         border-spacing: 0;
-                         font-family: sans-serif;
-                         text-align: left;
-                         padding-left: 20px;
-                         font-weight: bold;
-                         padding-top: 5px;
-                         font-size: 12px;
-                         line-height: 18px;
-                         color: #2564B8;
-                         padding-right: 20px;
-                         background-color: white;
-                       "
-                     >
-                      Deposit ID: <span>'.$DepositId.'</span>
-                   </tr>
+//                    <tr>
+//                      <td
+//                        align="center"
+//                        valign="top"
+//                        style="
+//                          border-collapse: collapse;
+//                          border-spacing: 0;
+//                          font-family: sans-serif;
+//                          text-align: left;
+//                          padding-left: 20px;
+//                          font-weight: bold;
+//                          padding-top: 5px;
+//                          font-size: 12px;
+//                          line-height: 18px;
+//                          color: #2564B8;
+//                          padding-right: 20px;
+//                          background-color: white;
+//                        "
+//                      >
+//                       Deposit ID: <span>'.$DepositId.'</span>
+//                    </tr>
          
          
-                   <tr>
-                     <td
-                       align="center"
-                       valign="top"
-                       style="
-                         border-collapse: collapse;
-                         border-spacing: 0;
-                         color: #000000;
-                         font-family: sans-serif;
-                         text-align: left;
-                         padding-left: 20px;
-                         font-weight: bold;
-                         padding-top: 20px;
-                         font-size: 12px;
-                         line-height: 18px;
-                         color: #929090;
-                         padding-top: 20px;
-                         width: 100%;
-                         background-color: white;
-                       "
-                     >
-                       If you have any questions, just contact us we are always happy to
-                       help you out.
-                     </td>
-                   </tr>
+//                    <tr>
+//                      <td
+//                        align="center"
+//                        valign="top"
+//                        style="
+//                          border-collapse: collapse;
+//                          border-spacing: 0;
+//                          color: #000000;
+//                          font-family: sans-serif;
+//                          text-align: left;
+//                          padding-left: 20px;
+//                          font-weight: bold;
+//                          padding-top: 20px;
+//                          font-size: 12px;
+//                          line-height: 18px;
+//                          color: #929090;
+//                          padding-top: 20px;
+//                          width: 100%;
+//                          background-color: white;
+//                        "
+//                      >
+//                        If you have any questions, just contact us we are always happy to
+//                        help you out.
+//                      </td>
+//                    </tr>
          
-                   <tr>
-                   <td
-                     align="center"
-                     valign="top"
-                     style="
-                       border-collapse: collapse;
-                       border-spacing: 0;
-                       color: #000000;
-                       font-family: sans-serif;
-                       text-align: left;
-                       padding-left: 20px;
-                       font-weight: bold;
-                       padding-top: 20px;
-                       font-size: 13px;
-                       line-height: 18px;
-                       color: #929090;
-                       padding-top: 20px;
-                       width: 100%;
-                       background-color: white;
-                     "
-                   >
-                     Sincerely,
-                   </td>
-                 </tr>
+//                    <tr>
+//                    <td
+//                      align="center"
+//                      valign="top"
+//                      style="
+//                        border-collapse: collapse;
+//                        border-spacing: 0;
+//                        color: #000000;
+//                        font-family: sans-serif;
+//                        text-align: left;
+//                        padding-left: 20px;
+//                        font-weight: bold;
+//                        padding-top: 20px;
+//                        font-size: 13px;
+//                        line-height: 18px;
+//                        color: #929090;
+//                        padding-top: 20px;
+//                        width: 100%;
+//                        background-color: white;
+//                      "
+//                    >
+//                      Sincerely,
+//                    </td>
+//                  </tr>
        
-                 <tr>
-                   <td
-                     align="center"
-                     valign="top"
-                     style="
-                       border-collapse: collapse;
-                       border-spacing: 0;
-                       color: #000000;
-                       font-family: sans-serif;
-                       text-align: left;
-                       padding-left: 20px;
-                       font-weight: bold;
-                       font-size: 13px;
-                       line-height: 18px;
-                       color: #929090;
-                       width: 100%;
-                       background-color: white;
-                       padding-bottom: 20px;
-                     "
-                   >
-                    Flyway International
-                   </td>
-                 </tr>
+//                  <tr>
+//                    <td
+//                      align="center"
+//                      valign="top"
+//                      style="
+//                        border-collapse: collapse;
+//                        border-spacing: 0;
+//                        color: #000000;
+//                        font-family: sans-serif;
+//                        text-align: left;
+//                        padding-left: 20px;
+//                        font-weight: bold;
+//                        font-size: 13px;
+//                        line-height: 18px;
+//                        color: #929090;
+//                        width: 100%;
+//                        background-color: white;
+//                        padding-bottom: 20px;
+//                      "
+//                    >
+//                     Flyway International
+//                    </td>
+//                  </tr>
        
-                 <tr>
-                   <td
-                     align="center"
-                     valign="top"
-                     style="
-                       border-collapse: collapse;
-                       border-spacing: 0;
-                       color: #ffffff;
-                       font-family: sans-serif;
-                       text-align: center;
-                       font-weight: 600;
-                       font-size: 14px;
-                       color: #ffffff;
-                       padding-top: 15px;
-                       background-color: #2564B8;
-                     "
-                   >
-                     Need more help?
-                   </td>
-                 </tr>
+//                  <tr>
+//                    <td
+//                      align="center"
+//                      valign="top"
+//                      style="
+//                        border-collapse: collapse;
+//                        border-spacing: 0;
+//                        color: #ffffff;
+//                        font-family: sans-serif;
+//                        text-align: center;
+//                        font-weight: 600;
+//                        font-size: 14px;
+//                        color: #ffffff;
+//                        padding-top: 15px;
+//                        background-color: #2564B8;
+//                      "
+//                    >
+//                      Need more help?
+//                    </td>
+//                  </tr>
        
-                 <tr>
-                   <td
-                     align="center"
-                     valign="top"
-                     style="
-                       border-collapse: collapse;
-                       border-spacing: 0;
-                       color: #ffffff;
-                       font-family: sans-serif;
-                       text-align: center;
-                       font-size: 12px;
-                       color: #ffffff;
-                       padding-top: 8px;
-                       padding-bottom: 20px;
-                       padding-left: 30px;
-                       padding-right: 30px;
-                       background-color: #2564B8;
-                     "
-                   >
-                     Mail us at
-                     <a
-                       style="color: white; font-size: 13px; text-decoration: none"
-                       href="http://"
-                       target="_blank"
-                       >reservation@flywayint.com
-                     </a>
-                     agency or Call us at 01400001101-04
-                   </td>
-                 </tr>
+//                  <tr>
+//                    <td
+//                      align="center"
+//                      valign="top"
+//                      style="
+//                        border-collapse: collapse;
+//                        border-spacing: 0;
+//                        color: #ffffff;
+//                        font-family: sans-serif;
+//                        text-align: center;
+//                        font-size: 12px;
+//                        color: #ffffff;
+//                        padding-top: 8px;
+//                        padding-bottom: 20px;
+//                        padding-left: 30px;
+//                        padding-right: 30px;
+//                        background-color: #2564B8;
+//                      "
+//                    >
+//                      Mail us at
+//                      <a
+//                        style="color: white; font-size: 13px; text-decoration: none"
+//                        href="http://"
+//                        target="_blank"
+//                        >reservation@flywayint.com
+//                      </a>
+//                      agency or Call us at 01400001101-04
+//                    </td>
+//                  </tr>
        
-                 <tr>
-                 <td
-                   valign="top"
-                   align="left"
-                   style="
-                     border-collapse: collapse;
-                     border-spacing: 0;
-                     color: #000000;
-                     font-family: sans-serif;
-                     text-align: left;
-                     font-weight: bold;
-                     font-size: 12px;
-                     line-height: 18px;
-                     color: #929090;
-                   "
-                 >
-                   <p>
-                     <a
-                       style="
-                         font-weight: bold;
-                         font-size: 12px;
-                         line-height: 15px;
-                         color: #222222;
-                       "
-                       href="https://flywaytravel.com.bd/terms"
-                       >Tearms & Conditions</a
-                     >
-                     <a
-                       style="
-                         font-weight: bold;
-                         font-size: 12px;
-                         line-height: 15px;
-                         color: #222222;
-                         padding-left: 10px;
-                       "
-                       href="https://flywaytravel.com.bd/privacy"
-                       >Privacy Policy</a
-                     >
-                   </p>
-                 </td>
-               </tr>
-                 <tr>
-                 <td
-                   align="center"
-                   valign="top"
-                   style="
-                     border-collapse: collapse;
-                     border-spacing: 0;
-                     font-family: sans-serif;
-                     text-align: center;
-                     padding-left: 20px;
-                     font-weight: bold;
-                     font-size: 12px;
-                     line-height: 18px;
-                     color: #929090;
-                     padding-right: 20px;
-                   "
-                 >
-                   <a href="https://m.facebook.com/flywayt"
-                     ><img
-                       src="https://cdn.flyfarint.com/fb.png"
-                       width="25px"
-                       style="margin: 10px"
-                   /></a>
-                   <a href="https://www.linkedin.com/company/flyway.travel"
-                     ><img
-                       src="https://cdn.flyfarint.com/lin.png"
-                       width="25px"
-                       style="margin: 10px"
-                   /></a>
-                   <a href="https://wa.me/+8801400001101"
-                     ><img
-                       src="https://cdn.flyfarint.com/wapp.png "
-                       width="25px"
-                       style="margin: 10px"
-                   /></a>
-                 </td>
-               </tr>
+//                  <tr>
+//                  <td
+//                    valign="top"
+//                    align="left"
+//                    style="
+//                      border-collapse: collapse;
+//                      border-spacing: 0;
+//                      color: #000000;
+//                      font-family: sans-serif;
+//                      text-align: left;
+//                      font-weight: bold;
+//                      font-size: 12px;
+//                      line-height: 18px;
+//                      color: #929090;
+//                    "
+//                  >
+//                    <p>
+//                      <a
+//                        style="
+//                          font-weight: bold;
+//                          font-size: 12px;
+//                          line-height: 15px;
+//                          color: #222222;
+//                        "
+//                        href="https://flywaytravel.com.bd/terms"
+//                        >Tearms & Conditions</a
+//                      >
+//                      <a
+//                        style="
+//                          font-weight: bold;
+//                          font-size: 12px;
+//                          line-height: 15px;
+//                          color: #222222;
+//                          padding-left: 10px;
+//                        "
+//                        href="https://flywaytravel.com.bd/privacy"
+//                        >Privacy Policy</a
+//                      >
+//                    </p>
+//                  </td>
+//                </tr>
+//                  <tr>
+//                  <td
+//                    align="center"
+//                    valign="top"
+//                    style="
+//                      border-collapse: collapse;
+//                      border-spacing: 0;
+//                      font-family: sans-serif;
+//                      text-align: center;
+//                      padding-left: 20px;
+//                      font-weight: bold;
+//                      font-size: 12px;
+//                      line-height: 18px;
+//                      color: #929090;
+//                      padding-right: 20px;
+//                    "
+//                  >
+//                    <a href="https://m.facebook.com/flywayt"
+//                      ><img
+//                        src="https://cdn.flyfarint.com/fb.png"
+//                        width="25px"
+//                        style="margin: 10px"
+//                    /></a>
+//                    <a href="https://www.linkedin.com/company/flyway.travel"
+//                      ><img
+//                        src="https://cdn.flyfarint.com/lin.png"
+//                        width="25px"
+//                        style="margin: 10px"
+//                    /></a>
+//                    <a href="https://wa.me/+8801400001101"
+//                      ><img
+//                        src="https://cdn.flyfarint.com/wapp.png "
+//                        width="25px"
+//                        style="margin: 10px"
+//                    /></a>
+//                  </td>
+//                </tr>
        
-                 <tr>
-                   <td
-                     align="center"
-                     valign="top"
-                     style="
-                       border-collapse: collapse;
-                       border-spacing: 0;
-                       color: #929090;
-                       font-family: sans-serif;
-                       text-align: center;
-                       font-weight: 500;
-                       font-size: 12px;
-                       padding-top: 5px;
-                       padding-bottom: 5px;
-                       padding-left: 10px;
-                       padding-right: 10px;
-                     "
-                   >
-                     Ka 11/2A, Bashundhora R/A Road, Jagannathpur, Dhaka 1229
-                   </td>
-                 </tr>
-               </table>
-             </div>
-           </div>
-         </body>
-       </html>
+//                  <tr>
+//                    <td
+//                      align="center"
+//                      valign="top"
+//                      style="
+//                        border-collapse: collapse;
+//                        border-spacing: 0;
+//                        color: #929090;
+//                        font-family: sans-serif;
+//                        text-align: center;
+//                        font-weight: 500;
+//                        font-size: 12px;
+//                        padding-top: 5px;
+//                        padding-bottom: 5px;
+//                        padding-left: 10px;
+//                        padding-right: 10px;
+//                      "
+//                    >
+//                      Ka 11/2A, Bashundhora R/A Road, Jagannathpur, Dhaka 1229
+//                    </td>
+//                  </tr>
+//                </table>
+//              </div>
+//            </div>
+//          </body>
+//        </html>
          
 
-        ';
+//         ';
       
                           
-                $mail1 = new PHPMailer();
+//                 $mail1 = new PHPMailer();
 
-                try {
-                    $mail1->isSMTP();                                    
-                    $mail1->Host       = 'b2b.flyfarint.com';                     
-                    $mail1->SMTPAuth   = true;                                  
-                    $mail1->Username   = 'deposit@b2b.flyfarint.com';                    
-                    $mail1->Password   = '123Next2$';                            
-                    $mail1->SMTPSecure = 'ssl';            
-                    $mail1->Port       = 465;                                    
+//                 try {
+//                     $mail1->isSMTP();                                    
+//                     $mail1->Host       = 'b2b.flyfarint.com';                     
+//                     $mail1->SMTPAuth   = true;                                  
+//                     $mail1->Username   = 'deposit@b2b.flyfarint.com';                    
+//                     $mail1->Password   = '123Next2$';                            
+//                     $mail1->SMTPSecure = 'ssl';            
+//                     $mail1->Port       = 465;                                    
 
-                    //Recipients
-                    $mail1->setFrom('deposit@flyfarint.com', 'Flyway International');
-                    $mail1->addAddress("$agentEmail", "$agentId");
-                    $mail1->addCC("afridi@flyfarint.com");
-                    $mail1->addCC("habib@flyfarint.com");
+//                     //Recipients
+//                     $mail1->setFrom('deposit@flyfarint.com', 'Flyway International');
+//                     $mail1->addAddress("$agentEmail", "$agentId");
+//                     $mail1->addCC("afridi@flyfarint.com");
+//                     $mail1->addCC("habib@flyfarint.com");
 
 
                     
-                    $mail1->isHTML(true);                                  
-                    $mail1->Subject = "New Deposit Request by - $companyname";
-                    $mail1->Body    = $OwnerMail;
-                    $mail1->addAttachment($attach);
+//                     $mail1->isHTML(true);                                  
+//                     $mail1->Subject = "New Deposit Request by - $companyname";
+//                     $mail1->Body    = $OwnerMail;
+//                     $mail1->addAttachment($attach);
 
 
-                    if(!$mail1->Send()) {
-                        $response['status']="success";
-                        $response['DepositId']="$DepositId";
-                        $response['message']="Deposit Request Successfully";
-                        $response['error']="Mail Doesn't Send";
-                    } else {
-                            $response['status']="success";
-                            $response['DepositId']="$DepositId";
-                            $response['message']="Deposit Request Successfully";
-                    }
+//                     if(!$mail1->Send()) {
+//                         $response['status']="success";
+//                         $response['DepositId']="$DepositId";
+//                         $response['message']="Deposit Request Successfully";
+//                         $response['error']="Mail Doesn't Send";
+//                     } else {
+//                             $response['status']="success";
+//                             $response['DepositId']="$DepositId";
+//                             $response['message']="Deposit Request Successfully";
+//                     }
                                                                          
-                }catch (Exception $e1) {
-                    $response['status']="error";
-                    $response['message']="Mail Doesn't Send"; 
-                } 
+//                 }catch (Exception $e1) {
+//                     $response['status']="error";
+//                     $response['message']="Mail Doesn't Send"; 
+//                 } 
 
-                           
+                $response['status']="success";
+                        $response['DepositId']="$DepositId";
+                        $response['message']="Deposit Request Successfully";           
          
             }
        

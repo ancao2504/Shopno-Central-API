@@ -46,7 +46,7 @@ if (array_key_exists('all', $_GET)) {
   echo json_encode($return_arr);
 }
 
-if (array_key_exists('all', $_GET) && array_key_exists("page", $_GET)) {
+else if (array_key_exists('all', $_GET) && array_key_exists("page", $_GET)) {
 
   $page = $_GET['page'];
   $result_per_page = 20;
@@ -136,7 +136,7 @@ if (array_key_exists('all', $_GET) && array_key_exists("page", $_GET)) {
 
   echo json_encode($return_arr);
 }
-if(array_key_exists("agentId", $_GET) && array_key_exists("pages", $_GET) && array_key_exists("type", $_GET)){
+else if(array_key_exists("agentId", $_GET) && array_key_exists("pages", $_GET) && array_key_exists("type", $_GET)){
 
   $type = $_GET['type'];
   $page = $_GET['pages'];

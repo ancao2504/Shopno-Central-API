@@ -26,12 +26,10 @@ if(!empty($controlrow)){
 $Airportsql =  "SELECT name, cityName,countryCode FROM airports WHERE";
 
 
-if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
+if(array_key_exists('tripType',$_GET)){
   $Way = $_GET['tripType'];
-	$agentId = $_GET['agentId'];
   
-	if($Way == "oneway"){
-	
+	if($Way == "oneway"){	
 		if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) && array_key_exists("departuredate",$_GET)){
 			$From = $_GET['journeyfrom'];
 			$To = $_GET['journeyto'];
@@ -127,7 +125,7 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 				"Version": "4",
 				"POS": {
 					"Source": [{
-							"PseudoCityCode": "FD3K",
+							"PseudoCityCode": "14KK",
 							"RequestorID": {
 								"Type": "1",
 								"ID": "1",
@@ -185,40 +183,42 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 
 	try{
 
-		$client_id= base64_encode("V1:396724:FD3K:AA");
-		$client_secret = base64_encode("FlWy967"); //prod
-		
-		$token = base64_encode($client_id.":".$client_secret);
-		
-		$curl = curl_init();
-		
-		curl_setopt_array($curl, array(
-		  CURLOPT_URL => 'https://api.platform.sabre.com/v2/auth/token',
-		  CURLOPT_RETURNTRANSFER => true,
-		  CURLOPT_ENCODING => '',
-		  CURLOPT_MAXREDIRS => 10,
-		  CURLOPT_TIMEOUT => 0,
-		  CURLOPT_FOLLOWLOCATION => true,
-		  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		  CURLOPT_CUSTOMREQUEST => 'POST',
-		  CURLOPT_POSTFIELDS =>'grant_type=client_credentials',
-		  CURLOPT_HTTPHEADER => array(
-			'Content-Type: application/x-www-form-urlencoded',
-			"Authorization: Basic $token"
-		  ),
-		));
-		$Tokenres = curl_exec($curl);
-		curl_close($curl);
-		$resToken = json_decode($Tokenres, true);
-		$access_token = $resToken['access_token'];
+	$client_id= base64_encode("V1:593072:14KK:AA");
+	//$client_secret = base64_encode("280ff537"); //cert
+	$client_secret = base64_encode("f270395"); //prod
 
-		//echo $access_token;
+	$token = base64_encode($client_id.":".$client_secret);
+	
+	$data='grant_type=client_credentials';
 
-	}catch (Exception $e){ 
+		$headers = array(
+			'Authorization: Basic '.$token,
+			'Accept: /',
+			'Content-Type: application/x-www-form-urlencoded'
+		);
+
+		$ch = curl_init();
+		//curl_setopt($ch,CURLOPT_URL,"https://api-crt.cert.havail.sabre.com/v2/auth/token");
+		curl_setopt($ch,CURLOPT_URL,"https://api.platform.sabre.com/v2/auth/token");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($ch,CURLOPT_POST,1);
+		curl_setopt($ch,CURLOPT_POSTFIELDS,$data);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$res = curl_exec($ch);
+		curl_close($ch);
+		$resf = json_decode($res,1);
+		$access_token = $resf['access_token'];
+
+		//print_r($resf);
+
+	}catch (Exception $e){
 		
 	}
 
+
 	$curl = curl_init();
+
 
 	if(isset($access_token)){
 
@@ -233,18 +233,20 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 	CURLOPT_CUSTOMREQUEST => 'POST',
 	CURLOPT_POSTFIELDS => $jsonreq,
-	CURLOPT_HTTPHEADER => array(
+			CURLOPT_HTTPHEADER => array(
 				'Content-Type: application/json',
 				'Conversation-ID: 2021.01.DevStudio',
-				"Authorization: Bearer $access_token",
+				'Authorization: Bearer '.$access_token,
 	),
 	));
 
 	$response = curl_exec($curl);
+
 	//echo $response;
 
 	curl_close($curl);
 	$result = json_decode($response, true);
+
 	if(isset($result['groupedItineraryResponse']['itineraryGroups'])){				
 			$SabreItenary = $result['groupedItineraryResponse']['itineraryGroups'];
 			//print_r($result);
@@ -281,7 +283,8 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 
 
 	if(isset($flightListSabre)){
-					$i = 0;
+		$i = 0;
+		$s=0;
 		foreach($flightListSabre as $var){
 
 				$i++;
@@ -319,16 +322,487 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 				$Seat = $fareComponents[0]['segments'][0]['segment']['seatsAvailable'];
 				
 											
-				//$lessFare = floor((($baseFareAmount * 0.93) + $totalTaxAmount) + ($totalFare* 0.003));
+				//$lessFare = floor((($baseFareAmount * $commission) + $totalTaxAmount) + ($totalFare* 0.003));
 				//$Commission = $totalFare - $Exact;
+				$commission= 0;
+				if ($vCarCode == "BS"){
+				$commission = 0.885;
+				}else{
+				$commission= 0.92;
+				}
 				
 				$PriceInfo = $var['pricingInformation'][0]['fare']['passengerInfoList'];
 
-				$baseFareAmount =  $var['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'];
+				if($fareRate == 7){	
+					if($From != "DAC" && $vCarCode =="SV"){
+						$baseFareAmount =  ceil(($var['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+						$totalTaxAmount = ceil(($var['pricingInformation'][0]['fare']['totalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);							
+						$totalFare = ceil(($var['pricingInformation'][0]['fare']['totalFare']['totalPrice'] / $gdsPrice) * $farePrice);
+						$AgentPrice = floor((($baseFareAmount * $commission) + $totalTaxAmount) + ($totalFare* 0.003));
+						$Commission = $totalFare - $AgentPrice;
+
+						//Price Break Down
+						if($adult > 0 && $child > 0 &&  $infants > 0){
+						
+							
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+
+							$childBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$childTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+
+							$infantBasePrice = ceil(($PriceInfo[2]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$infantTaxAmount = ceil(($PriceInfo[2]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>
+												array("BaseFare"=> "$childBasePrice",
+												"Tax"=> "$childTaxAmount",
+												"PaxCount"=> $child,
+												"PaxType"=> "CNN",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0"),
+												"2" =>
+												array("BaseFare"=> "$infantBasePrice",
+												"Tax"=> "$infantTaxAmount",
+												"PaxCount"=> $infants,
+												"PaxType"=> "INF",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                         
+
+										);
+
+
+
+						}else if($adult > 0 && $child > 0){
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount']/ $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+
+							$childBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$childTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount']  / $gdsPrice) * $farePrice);
+
+						}else if($adult > 0 && $infants > 0){
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+							$infantBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$infantTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+							
+						}else if($adult> 0){
+														
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount']/ $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")												                                     
+
+										);
+						}
+						
+						
+						
+					}else if($From != "DAC" && $vCarCode =="SQ"){
+
+						$baseFareAmount =  $var['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'];
 						$totalTaxAmount = $var['pricingInformation'][0]['fare']['totalFare']['totalTaxAmount'];							
 						$totalFare = $var['pricingInformation'][0]['fare']['totalFare']['totalPrice'] ;
 						
-						$AgentPrice = floor((($baseFareAmount * 0.93) + $totalTaxAmount) + ($totalFare* 0.003));
+						$AgentPrice = $totalFare;
+						$Commission = 0;
+
+						
+						if($adult > 0 && $child > 0 &&  $infants > 0){									
+							
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+
+							$childBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$childTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+							$infantBasePrice = ceil(($PriceInfo[2]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$infantTaxAmount = ceil(($PriceInfo[2]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>
+												array("BaseFare"=> "$childBasePrice",
+												"Tax"=> "$childTaxAmount",
+												"PaxCount"=> $child,
+												"PaxType"=> "CNN",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0"),
+												"2" =>
+												array("BaseFare"=> "$infantBasePrice",
+												"Tax"=> "$infantTaxAmount",
+												"PaxCount"=> $infants,
+												"PaxType"=> "INF",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                         
+
+										);
+
+
+
+						}else if($adult > 0 && $child > 0){
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+							$childBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$childTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>
+												array("BaseFare"=> "$childBasePrice",
+												"Tax"=> "$childTaxAmount",
+												"PaxCount"=> $child,
+												"PaxType"=> "CNN",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                      
+
+										);
+
+						}else if($adult > 0 && $infants > 0){
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+							$infantBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$infantTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount']  / $gdsPrice) * $farePrice);
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>															
+												array("BaseFare"=> "$infantBasePrice",
+												"Tax"=> "$infantTaxAmount",
+												"PaxCount"=> $infants,
+												"PaxType"=> "INF",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                         
+
+										);
+
+						}else if($adult> 0){
+														
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount']/ $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")												                                     
+
+										);
+						}
+																								
+					}else if($From != "DAC" && $vCarCode =="EY"){
+
+						$baseFareAmount =  $var['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'];
+						$totalTaxAmount = $var['pricingInformation'][0]['fare']['totalFare']['totalTaxAmount'];							
+						$totalFare = $var['pricingInformation'][0]['fare']['totalFare']['totalPrice'] ;
+						
+						$AgentPrice = $totalFare;
+						$Commission = 0;
+
+						
+						if($adult > 0 && $child > 0 &&  $infants > 0){									
+							
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+
+							$childBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$childTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+							$infantBasePrice = ceil(($PriceInfo[2]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$infantTaxAmount = ceil(($PriceInfo[2]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>
+												array("BaseFare"=> "$childBasePrice",
+												"Tax"=> "$childTaxAmount",
+												"PaxCount"=> $child,
+												"PaxType"=> "CNN",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0"),
+												"2" =>
+												array("BaseFare"=> "$infantBasePrice",
+												"Tax"=> "$infantTaxAmount",
+												"PaxCount"=> $infants,
+												"PaxType"=> "INF",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                         
+
+										);
+
+
+
+						}else if($adult > 0 && $child > 0){
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+							$childBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$childTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>
+												array("BaseFare"=> "$childBasePrice",
+												"Tax"=> "$childTaxAmount",
+												"PaxCount"=> $child,
+												"PaxType"=> "CNN",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                      
+
+										);
+
+						}else if($adult > 0 && $infants > 0){
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+							$infantBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+							$infantTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount']  / $gdsPrice) * $farePrice);
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>															
+												array("BaseFare"=> "$infantBasePrice",
+												"Tax"=> "$infantTaxAmount",
+												"PaxCount"=> $infants,
+												"PaxType"=> "INF",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                         
+
+										);
+
+						}else if($adult> 0){
+														
+							$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount']/ $gdsPrice) * $farePrice);
+							$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+							
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")												                                     
+
+										);
+						}
+																								
+					}else if($vCarCode == "WY" && $From != "DAC"){
+					$baseFareAmount =  $var['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'];
+					$totalTaxAmount = $var['pricingInformation'][0]['fare']['totalFare']['totalTaxAmount'];							
+					$totalFare = $var['pricingInformation'][0]['fare']['totalFare']['totalPrice'] + $addMarkup;
+					
+					$AgentPrice = $totalFare;
+					$Commission = $totalFare - $AgentPrice;
+
+							if($adult > 0 && $child > 0 &&  $infants > 0){
+								
+								$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+								$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+								
+
+								$childBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+								$childTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+								
+								$infantBasePrice = $PriceInfo[2]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+								$infantTaxAmount = $PriceInfo[2]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+
+
+								$PriceBreakDown = array("0" =>
+													array("BaseFare"=> "$adultBasePrice",
+													"Tax"=> "$adultTaxAmount",
+													"PaxCount"=> $adult,
+													"PaxType"=> "ADT",
+													"Discount"=> "0",
+													"OtherCharges"=> "0",
+													"ServiceFee"=> "0")
+													,
+													"1" =>
+													array("BaseFare"=> "$childBasePrice",
+													"Tax"=> "$childTaxAmount",
+													"PaxCount"=> $child,
+													"PaxType"=> "CNN",
+													"Discount"=> "0",
+													"OtherCharges"=> "0",
+													"ServiceFee"=> "0"),
+													"2" =>
+													array("BaseFare"=> "$infantBasePrice",
+													"Tax"=> "$infantTaxAmount",
+													"PaxCount"=> $infants,
+													"PaxType"=> "INF",
+													"Discount"=> "0",
+													"OtherCharges"=> "0",
+													"ServiceFee"=> "0")                                         
+
+											);
+
+
+
+							}else if($adult > 0 && $child > 0){
+								$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+								$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+								
+
+								$childBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+								$childTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+								
+
+								$PriceBreakDown = array("0" =>
+													array("BaseFare"=> "$adultBasePrice",
+													"Tax"=> "$adultTaxAmount",
+													"PaxCount"=> $adult,
+													"PaxType"=> "ADT",
+													"Discount"=> "0",
+													"OtherCharges"=> "0",
+													"ServiceFee"=> "0")
+													,
+													"1" =>
+													array("BaseFare"=> "$childBasePrice",
+													"Tax"=> "$childTaxAmount",
+													"PaxCount"=> $child,
+													"PaxType"=> "CNN",
+													"Discount"=> "0",
+													"OtherCharges"=> "0",
+													"ServiceFee"=> "0")                                        
+
+											);
+
+
+							}else if($adult > 0 && $infants > 0){
+								$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+								$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+								
+								
+								$infantBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+								$infantTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+
+								$PriceBreakDown = array("0" =>
+													array("BaseFare"=> "$adultBasePrice",
+													"Tax"=> "$adultTaxAmount",
+													"PaxCount"=> $adult,
+													"PaxType"=> "ADT",
+													"Discount"=> "0",
+													"OtherCharges"=> "0",
+													"ServiceFee"=> "0")
+													,
+													"1" =>
+													
+													array("BaseFare"=> "$infantBasePrice",
+													"Tax"=> "$infantTaxAmount",
+													"PaxCount"=> $infants,
+													"PaxType"=> "INF",
+													"Discount"=> "0",
+													"OtherCharges"=> "0",
+													"ServiceFee"=> "0")                                         
+
+											);
+
+								
+							}else if($adult> 0){
+															
+								$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+								$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+								
+								$PriceBreakDown = array("0" =>
+													array("BaseFare"=> "$adultBasePrice",
+													"Tax"=> "$adultTaxAmount",
+													"PaxCount"=> $adult,
+													"PaxType"=> "ADT",
+													"Discount"=> "0",
+													"OtherCharges"=> "0",
+													"ServiceFee"=> "0")												                                     
+
+											);
+					}
+					}else{
+						$baseFareAmount =  $var['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'];
+						$totalTaxAmount = $var['pricingInformation'][0]['fare']['totalFare']['totalTaxAmount'];							
+						$totalFare = $var['pricingInformation'][0]['fare']['totalFare']['totalPrice'] ;
+						
+						$AgentPrice = floor((($baseFareAmount * $commission) + $totalTaxAmount) + ($totalFare* 0.003));
 						$Commission = $totalFare - $AgentPrice;
 
 						if($adult > 0 && $child > 0 &&  $infants > 0){
@@ -450,6 +924,273 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 
 										);
 						}
+					}																							
+				}else if($fareRate == 3){
+					if($vCarCode == "FZ" || $vCarCode == "EY"){
+						$addMarkup = 2000;
+					}else{
+						$addMarkup = 0;
+					}
+
+					
+					
+						$baseFareAmount =  $var['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'];
+						$totalTaxAmount = $var['pricingInformation'][0]['fare']['totalFare']['totalTaxAmount'];							
+						$totalFare = $var['pricingInformation'][0]['fare']['totalFare']['totalPrice'] + $addMarkup;
+						
+						$AgentPrice = $totalFare;
+						$Commission = $totalFare - $AgentPrice;
+
+						if($adult > 0 && $child > 0 &&  $infants > 0){
+							
+							$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+							$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+							
+
+							$childBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+							$childTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+							
+							$infantBasePrice = $PriceInfo[2]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+							$infantTaxAmount = $PriceInfo[2]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+
+
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>
+												array("BaseFare"=> "$childBasePrice",
+												"Tax"=> "$childTaxAmount",
+												"PaxCount"=> $child,
+												"PaxType"=> "CNN",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0"),
+												"2" =>
+												array("BaseFare"=> "$infantBasePrice",
+												"Tax"=> "$infantTaxAmount",
+												"PaxCount"=> $infants,
+												"PaxType"=> "INF",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                         
+
+										);
+
+
+
+						}else if($adult > 0 && $child > 0){
+							$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+							$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+							
+
+							$childBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+							$childTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+							
+
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>
+												array("BaseFare"=> "$childBasePrice",
+												"Tax"=> "$childTaxAmount",
+												"PaxCount"=> $child,
+												"PaxType"=> "CNN",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                        
+
+										);
+
+
+						}else if($adult > 0 && $infants > 0){
+							$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+							$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+							
+							
+							$infantBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+							$infantTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")
+												,
+												"1" =>
+												
+												array("BaseFare"=> "$infantBasePrice",
+												"Tax"=> "$infantTaxAmount",
+												"PaxCount"=> $infants,
+												"PaxType"=> "INF",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")                                         
+
+										);
+
+							
+						}else if($adult> 0){
+														
+							$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+							$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+							
+							$PriceBreakDown = array("0" =>
+												array("BaseFare"=> "$adultBasePrice",
+												"Tax"=> "$adultTaxAmount",
+												"PaxCount"=> $adult,
+												"PaxType"=> "ADT",
+												"Discount"=> "0",
+												"OtherCharges"=> "0",
+												"ServiceFee"=> "0")												                                     
+
+										);
+						}
+					
+				}else{
+				
+					
+					$baseFareAmount =  ceil(($var['pricingInformation'][0]['fare']['totalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+					$totalTaxAmount = ceil(($var['pricingInformation'][0]['fare']['totalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);							
+					$totalFare = ceil(($var['pricingInformation'][0]['fare']['totalFare']['totalPrice'] / $gdsPrice) * $farePrice);
+					
+					$AgentPrice = floor((($baseFareAmount * $commission) + $totalTaxAmount) + ($totalFare* 0.003));
+					$Commission = $totalFare - $AgentPrice;	
+					
+					//Price Break Down
+					if($adult > 0 && $child > 0 &&  $infants > 0){
+						
+						
+						$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+						$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+
+
+						$childBasePrice = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+						$childTaxAmount = ceil(($PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+						
+
+						$infantBasePrice = ceil(($PriceInfo[2]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+						$infantTaxAmount = ceil(($PriceInfo[2]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+						
+
+						$PriceBreakDown = array("0" =>
+											array("BaseFare"=> "$adultBasePrice",
+											"Tax"=> "$adultTaxAmount",
+											"PaxCount"=> $adult,
+											"PaxType"=> "ADT",
+											"Discount"=> "0",
+											"OtherCharges"=> "0",
+											"ServiceFee"=> "0")
+											,
+											"1" =>
+											array("BaseFare"=> "$childBasePrice",
+											"Tax"=> "$childTaxAmount",
+											"PaxCount"=> $child,
+											"PaxType"=> "CNN",
+											"Discount"=> "0",
+											"OtherCharges"=> "0",
+											"ServiceFee"=> "0"),
+											"2" =>
+											array("BaseFare"=> "$infantBasePrice",
+											"Tax"=> "$infantTaxAmount",
+											"PaxCount"=> $infants,
+											"PaxType"=> "INF",
+											"Discount"=> "0",
+											"OtherCharges"=> "0",
+											"ServiceFee"=> "0")                                         
+
+									);
+
+
+
+					}else if($adult > 0 && $child > 0){
+						$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+						$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+
+
+						$childBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+						$childTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+
+						$PriceBreakDown = array("0" =>
+											array("BaseFare"=> "$adultBasePrice",
+											"Tax"=> "$adultTaxAmount",
+											"PaxCount"=> $adult,
+											"PaxType"=> "ADT",
+											"Discount"=> "0",
+											"OtherCharges"=> "0",
+											"ServiceFee"=> "0")
+											,
+											"1" =>
+											array("BaseFare"=> "$childBasePrice",
+											"Tax"=> "$childTaxAmount",
+											"PaxCount"=> $adult,
+											"PaxType"=> "CNN",
+											"Discount"=> "0",
+											"OtherCharges"=> "0",
+											"ServiceFee"=> "0")
+																						
+
+									);
+
+					}else if($adult > 0 && $infants > 0){
+						$adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+						$adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+						
+						$infantBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
+						$infantTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
+
+						$PriceBreakDown = array("0" =>
+											array("BaseFare"=> "$adultBasePrice",
+											"Tax"=> "$adultTaxAmount",
+											"PaxCount"=> $adult,
+											"PaxType"=> "ADT",
+											"Discount"=> "0",
+											"OtherCharges"=> "0",
+											"ServiceFee"=> "0")
+											,
+											"1" =>
+											
+											array("BaseFare"=> "$infantBasePrice",
+											"Tax"=> "$infantTaxAmount",
+											"PaxCount"=> $adult,
+											"PaxType"=> "INF",
+											"Discount"=> "0",
+											"OtherCharges"=> "0",
+											"ServiceFee"=> "0")                                         
+
+									);
+					}else if($adult> 0){
+													
+						$adultBasePrice = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'] / $gdsPrice) * $farePrice);
+						$adultTaxAmount = ceil(($PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'] / $gdsPrice) * $farePrice);
+						
+						$PriceBreakDown = array("0" =>
+											array("BaseFare"=> "$adultBasePrice",
+											"Tax"=> "$adultTaxAmount",
+											"PaxCount"=> $adult,
+											"PaxType"=> "ADT",
+											"Discount"=> "0",
+											"OtherCharges"=> "0",
+											"ServiceFee"=> "0")												                                     
+
+						);
+					}
+				}
+
 								
 				$Segment = $fareComponents[0]['segments'];
 
@@ -494,105 +1235,7 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 				
 				$ElapedTime = $legDescs[$id]['elapsedTime'];
 				$JourneyDuration = floor($ElapedTime / 60)."H ".($ElapedTime - ((floor($ElapedTime / 60)) * 60))."Min";
-				//Agent MarkUP
-				$agentMarksql = mysqli_query($conn,"SELECT iMarkupType,iMarkup,dMarkupType,dMarkup,alliMarkupType,alliMarkup, alldMarkupType,alldMarkup FROM agent WHERE agentId='$agentId' ");
-				$agentmarkrow = mysqli_fetch_array($agentMarksql,MYSQLI_ASSOC);
 
-				if(!empty($agentmarkrow)){
-					
-					$iMarkupType = $agentmarkrow['iMarkupType'];
-					$dMarkupType = $agentmarkrow['dMarkupType']; 
-					$alliMarkupType = $agentmarkrow['alliMarkupType'];
-					$alldMarkupType = $agentmarkrow['alldMarkupType'];
-					  
-					if($iMarkupType == 'amount' || $dMarkupType == 'amount'){
-
-						if($TripType == 'Inbound'){
-							 $markup = $agentmarkrow['dMarkup'];
-							 if($markup > 0){
-								$PricewithmarkupAgentPrice =(int)$AgentPrice + (int) $markup;
-							 }else{
-								$PricewithmarkupAgentPrice = $AgentPrice;
-							 }
-						}else{
-							 $markup = $agentmarkrow['iMarkup'];
-							 if($markup > 0){
-								$PricewithmarkupAgentPrice =(int)$AgentPrice + (int) $markup;
-							 }else{
-								$PricewithmarkupAgentPrice = $AgentPrice;
-							 }
-						}
-						
-
-						 
-					}else if($iMarkupType == 'percentage' || $dMarkupType =='percentage' ){
-						if($TripType == 'Inbound'){ 
-							$markup = $agentmarkrow['dMarkup'];
-							if($markup > 0){
-								$PricewithmarkupAgentPrice = ceil($AgentPrice + ($AgentPrice * ((int)$markup/100)));
-							}else{
-								$PricewithmarkupAgentPrice = $AgentPrice;
-							}
-					   }else{
-							$markup = $agentmarkrow['iMarkup'];
-							if($markup > 0){
-								$PricewithmarkupAgentPrice = ceil($AgentPrice + ($AgentPrice * ((int)$markup/100)));
-							}else{
-								$PricewithmarkupAgentPrice = $AgentPrice;
-							}
-					   }
-					  
-						
-					}else{
-						$PricewithmarkupAgentPrice = $AgentPrice;
-					}
-					
-					if($alliMarkupType == 'amount' || $alldMarkupType =='amount'){
-
-						if($TripType == 'Inbound'){
-							 $markup = $agentmarkrow['alldMarkup'];
-							 if($markup > 0){
-								$PricewithmarkupAgentPrice = (int)$AgentPrice + (int)$markup; 
-							 }else{
-								$PricewithmarkupAgentPrice = $AgentPrice;
-							 }
-
-						}else{
-							 $markup = $agentmarkrow['alliMarkup'];
-							if($markup > 0){
-								$PricewithmarkupAgentPrice = (int)$AgentPrice + (int)$markup; 
-							 }else{
-								$PricewithmarkupAgentPrice = $AgentPrice;
-							 }
-						}
-						
-			
-						 
-					}else if($alliMarkupType == 'percentage' || $alldMarkupType == 'percentage'){   
-
-						if($TripType == 'Inbound'){
-							 $markup = $agentmarkrow['alldMarkup'];
-							 if($markup > 0){
-								$PricewithmarkupAgentPrice = ceil($AgentPrice + ($AgentPrice * ((int)$markup/100)));	
-							 }else{
-								$PricewithmarkupAgentPrice = $AgentPrice;
-							 }
-							 
-						}else{
-							 $markup = $agentmarkrow['alliMarkup'];
-							 if($markup > 0){
-								$PricewithmarkupAgentPrice = ceil($AgentPrice + ($AgentPrice * ((int)$markup/100)));	
-							 }else{
-								$PricewithmarkupAgentPrice = $AgentPrice;
-							 }
-						}
-					    
-						
-					} 
-				}else{ 
-					$PricewithmarkupAgentPrice = $AgentPrice;
-					
-				}
 				$uId = sha1(md5(time()).''.rand());
 				
 				if($sgCount ==  1){								
@@ -647,6 +1290,7 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 					// Departure Country
 					$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
 					$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
 					if(!empty($row1)){
 						$dAirport = $row1['name'];
 						$dCity = $row1['cityName'];
@@ -752,7 +1396,7 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 									"lastTicketTime"=> "$timelimit",
 									"BasePrice" => "$baseFareAmount",
 									"Taxes" => "$totalTaxAmount",
-									"price" => "$PricewithmarkupAgentPrice",
+									"price" => "$AgentPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
 									"pricebreakdown"=> $PriceBreakDown,
@@ -1080,7 +1724,7 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 									"lastTicketTime"=> "$timelimit",
 									"BasePrice" => "$baseFareAmount",
 									"Taxes" => "$totalTaxAmount",
-									"price" => "$PricewithmarkupAgentPrice",
+									"price" => "$AgentPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
 									"pricebreakdown"=> $PriceBreakDown,
@@ -1562,13 +2206,14 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 
 				$basic = array("system" =>"Sabre",
 									"segment"=> "3",
+									"uId"=> $uId,
 									"triptype"=>$TripType,
 									"career"=> "$vCarCode",
 									"careerName" => "$CarrieerName",
 									"lastTicketTime"=> "$timelimit",
 									"BasePrice" => "$baseFareAmount",
 									"Taxes" => "$totalTaxAmount",
-									"price" => "$PricewithmarkupAgentPrice",
+									"price" => "$AgentPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
 									"pricebreakdown"=> $PriceBreakDown,
@@ -2191,7 +2836,7 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 									"careerName" => "$CarrieerName",
 									"BasePrice" => "$baseFareAmount",
 									"Taxes" => "$totalTaxAmount",
-									"price" => "$PricewithmarkupAgentPrice",
+									"price" => "$AgentPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
 									"pricebreakdown"=> $PriceBreakDown,
@@ -2221,555 +2866,60 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 		}
 		}
 
-	} /// Sabre End
-
-	if($Amadeus == 1){
-	$Acurl = curl_init();
-
-		curl_setopt_array($Acurl, array(
-		CURLOPT_URL => 'https://test.api.amadeus.com/v1/security/oauth2/token',
-		CURLOPT_RETURNTRANSFER => true,
-		CURLOPT_ENCODING => '',
-		CURLOPT_MAXREDIRS => 10,
-		CURLOPT_TIMEOUT => 0,
-		CURLOPT_FOLLOWLOCATION => true,
-		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		CURLOPT_CUSTOMREQUEST => 'POST',
-		CURLOPT_POSTFIELDS => 'client_id=8kt3la3SudclVxenjcNs74l4nTrpEZVE&client_secret=KnpjmyAcTAxnLZGZ&grant_type=client_credentials',
-		CURLOPT_HTTPHEADER => array(
-			'Content-Type: application/x-www-form-urlencoded'
-		),
-		));
-
-		$response = curl_exec($Acurl);
-		curl_close($Acurl);
-
-		$toke_result = json_decode($response,JSON_PRETTY_PRINT );
-		$access_token_amadeus = $toke_result['access_token'];
-
-
-		// Search Flight
-
-		$Acurl1 = curl_init();
-		curl_setopt_array($Acurl1, array(
-		CURLOPT_URL => "https://test.api.amadeus.com/v2/shopping/flight-offers?currencyCode=BDT&originLocationCode=$From&destinationLocationCode=$To&departureDate=$Date&adults=$adult&children=$child&infants=$infants",
-		CURLOPT_RETURNTRANSFER => true,
-		CURLOPT_ENCODING => '',
-		CURLOPT_MAXREDIRS => 10,
-		CURLOPT_TIMEOUT => 0,
-		CURLOPT_FOLLOWLOCATION => true,
-		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		CURLOPT_CUSTOMREQUEST => 'GET',
-		CURLOPT_HTTPHEADER => array(
-			"Authorization: Bearer $access_token_amadeus"
-		),
-		));
-
-		$Amadeusresponse = curl_exec($Acurl1);
-
-		curl_close($Acurl1);
-
-		$AmadeusSearchResult = json_decode($Amadeusresponse,JSON_PRETTY_PRINT );
-
-		$AmadeusFlightList = $AmadeusSearchResult['data'];
-
-		//print_r($AmadeusFlightList);
-
-		foreach($AmadeusFlightList as $amadeusFlight){
-
-		$TotalFare = $amadeusFlight['price']['total'];
-		$BasePrice = $amadeusFlight['price']['base'];
-		$Validatingcarrier = $amadeusFlight['validatingAirlineCodes'][0];
-		$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$Validatingcarrier' ");
-		$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-		if(!empty($row)){
-		$CarrieerName = $row['name'];		
-		}
-		$Segment= count($amadeusFlight['itineraries'][0]['segments']);
-		$Seat = $amadeusFlight['numberOfBookableSeats'];
-		$CabinClass= $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['cabin'];
-
-		if(isset($amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['includedCheckedBags']['weight'])){
-		$quantity = $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['includedCheckedBags']['weight'];
-		$Baggage = "$quantity KG";
-		}else if (isset($amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['includedCheckedBags']['quantity'])){
-		$quantity = $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['includedCheckedBags']['quantity'];
-		$Baggage = "$quantity Piece";
-
-		}else{
-		$Baggage = "0 KG";
-		}
-
-		$CabinClass= $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['cabin'];
-
-
-		if($Segment == 1){
-
-		// Departure Country
-		$dAirportCode = $amadeusFlight['itineraries'][0]['segments'][0]['departure']['iataCode'];
-		$sql1 = mysqli_query($conn,"$Airportsql code='$dAirportCode' ");
-		$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-		if(!empty($row1)){
-			$dAirport = $row1['name'];
-			$dCity = $row1['cityName'];
-			$dCountry = $row1['countryCode'];		
-		}
-
-		// Arrival Country
-		$aAirportCode = $amadeusFlight['itineraries'][0]['segments'][0]['arrival']['iataCode'];
-		$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$aAirportCode' ");
-		$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-		if(!empty($row2)){
-			$aAirport = $row2['name'];
-			$aCity = $row2['cityName'];
-			$aCountry = $row2['countryCode'];
-		}
-
-				$DepTime = $amadeusFlight['itineraries'][0]['segments'][0]['departure']['at'];
-				$ArrTime = $amadeusFlight['itineraries'][0]['segments'][0]['arrival']['at'];
-
-				$AirlineCode = $amadeusFlight['itineraries'][0]['segments'][0]['carrierCode'];
-				$FlightNumber = $amadeusFlight['itineraries'][0]['segments'][0]['number'];
-				$BookingClass = $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['class'];
-				$OperatingCarrier = $amadeusFlight['itineraries'][0]['segments'][0]['operating']['carrierCode'];
-				$Duration = substr($amadeusFlight['itineraries'][0]['duration'],2,8);
-
-
-		$segment = array("0" =>
-													array("marketingcareer"=> "$AirlineCode",
-														"marketingflight"=> "$FlightNumber",
-														"operatingcareer"=> "$OperatingCarrier",
-														"operatingflight"=> "$FlightNumber",
-														"departure"=> "$dAirportCode",
-														"departureAirport"=> "$dAirport",
-														"departureLocation"=> "$dCity , $dCountry",                    
-														"departureTime" => "$DepTime",
-														"arrival"=> "$aAirportCode",                   
-														"arrivalTime" => "$ArrTime",
-														"arrivalAirport"=> "$aAirport",
-														"arrivalLocation"=> "$aCity , $aCountry",
-								"BookingClass"=> "$BookingClass",
-														"flightduration"=> "$Duration",
-														"seat"=> "$Seat")                                           
-
-												);
-
-			$basic = array("system"=>"Amadeus",
-													"segment"=> "$Segment",
-													"career"=> "$Validatingcarrier",
-													"careerName" => "$CarrieerName",
-													"price" => "$TotalFare",
-													"departure"=> "$dAirportCode",                   
-													"departureTime" => substr($DepTime,11,13),
-													"departureDate" => "$DepTime",
-													"arrival"=> "$aAirportCode",                   
-													"arrivalTime" => substr($ArrTime,11,13),
-													"arrivalDate" => "$ArrTime",
-													"flightduration"=> "$Duration",
-													"transit" => $Transits,
-													"bags" => "$Baggage",
-													"seat" => "$Seat",
-													"class" => "$CabinClass",
-													"refundable"=> "Refundable",
-													"segments" => $segment																								
-											);
-
-		array_push($All, $basic);
-
-
-		}else if($Segment == 2){
-
-		//Segment 1
-		// Departure Country
-		$dAirportCode = $amadeusFlight['itineraries'][0]['segments'][0]['departure']['iataCode'];
-		$dsql = mysqli_query($conn,"$Airportsql code='$dAirportCode' ");
-		$drow = mysqli_fetch_array($dsql,MYSQLI_ASSOC);
-
-		if(!empty($drow)){
-			$dAirport = $drow['name'];
-			$dCity = $drow['cityName'];
-			$dCountry = $drow['countryCode'];		
-		}
-
-		// Arrival Country
-		$aAirportCode = $amadeusFlight['itineraries'][0]['segments'][0]['arrival']['iataCode'];
-		$asql = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$aAirportCode' ");
-		$arow = mysqli_fetch_array($asql,MYSQLI_ASSOC);
-
-		if(!empty($arow)){
-			$aAirport = $arow['name'];
-			$aCity = $arow['cityName'];
-			$aCountry = $arow['countryCode'];
-		}
-
-				$DepTime = $amadeusFlight['itineraries'][0]['segments'][0]['departure']['at'];
-				$ArrTime = $amadeusFlight['itineraries'][0]['segments'][0]['arrival']['at'];
-
-				$AirlineCode = $amadeusFlight['itineraries'][0]['segments'][0]['carrierCode'];
-				$FlightNumber = $amadeusFlight['itineraries'][0]['segments'][0]['number'];
-				$BookingClass = $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['class'];
-				$OperatingCarrier = $amadeusFlight['itineraries'][0]['segments'][0]['operating']['carrierCode'];
-				$Duration = substr($amadeusFlight['itineraries'][0]['duration'],2,8);
-
-		//Segment 2
-		// Departure Country
-		$dAirportCode1 = $amadeusFlight['itineraries'][0]['segments'][1]['departure']['iataCode'];
-		$dsql1 = mysqli_query($conn,"$Airportsql code='$dAirportCode1' ");
-		$drow1 = mysqli_fetch_array($dsql1,MYSQLI_ASSOC);
-
-		if(!empty($drow1)){
-			$dAirport1 = $drow1['name'];
-			$dCity1= $drow1['cityName'];
-			$dCountry1 = $drow1['countryCode'];		
-		}
-
-		// Arrival Country
-		$aAirportCode1 = $amadeusFlight['itineraries'][0]['segments'][1]['arrival']['iataCode'];
-		$asql1 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$aAirportCode1' ");
-		$arow1 = mysqli_fetch_array($asql1,MYSQLI_ASSOC);
-
-		if(!empty($arow1)){
-			$aAirport1 = $arow1['name'];
-			$aCity1 = $arow1['cityName'];
-			$aCountry1 = $arow1['countryCode'];
-		}
-
-				$DepTime1 = $amadeusFlight['itineraries'][0]['segments'][1]['departure']['at'];
-				$ArrTime1 = $amadeusFlight['itineraries'][0]['segments'][1]['arrival']['at'];
-
-				$AirlineCode1 = $amadeusFlight['itineraries'][0]['segments'][1]['carrierCode'];
-				$FlightNumber1 = $amadeusFlight['itineraries'][0]['segments'][1]['number'];
-				$BookingClass1 = $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['class'];
-				$OperatingCarrier1 = $amadeusFlight['itineraries'][0]['segments'][1]['operating']['carrierCode'];
-				$Duration1 = substr($amadeusFlight['itineraries'][0]['duration'],2,8);
-
-
-			$start_date = new DateTime($ArrTime);
-			$since_start = $start_date->diff(new DateTime($DepTime1));
-
-			$Hours =  $since_start->h;
-			$Minutes =  $since_start->i;
-
-
-			$Transit = "$Hours H $Minutes M";
-			$Transits = array("0" => $Transit);
-
-
-		$segment = array("0" =>
-													array("marketingcareer"=> "$AirlineCode",
-														"marketingflight"=> "$FlightNumber",
-														"operatingcareer"=> "$OperatingCarrier",
-														"operatingflight"=> "$FlightNumber",
-														"departure"=> "$dAirportCode",
-														"departureAirport"=> "$dAirport",
-														"departureLocation"=> "$dCity , $dCountry",                    
-														"departureTime" => "$DepTime",
-														"arrival"=> "$aAirportCode",                   
-														"arrivalTime" => "$ArrTime",
-														"arrivalAirport"=> "$aAirport",
-														"arrivalLocation"=> "$aCity , $aCountry",
-								"BookingClass"=> "$BookingClass",
-														"flightduration"=> "$Duration",
-														"seat"=> "$Seat"),                                           
-
-												"1" =>
-													array("marketingcareer"=> "$AirlineCode1",
-														"marketingflight"=> "$FlightNumber1",
-														"operatingcareer"=> "$OperatingCarrier1",
-														"operatingflight"=> "$FlightNumber1",
-														"departure"=> "$dAirportCode1",
-														"departureAirport"=> "$dAirport1",
-														"departureLocation"=> "$dCity1 , $dCountry1",                    
-														"departureTime" => "$DepTime1",
-														"arrival"=> "$aAirportCode1",                   
-														"arrivalTime" => "$ArrTime1",
-														"arrivalAirport"=> "$aAirport1",
-														"arrivalLocation"=> "$aCity1 , $aCountry1",
-								"BookingClass"=> "$BookingClass1",
-														"flightduration"=> "$Duration1",
-														"seat"=> "$Seat")                                           
-
-												);
-
-			$basic = array("system"=>"Amadeus",
-													"segment"=> "$Segment",
-													"career"=> "$Validatingcarrier",
-													"careerName" => "$CarrieerName",
-													"price" => "$TotalFare",
-													"departure"=> "$dAirportCode",                   
-													"departureTime" => substr($DepTime,11,13),
-													"departureDate" => "$DepTime",
-													"arrival"=> "$aAirportCode",                   
-													"arrivalTime" => substr($ArrTime1,11,13),
-													"arrivalDate" => "$ArrTime1",
-													"flightduration"=> "$Duration",
-													"transit" => $Transits,
-													"bags" => "$Baggage",
-													"seat" => "$Seat",
-													"class" => "$CabinClass",
-													"refundable"=> "Refundable",
-													"segments" => $segment																								
-											);
-
-		array_push($All, $basic);
-
-		}else if($Segment == 3){
-		//Segment 1
-		// Departure Country
-		$dAirportCode = $amadeusFlight['itineraries'][0]['segments'][0]['departure']['iataCode'];
-		$dsql = mysqli_query($conn,"$Airportsql code='$dAirportCode' ");
-		$drow = mysqli_fetch_array($dsql,MYSQLI_ASSOC);
-
-		if(!empty($drow)){
-			$dAirport = $drow['name'];
-			$dCity = $drow['cityName'];
-			$dCountry = $drow['countryCode'];		
-		}
-
-		// Arrival Country
-		$aAirportCode = $amadeusFlight['itineraries'][0]['segments'][0]['arrival']['iataCode'];
-		$asql = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$aAirportCode' ");
-		$arow = mysqli_fetch_array($asql,MYSQLI_ASSOC);
-
-		if(!empty($arow)){
-			$aAirport = $arow['name'];
-			$aCity = $arow['cityName'];
-			$aCountry = $arow['countryCode'];
-		}
-
-				$DepTime = $amadeusFlight['itineraries'][0]['segments'][0]['departure']['at'];
-				$ArrTime = $amadeusFlight['itineraries'][0]['segments'][0]['arrival']['at'];
-
-				$AirlineCode = $amadeusFlight['itineraries'][0]['segments'][0]['carrierCode'];
-				$FlightNumber = $amadeusFlight['itineraries'][0]['segments'][0]['number'];
-				$BookingClass = $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['class'];
-				$OperatingCarrier = $amadeusFlight['itineraries'][0]['segments'][0]['operating']['carrierCode'];
-				$Duration = substr($amadeusFlight['itineraries'][0]['duration'],2,8);
-
-		//Segment 2
-		// Departure Country
-		$dAirportCode1 = $amadeusFlight['itineraries'][0]['segments'][1]['departure']['iataCode'];
-		$dsql1 = mysqli_query($conn,"$Airportsql code='$dAirportCode1' ");
-		$drow1 = mysqli_fetch_array($dsql1,MYSQLI_ASSOC);
-
-		if(!empty($drow1)){
-			$dAirport1 = $drow1['name'];
-			$dCity1= $drow1['cityName'];
-			$dCountry1 = $drow1['countryCode'];		
-		}
-
-		// Arrival Country
-		$aAirportCode1 = $amadeusFlight['itineraries'][0]['segments'][1]['arrival']['iataCode'];
-		$asql1 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$aAirportCode1' ");
-		$arow1 = mysqli_fetch_array($asql1,MYSQLI_ASSOC);
-
-		if(!empty($arow1)){
-			$aAirport1 = $arow1['name'];
-			$aCity1 = $arow1['cityName'];
-			$aCountry1 = $arow1['countryCode'];
-		}
-
-				$DepTime1 = $amadeusFlight['itineraries'][0]['segments'][1]['departure']['at'];
-				$ArrTime1 = $amadeusFlight['itineraries'][0]['segments'][1]['arrival']['at'];
-
-				$AirlineCode1 = $amadeusFlight['itineraries'][0]['segments'][1]['carrierCode'];
-				$FlightNumber1 = $amadeusFlight['itineraries'][0]['segments'][1]['number'];
-				$BookingClass1 = $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['class'];
-				$OperatingCarrier1 = $amadeusFlight['itineraries'][0]['segments'][1]['operating']['carrierCode'];
-				$Duration1 = substr($amadeusFlight['itineraries'][0]['duration'],2,8);
-
-		//Segment 3
-		// Departure Country
-		$dAirportCode2 = $amadeusFlight['itineraries'][0]['segments'][0]['departure']['iataCode'];
-		$dsql2 = mysqli_query($conn,"$Airportsql code='$dAirportCode' ");
-		$drow2 = mysqli_fetch_array($dsql2,MYSQLI_ASSOC);
-
-		if(!empty($drow2)){
-			$dAirport2 = $drow2['name'];
-			$dCity2 = $drow2['cityName'];
-			$dCountry2 = $drow2['countryCode'];		
-		}
-
-		// Arrival Country
-		$aAirportCode2 = $amadeusFlight['itineraries'][0]['segments'][2]['arrival']['iataCode'];
-		$asql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$aAirportCode' ");
-		$arow2 = mysqli_fetch_array($asql2,MYSQLI_ASSOC);
-
-		if(!empty($arow2)){
-			$aAirport2 = $arow2['name'];
-			$aCity2 = $arow2['cityName'];
-			$aCountry2 = $arow2['countryCode'];
-		}
-
-			$DepTime2 = $amadeusFlight['itineraries'][0]['segments'][2]['departure']['at'];
-			$ArrTime2 = $amadeusFlight['itineraries'][0]['segments'][2]['arrival']['at'];
-
-			$AirlineCode2 = $amadeusFlight['itineraries'][0]['segments'][2]['carrierCode'];
-			$FlightNumber2 = $amadeusFlight['itineraries'][0]['segments'][2]['number'];
-			$BookingClass2 = $amadeusFlight['travelerPricings'][0]['fareDetailsBySegment'][0]['class'];
-			$OperatingCarrier2 = $amadeusFlight['itineraries'][0]['segments'][2]['operating']['carrierCode'];
-			$Duration2 = substr($amadeusFlight['itineraries'][0]['duration'],2,8);
-
-			//Segment 1
-			$start_date = new DateTime($ArrTime);
-			$since_start = $start_date->diff(new DateTime($DepTime1));
-			$Hours =  $since_start->h;
-			$Minutes =  $since_start->i;
-			$Transit = "'$Hours'H '$Minutes'M";
-
-			//Segment 2
-			$start_date1 = new DateTime($ArrTime1);
-			$since_start1 = $start_date->diff(new DateTime($DepTime2));
-
-			$Hours1 =  $since_start1->h;
-			$Minutes1 =  $since_start1->i;
-
-			$Transit1 = "'$Hours1'H '$Minutes1'M";
-
-			$Transits = array("0" => $Transit,
-							  "1" => $Transit1);
-
-
-		$segment = array("0" =>
-								array("marketingcareer"=> "$AirlineCode",
-										"marketingflight"=> "$FlightNumber",
-										"operatingcareer"=> "$OperatingCarrier",
-										"operatingflight"=> "$FlightNumber",
-										"departure"=> "$dAirportCode",
-										"departureAirport"=> "$dAirport",
-										"departureLocation"=> "$dCity , $dCountry",                    
-										"departureTime" => "$DepTime",
-										"arrival"=> "$aAirportCode",                   
-										"arrivalTime" => "$ArrTime",
-										"arrivalAirport"=> "$aAirport",
-										"arrivalLocation"=> "$aCity , $aCountry",
-										"BookingClass"=> "$BookingClass",
-										"flightduration"=> "$Duration",
-										"seat"=> "$Seat"),                                           
-
-								"1" =>
-									array("marketingcareer"=> "$AirlineCode1",
-										"marketingflight"=> "$FlightNumber1",
-										"operatingcareer"=> "$OperatingCarrier1",
-										"operatingflight"=> "$FlightNumber1",
-										"departure"=> "$dAirportCode1",
-										"departureAirport"=> "$dAirport1",
-										"departureLocation"=> "$dCity1 , $dCountry1",                    
-										"departureTime" => "$DepTime1",
-										"arrival"=> "$aAirportCode1",                   
-										"arrivalTime" => "$ArrTime1",
-										"arrivalAirport"=> "$aAirport1",
-										"arrivalLocation"=> "$aCity1 , $aCountry1",
-										"BookingClass"=> "$BookingClass1",
-										"flightduration"=> "$Duration1",
-										"seat"=> "$Seat"),
-								"2" =>
-									array("marketingcareer"=> "$AirlineCode2",
-										"marketingflight"=> "$FlightNumber2",
-										"operatingcareer"=> "$OperatingCarrier2",
-										"operatingflight"=> "$FlightNumber2",
-										"departure"=> "$dAirportCode2",
-										"departureAirport"=> "$dAirport2",
-										"departureLocation"=> "$dCity2 , $dCountry2",                    
-										"departureTime" => "$DepTime2",
-										"arrival"=> "$aAirportCode2",                   
-										"arrivalTime" => "$ArrTime2",
-										"arrivalAirport"=> "$aAirport2",
-										"arrivalLocation"=> "$aCity2 , $aCountry2",
-								"BookingClass"=> "$BookingClass2",
-								"flightduration"=> "$Duration2",
-								"seat"=> "$Seat")                                           
-
-												);
-
-			$basic = array("system"=>"Amadeus",
-													"segment"=> "$Segment",
-													"career"=> "$Validatingcarrier",
-													"careerName" => "$CarrieerName",
-													"price" => "$TotalFare",
-													"departure"=> "$dAirportCode",                   
-													"departureTime" => substr($DepTime,11,13),
-													"departureDate" => "$DepTime",
-													"arrival"=> "$aAirportCode",                   
-													"arrivalTime" => substr($ArrTime1,11,13),
-													"arrivalDate" => "$ArrTime1",
-													"flightduration"=> "$Duration",
-													"transit" => $Transits,
-													"bags" => "$Baggage",
-													"seat" => "$Seat",
-													"class" => "$CabinClass",
-													"refundable"=> "Refundable",
-													"segments" => $segment																								
-											);
-
-		array_push($All, $basic);
-
-		}
-
-
-
-		}	
-
-		
-		
 	}
-	
-	
-	
+
+
 	if($Galileo == 1){	// Galileo Start
 
-		$Gallpax= array();
+	$Gallpax= array();
 				
-		if($adult > 0 && $child> 0 && $infants> 0){
-		
-				for($i = 1; $i <= $adult ; $i++){
-					$adultcount='<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="ADT" BookingTravelerRef="1'.$i.'" />';
-					array_push($Gallpax, $adultcount);
-				}
-				for($i = 1; $i <= $child ; $i++){
-					$childcount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="CNN" Age="07" BookingTravelerRef="2'.$i.'" />';
-					array_push($Gallpax,$childcount);
-				}
-				for($i = 1; $i <= $infants ; $i++){
-					$infantscount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="INF" Age="1" DOB="2021-06-04" BookingTravelerRef="3'.$i.'" />';
-					array_push($Gallpax, $infantscount);
-				
-				}
+	if($adult > 0 && $child> 0 && $infants> 0){
+	
+			for($i = 1; $i <= $adult ; $i++){
+				$adultcount='<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="ADT" BookingTravelerRef="1'.$i.'" />';
+				array_push($Gallpax, $adultcount);
+			}
+			for($i = 1; $i <= $child ; $i++){
+				$childcount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="CNN" Age="07" BookingTravelerRef="2'.$i.'" />';
+				array_push($Gallpax,$childcount);
+			}
+			for($i = 1; $i <= $infants ; $i++){
+				$infantscount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="INF" Age="1" DOB="2021-06-04" BookingTravelerRef="3'.$i.'" />';
+				array_push($Gallpax, $infantscount);
+			
+			}
 
-				
-		}else if($adult > 0 && $child > 0){
-
-				for($i = 1; $i <= $adult ; $i++){
-					$adultcount='<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="ADT" BookingTravelerRef="1'.$i.'" />';
-					array_push($Gallpax, $adultcount);
-				}
-				for($i = 1; $i <= $child ; $i++){
-					$childcount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="CNN" Age="07" BookingTravelerRef="2'.$i.'" />';
-					array_push($Gallpax,$childcount);
-				}
-		
-		}else if($adult > 0 && $infants > 0){
-		
-				for($i = 1; $i <= $adult ; $i++){
-					$adultcount ='<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="ADT" BookingTravelerRef="1'.$i.'" />';
-					array_push($Gallpax, $adultcount);
-				}
-				for($i = 1; $i <= $infants ; $i++){
-					$infantscount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="INF" Age="1" BookingTravelerRef="3'.$i.'" />';
-					array_push($Gallpax, $infantscount);
-				
-				}
-
-		}else{
+			
+	}else if($adult > 0 && $child > 0){
 
 			for($i = 1; $i <= $adult ; $i++){
 				$adultcount='<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="ADT" BookingTravelerRef="1'.$i.'" />';
 				array_push($Gallpax, $adultcount);
 			}
+			for($i = 1; $i <= $child ; $i++){
+				$childcount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="CNN" Age="07" BookingTravelerRef="2'.$i.'" />';
+				array_push($Gallpax,$childcount);
+			}
+	
+	}else if($adult > 0 && $infants > 0){
+	
+			for($i = 1; $i <= $adult ; $i++){
+				$adultcount ='<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="ADT" BookingTravelerRef="1'.$i.'" />';
+				array_push($Gallpax, $adultcount);
+			}
+			for($i = 1; $i <= $infants ; $i++){
+				$infantscount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="INF" Age="1" BookingTravelerRef="3'.$i.'" />';
+				array_push($Gallpax, $infantscount);
+			
+			}
+
+	}else{
+
+		for($i = 1; $i <= $adult ; $i++){
+			$adultcount='<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="ADT" BookingTravelerRef="1'.$i.'" />';
+			array_push($Gallpax, $adultcount);
 		}
+	}
 
 				
 
@@ -2781,6 +2931,7 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 	
 	$TARGETBRANCH = 'P4218912';
 	$CREDENTIALS = 'Universal API/uAPI4444837655-83fe5101:K/s3-5Sy4c';  //Prod
+	$Token  = base64_encode($CREDENTIALS);
 	$message = <<<EOM
 	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
 	<soapenv:Header/>
@@ -2810,33 +2961,31 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 	</soapenv:Envelope>
 	EOM;
 
+	//echo $message;
 
 
-	$auth = base64_encode("$CREDENTIALS"); 
-	$soap_do = curl_init("https://apac.universal-api.travelport.com/B2BGateway/connect/uAPI/AirService");
-	$header = array(
-	"Content-Type: text/xml;charset=UTF-8", 
-	"Accept: gzip,deflate", 
-	"Cache-Control: no-cache", 
-	"Pragma: no-cache", 
-	"SOAPAction: \"\"",
-	"Authorization: Basic $auth", 
-	"Content-length: ".strlen($message),
-	); 
 
+	$curl = curl_init();
 
-	curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false); 
-	curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false); 
-	curl_setopt($soap_do, CURLOPT_POST, true ); 
-	curl_setopt($soap_do, CURLOPT_POSTFIELDS, $message); 
-	curl_setopt($soap_do, CURLOPT_HTTPHEADER, $header); 
-	curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
-	$return = curl_exec($soap_do);
-	curl_close($soap_do);
+	curl_setopt_array($curl, array(
+	CURLOPT_URL => 'https://apac.universal-api.travelport.com/B2BGateway/connect/uAPI/AirService',
+	CURLOPT_RETURNTRANSFER => true,
+	CURLOPT_ENCODING => '',
+	CURLOPT_MAXREDIRS => 10,
+	CURLOPT_TIMEOUT => 0,
+	CURLOPT_FOLLOWLOCATION => true,
+	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	CURLOPT_CUSTOMREQUEST => 'POST',
+	CURLOPT_POSTFIELDS =>  $message,
+	CURLOPT_HTTPHEADER => array(
+		"Authorization: Basic $Token",
+		'Content-Type: application/xml'
+	),
+	));
 
-	//print_r($return);
+	$return = curl_exec($curl);
+	curl_close($curl);
 
-	//$return = file_get_contents("res.xml") ;
 	$response = preg_replace("/(<\/?)(\w+):([^>]*>)/", "$1$2$3", $return);
 	$xml = new SimpleXMLElement($response); /// to do 
 	
@@ -3022,2679 +3171,2895 @@ if(array_key_exists('tripType',$_GET) && array_key_exists('agentId', $_GET)){
 
 	
 
+    foreach($airAirPricePointList as $airAirPricePoint){
+
+        $PriceBreakDown = array();
+        if($adult  > 0 && $child > 0 && $infants > 0 ){	
+            $airPricePointOptions = $airAirPricePoint['airAirPricingInfo'][0];
+            $airPricePoint = $airPricePointOptions['airFlightOptionsList']['airFlightOption']['airOption'];
+            
+            $airPricePointOptions = $airAirPricePoint['airAirPricingInfo'][0];
+            $adultPrice = $airAirPricePoint['airAirPricingInfo'][0];
+            $aEquivalentBasePrice = $adultPrice['@attributes']['EquivalentBasePrice'];
+            $aPassengerTaxes = $adultPrice['@attributes']['Taxes'];
+            $aPaxType = $adultPrice['airPassengerType']['@attributes']['Code'];
+            $aAirFareInfoKey = $adultPrice['@attributes']['Key'];
+            $aFareInfoRef = $adultPrice['airFareInfoRef']['@attributes']['Key'];
+            $adultBreakDown = array("BaseFare"=> "$aEquivalentBasePrice",
+                                    "Tax"=> "$aPassengerTaxes",
+                                    "PaxCount"=> $adult,
+                                    "PaxType"=> "$aPaxType",
+                                    "Discount"=> "0",
+                                    "OtherCharges"=> "0",
+                                    "ServiceFee"=> "0",
+                                    "AirFareInfo"=> $aAirFareInfoKey,
+                                    "FareInfoRef"=>  $aFareInfoRef);
+            
+            array_push($PriceBreakDown, $adultBreakDown);
+                
+            $childPrice = $airAirPricePoint['airAirPricingInfo'][2];
+            $cEquivalentBasePrice = $childPrice['@attributes']['EquivalentBasePrice'];
+            $cPassengerTaxes = $childPrice['@attributes']['Taxes'];
+            $cPaxType = $childPrice['airPassengerType']['@attributes']['Code'];
+            $cAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][2]['@attributes']['Key'];
+            $cFareInfoRef = $airAirPricePoint['airAirPricingInfo'][2]['airFareInfoRef']['@attributes']['Key'];
+            $childBreakDown = array("BaseFare"=> "$cEquivalentBasePrice",
+                                    "Tax"=> "$cPassengerTaxes",
+                                    "PaxCount"=> $child,
+                                    "PaxType"=> "$cPaxType",
+                                    "Discount"=> "0",
+                                    "OtherCharges"=> "0",
+                                    "ServiceFee"=> "0",
+                                    "AirFareInfo"=> $cAirFareInfoKey,
+                                    "FareInfoRef"=>  $cFareInfoRef);
+                                    
+            array_push($PriceBreakDown, $childBreakDown);
+                
+                
+            $infantsPrice = $airAirPricePoint['airAirPricingInfo'][1];
+            $iEquivalentBasePrice = $infantsPrice['@attributes']['EquivalentBasePrice'];
+            $iPassengerTaxes = $infantsPrice['@attributes']['Taxes'];
+            $iPaxType = $infantsPrice['airPassengerType']['@attributes']['Code'];
+            $iAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][1]['@attributes']['Key'];
+            $iFareInfoRef = $airAirPricePoint['airAirPricingInfo'][1]['airFareInfoRef']['@attributes']['Key'];
+            $infantBreakDown = array("BaseFare"=> "$iEquivalentBasePrice",
+                                    "Tax"=> "$iPassengerTaxes",
+                                    "PaxCount"=> $infants,
+                                    "PaxType"=> "$iPaxType",
+                                    "Discount"=> "0",
+                                    "OtherCharges"=> "0",
+                                    "ServiceFee"=> "0",
+                                    "AirFareInfo"=> $iAirFareInfoKey,
+                                    "FareInfoRef"=>  $iFareInfoRef);
+									
+            array_push($PriceBreakDown, $infantBreakDown);
+            
+            
+        }else if($adult  > 0 && $child > 0){
+            $airPricePointOptions = $airAirPricePoint['airAirPricingInfo'][0];
+            $airPricePoint = $airPricePointOptions['airFlightOptionsList']['airFlightOption']['airOption'];
+            
+            $adultPrice = $airAirPricePoint['airAirPricingInfo'][0];
+            $aEquivalentBasePrice = $adultPrice['@attributes']['EquivalentBasePrice'];
+            $aPassengerTaxes = $adultPrice['@attributes']['Taxes'];
+            $aPaxType = $adultPrice['airPassengerType']['@attributes']['Code'];
+            $aAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][0]['@attributes']['Key'];
+            $aFareInfoRef = $airAirPricePoint['airAirPricingInfo'][0]['airFareInfoRef']['@attributes']['Key'];
+            $adultBreakDown = array("BaseFare"=> "$aEquivalentBasePrice",
+                                    "Tax"=> "$aPassengerTaxes",
+                                    "PaxCount"=> $adult,
+                                    "PaxType"=> "$aPaxType",
+                                    "Discount"=> "0",
+                                    "OtherCharges"=> "0",
+                                    "ServiceFee"=> "0",
+                                    "AirFareInfo"=> $aAirFareInfoKey,
+                                    "FareInfoRef"=>  $aFareInfoRef);
+            
+            array_push($PriceBreakDown, $adultBreakDown);
+                
+            $childPrice = $airAirPricePoint['airAirPricingInfo'][1];
+            $cEquivalentBasePrice = $childPrice['@attributes']['EquivalentBasePrice'];
+            $cPassengerTaxes = $childPrice['@attributes']['Taxes'];
+            $cPaxType = $childPrice['airPassengerType']['@attributes']['Code'];
+            $cAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][1]['@attributes']['Key'];
+            $cFareInfoRef = $airAirPricePoint['airAirPricingInfo'][1]['airFareInfoRef']['@attributes']['Key'];
+            $childBreakDown = array("BaseFare"=> "$cEquivalentBasePrice",
+                                    "Tax"=> "$cPassengerTaxes",
+                                    "PaxCount"=> $child,
+                                    "PaxType"=> "$cPaxType",
+                                    "Discount"=> "0",
+                                    "OtherCharges"=> "0",
+                                    "ServiceFee"=> "0",
+                                    "AirFareInfo"=> $cAirFareInfoKey,
+                                    "FareInfoRef"=>  $cFareInfoRef);
+                                    
+            array_push($PriceBreakDown, $childBreakDown);
+        }else if($adult  > 0 && $infants > 0 ){
+            $airPricePointOptions = $airAirPricePoint['airAirPricingInfo'][0];
+            $airPricePoint = $airPricePointOptions['airFlightOptionsList']['airFlightOption']['airOption'];
+            
+            $adultPrice = $airAirPricePoint['airAirPricingInfo'][0];
+            $aEquivalentBasePrice = $adultPrice['@attributes']['EquivalentBasePrice'];
+            $aPassengerTaxes = $adultPrice['@attributes']['Taxes'];
+            $aPaxType = $adultPrice['airPassengerType']['@attributes']['Code'];
+            $aAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][0]['@attributes']['Key'];
+            $aFareInfoRef = $airAirPricePoint['airAirPricingInfo'][0]['airFareInfoRef']['@attributes']['Key'];
+            $adultBreakDown = array("BaseFare"=> "$aEquivalentBasePrice",
+                                    "Tax"=> "$aPassengerTaxes",
+                                    "PaxCount"=> $adult,
+                                    "PaxType"=> "$aPaxType",
+                                    "Discount"=> "0",
+                                    "OtherCharges"=> "0",
+                                    "ServiceFee"=> "0",
+                                    "AirFareInfo"=> $aAirFareInfoKey,
+                                    "FareInfoRef"=>  $aFareInfoRef);
+            
+            array_push($PriceBreakDown, $adultBreakDown);
+                
+                          
+            $infantsPrice = $airAirPricePoint['airAirPricingInfo'][1];
+            $iEquivalentBasePrice = $infantsPrice['@attributes']['EquivalentBasePrice'];
+            $iPassengerTaxes = $infantsPrice['@attributes']['Taxes'];
+            $iPaxType = $infantsPrice['airPassengerType']['@attributes']['Code'];
+            $iAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][1]['@attributes']['Key'];
+            $iFareInfoRef = $airAirPricePoint['airAirPricingInfo'][1]['airFareInfoRef']['@attributes']['Key'];
+            $infantBreakDown = array("BaseFare"=> "$iEquivalentBasePrice",
+                                    "Tax"=> "$iPassengerTaxes",
+                                    "PaxCount"=> $infants,
+                                    "PaxType"=> "$iPaxType",
+                                    "Discount"=> "0",
+                                    "OtherCharges"=> "0",
+                                    "ServiceFee"=> "0",
+                                    "AirFareInfo"=> $iAirFareInfoKey,
+                                    "FareInfoRef"=>  $iFareInfoRef);
+            array_push($PriceBreakDown, $infantBreakDown);
+        }else if($adult  > 0){
+            $airPricePointOptions = $airAirPricePoint['airAirPricingInfo'][0];
+            $airPricePoint = $airPricePointOptions['airFlightOptionsList']['airFlightOption']['airOption'];
+            
+            $airPricePointOptions = $airAirPricePoint['airAirPricingInfo'];
+            $airPricePoint = $airPricePointOptions['airFlightOptionsList']['airFlightOption']['airOption'];
+            
+            $aEquivalentBasePrice = $airPricePointOptions['@attributes']['EquivalentBasePrice'];
+            $aPassengerTaxes = $airPricePointOptions['@attributes']['Taxes'];
+            $aPaxType = $airPricePointOptions['airPassengerType']['@attributes']['Code'];
+            $aAirFareInfoKey = $airPricePointOptions['@attributes']['Key'];
+            $aFareInfoRef = $airPricePointOptions['airFareInfoRef']['@attributes']['Key'];
+            $adultBreakDown = array("BaseFare"=> "$aEquivalentBasePrice",
+                                    "Tax"=> "$aPassengerTaxes",
+                                    "PaxCount"=> $adult,
+                                    "PaxType"=> "$aPaxType",
+                                    "Discount"=> "0",
+                                    "OtherCharges"=> "0",
+                                    "ServiceFee"=> "0",
+                                    "AirFareInfo"=> $aAirFareInfoKey,
+                                    "FareInfoRef"=>  $aFareInfoRef);
+									
+			array_push($PriceBreakDown, $adultBreakDown);
+        }
+
+        
+                
+        $key = $airAirPricePoint['@attributes']['Key'];
+        $validatingCarrierCode = $airPricePointOptions['@attributes']['PlatingCarrier'];
+        $TotalPrice = (int) filter_var($airAirPricePoint['@attributes']['TotalPrice'], FILTER_SANITIZE_NUMBER_INT);
+
+        
+        if(isset($airAirPricePoint['@attributes']['EquivalentBasePrice'])){
+            $BasePrice = (int) filter_var($airAirPricePoint['@attributes']['EquivalentBasePrice'], FILTER_SANITIZE_NUMBER_INT);
+        }else{
+            $BasePrice = (int) filter_var($airAirPricePoint['@attributes']['BasePrice'], FILTER_SANITIZE_NUMBER_INT);
+        }
+
+		$Taxes = (int) filter_var($airAirPricePoint['@attributes']['Taxes'] , FILTER_SANITIZE_NUMBER_INT);
+		
+		$AgentPrice = floor((($BasePrice * $commission) + $Taxes) + ($TotalPrice* 0.003));
+		$Commission = $TotalPrice - $AgentPrice;
+        
+        
+        $LatestTicketingTime =  $airPricePointOptions['@attributes']['LatestTicketingTime'];
+        
+        if(isset($airPricePointOptions['airFareInfoRef'][0])){
+            $airFareInfoRef =  $airPricePointOptions['airFareInfoRef'][0];
+        }else{
+            $airFareInfoRef =  $airPricePointOptions['airFareInfoRef']['@attributes']['Key'];
+        }
+        
+            $airFareCalc =  $airPricePointOptions['airFareCalc'];
+
+        if(isset($airPricePointOptions['airChangePenalty']['airAmount']) == TRUE){
+            $airChangePenalty =  $airPricePointOptions['airChangePenalty']['airAmount'];
+        }else if(isset($airPricePointOptions['airChangePenalty']['airPercentage']) == TRUE){
+            $airChangePenalty =  $airPricePointOptions['airChangePenalty']['airPercentage'];
+        }else{
+            //print_r($airPricePointOptions['airChangePenalty']);
+        }
+
+        if(isset($airPricePointOptions['airCancelPenalty']['airAmount']) == TRUE){
+            $airCancelPenalty =  $airPricePointOptions['airCancelPenalty']['airAmount'];
+        }else if(isset($airPricePointOptions['airCancelPenalty']['airPercentage']) ==TRUE){
+                $airCancelPenalty =  $airPricePointOptions['airCancelPenalty']['airPercentage'];
+        }else{
+                //print_r($airPricePointOptions['airCancelPenalty']);
+        }
+        
+                    
+        if(isset($airPricePointOptions['@attributes']['Refundable'])){
+            $Refundable = "Refundable";
+        }else{
+            $Refundable = "Nonrefundable";
+
+        }
+        
+        $From = $result['airRouteList']['airRoute']['airLeg']['@attributes']['Origin'];
+        $To = $result['airRouteList']['airRoute']['airLeg']['@attributes']['Destination'];
 
 
-	//print_r($airAirSegment);
+        $sql = mysqli_query($conn,"SELECT nameBangla, name FROM airlines WHERE code='$validatingCarrierCode'");
+        $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
 
-  if(isset($airAirPricePointList[0])){
+        if(!empty($row)){
+            $CarrieerName = $row['name'];		
+        }
 
-		foreach($airAirPricePointList as $airAirPricePoint){
-				if($adult  > 0 && $child == 0){	
-					$airPricePointOptions = $airAirPricePoint['airAirPricingInfo'];
-				}else{
-					$airPricePointOptions = $airAirPricePoint['airAirPricingInfo'][0];		
-				}
+        if(isset($airPricePoint[0]) == TRUE){
+            $itemcount = count($airPricePoint);
 
-				$airPricePoint = $airPricePointOptions['airFlightOptionsList']['airFlightOption']['airOption'];
-						
-				$key = $airAirPricePoint['@attributes']['Key'];
-				$TotalPrice = $airAirPricePoint['@attributes']['TotalPrice'];
-				$validatingCarrierCode = $airPricePointOptions['@attributes']['PlatingCarrier'];
-				$Exact = (int) filter_var($TotalPrice, FILTER_SANITIZE_NUMBER_INT);
+            if(isset($airPricePoint[0]) == TRUE){
 
-				
-				if(isset($airAirPricePoint['@attributes']['EquivalentBasePrice'])){
-					$BasePrice = (int) filter_var($airAirPricePoint['@attributes']['EquivalentBasePrice'], FILTER_SANITIZE_NUMBER_INT);
-				}else{
-					$BasePrice = (int) filter_var($airAirPricePoint['@attributes']['BasePrice'], FILTER_SANITIZE_NUMBER_INT);
-				}
-				
-				
-				$Taxes = $airAirPricePoint['@attributes']['Taxes'];
-				$LatestTicketingTime =  $airPricePointOptions['@attributes']['LatestTicketingTime'];
-				
-				if(isset($airPricePointOptions['airFareInfoRef'][0])){
-					$airFareInfoRef =  $airPricePointOptions['airFareInfoRef'][0];
-				}else{
-					$airFareInfoRef =  $airPricePointOptions['airFareInfoRef']['@attributes']['Key'];
-				}
-				
-					$airFareCalc =  $airPricePointOptions['airFareCalc'];
-
-				if(isset($airPricePointOptions['airChangePenalty']['airAmount']) == TRUE){
-					$airChangePenalty =  $airPricePointOptions['airChangePenalty']['airAmount'];
-				}else if(isset($airPricePointOptions['airChangePenalty']['airPercentage']) == TRUE){
-					$airChangePenalty =  $airPricePointOptions['airChangePenalty']['airPercentage'];
-				}else{
-					//print_r($airPricePointOptions['airChangePenalty']);
-				}
-
-				if(isset($airPricePointOptions['airCancelPenalty']['airAmount']) == TRUE){
-					$airCancelPenalty =  $airPricePointOptions['airCancelPenalty']['airAmount'];
-				}else if(isset($airPricePointOptions['airCancelPenalty']['airPercentage']) ==TRUE){
-						$airCancelPenalty =  $airPricePointOptions['airCancelPenalty']['airPercentage'];
-				}else{
-						//print_r($airPricePointOptions['airCancelPenalty']);
-				}
-				
-							
-				if(isset($airPricePointOptions['@attributes']['Refundable'])){
-					$Refundable = "Refundable";
-				}else{
-					$Refundable = "Nonrefundable";
-
-				}
-				
-				$From = $result['airRouteList']['airRoute']['airLeg']['@attributes']['Origin'];
-				$To = $result['airRouteList']['airRoute']['airLeg']['@attributes']['Destination'];
+                if(isset($airPricePoint[0]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == False){
+                    $FareInfoRef = $airPricePoint[0]['airBookingInfo']['@attributes']['FareInfoRef'];
+                    $SegmentRef = $airPricePoint[0]['airBookingInfo']['@attributes']['SegmentRef'];
+                    $Bags = $airFareInfo[$FareInfoRef]['Bags'];						
+                    $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                    $FareBasisCode = $airFareInfo[$FareInfoRef]['FareBasisCode'];
+                    $AvailabilitySource = $airAirSegment[$SegmentRef]['AvailabilitySource'];
+                    $Distance = $airAirSegment[$SegmentRef]['Distance'];
+                    $Equipment = $airAirSegment[$SegmentRef]['Equipment'];
+                    $ParticipantLevel = $airAirSegment[$SegmentRef]['ParticipantLevel'];
+                    $PolledAvailabilityOption = $airAirSegment[$SegmentRef]['PolledAvailabilityOption'];
+                    $Group = $airAirSegment[$SegmentRef]['Group'];
+                    $ChangeOfPlane = $airAirSegment[$SegmentRef]['ChangeOfPlane'];
+                    $AvailabilityDisplayType = $airAirSegment[$SegmentRef]['AvailabilityDisplayType'];
+                    $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
 
 
-				$sql = mysqli_query($conn,"SELECT nameBangla, name FROM airlines WHERE code='$validatingCarrierCode'");
-				$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+                    $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                    $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
 
-				if(!empty($row)){
-					$CarrieerName = $row['name'];		
-				}
+                    $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                    $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
 
-				if(isset($airPricePoint[0]) == TRUE){
-					$itemcount = count($airPricePoint);
+                    $dpTime = date("D d M Y", strtotime($DepartureTime));
+                    $arrTime = date("D d M Y", strtotime($ArrivalTime));
+                    
+                    $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                    $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-					if(isset($airPricePoint[0]) == TRUE){
+                    $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                    $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
 
-						if(isset($airPricePoint[0]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == False){
-							$FareInfoRef = $airPricePoint[0]['airBookingInfo']['@attributes']['FareInfoRef'];
-							$SegmentRef = $airPricePoint[0]['airBookingInfo']['@attributes']['SegmentRef'];
-							$Bags = $airFareInfo[$FareInfoRef]['Bags'];						
-							$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-							$FareBasisCode = $airFareInfo[$FareInfoRef]['FareBasisCode'];
-							$AvailabilitySource = $airAirSegment[$SegmentRef]['AvailabilitySource'];
-							$Distance = $airAirSegment[$SegmentRef]['Distance'];
-							$Equipment = $airAirSegment[$SegmentRef]['Equipment'];
-							$ParticipantLevel = $airAirSegment[$SegmentRef]['ParticipantLevel'];
-							$PolledAvailabilityOption = $airAirSegment[$SegmentRef]['PolledAvailabilityOption'];
-							$Group = $airAirSegment[$SegmentRef]['Group'];
-							$ChangeOfPlane = $airAirSegment[$SegmentRef]['ChangeOfPlane'];
-							$AvailabilityDisplayType = $airAirSegment[$SegmentRef]['AvailabilityDisplayType'];
-							$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
+                    if(!empty($row)){
+                        $markettingCarrierName = $row['name'];		
+                    }
+
+                    // Departure Country
+                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport = $row1['name'];
+                        $dCity = $row1['cityName'];
+                        $dCountry = $row1['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport = $row2['name'];
+                        $aCity = $row2['cityName'];
+                        $aCountry = $row2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode = $airPricePoint[0]['airBookingInfo']['@attributes']['BookingCode'];
+                    $Seat = $airPricePoint[0]['airBookingInfo']['@attributes']['BookingCount'];
+                    $CabinClass = $airPricePoint[0]['airBookingInfo']['@attributes']['CabinClass'];
+
+                    $Transit = array("Transit1" => "0");
+
+                    $segment = array(
+                                    array("marketingcareer"=> "$markettingCarrier",
+                                            "marketingflight"=> "$markettingFN",
+                                            "operatingcareer"=> "$markettingCarrier",
+                                            "operatingflight"=> "$markettingFN",
+                                            "departure"=> "$DepartureFrom",
+                                            "departureAirport"=> "$dAirport ",
+                                            "departureLocation"=> "$dCity , $dCountry",                    
+                                            "departureTime" => "$DepartureTime",
+                                            "arrival"=> "$ArrivalTo",                   
+                                            "arrivalTime" => "$ArrivalTime",
+                                            "arrivalAirport"=> "$aAirport",
+                                            "arrivalLocation"=> "$aCity , $aCountry",
+                                            "flightduration"=> "$TravelTimeHm",
+                                            "bookingcode"=> "$BookingCode",
+                                            "seat"=> $Seat,
+                                            'CabinClass' => $CabinClass,
+                                            'FareInfoRef' => $FareInfoRef,
+                                            'SegmentRef' => $SegmentRef,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                    )
+                                );
+
+                        $basic = array("system" =>"Galileo",
+                                        "segment"=> "1",
+										"triptype"=>$TripType,
+                                        "career"=> $validatingCarrierCode,
+                                        "careerName" => $CarrieerName,
+                                        "BasePrice" => $BasePrice ,
+                                        "Taxes" => $Taxes,
+                                        "price" => $AgentPrice,
+										"clientPrice"=> $TotalPrice,
+										"comission"=> $Commission,
+                                        "pricebreakdown"=> $PriceBreakDown,
+                                        "airChangePenalty " => $airChangePenalty ,
+                                        "airCancelPenalty" => $airCancelPenalty,
+                                        "airFareCalc " => $airFareCalc ,
+                                        "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                        "airFareInfoRef" => $airFareInfoRef,
+                                        "LatestTicketingTime" => $LatestTicketingTime ,
+                                        "departure"=> $From,
+                                        "departureTime" => substr($DepartureTime,11,5),                  
+                                        "departureDate" => $dpTime,
+                                        "arrival"=> "$To",                   
+                                        "arrivalTime" => substr($ArrivalTime,11,5),
+                                        "arrivalDate" => $arrTime,
+                                        "flightduration"=> "$TravelTimeHm",								
+                                        "bags" => $Bags,
+                                        "seat" => $Seat,
+                                        "class" => $CabinClass,											
+                                        "refundable"=> $Refundable,
+                                        "segments" => $segment,
+                                        "traceid" => $TraceId
+                                    );
+
+                                    array_push($All,$basic);
 
 
-							$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-							$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
+                        }else if(isset($airPricePoint[0]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == True){
+                            //Leg1
+        
+                            $FareInfoRef = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['FareInfoRef'];
+                            $SegmentRef = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['SegmentRef'];
+                            
+                            $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+                            $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                            
+                            $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
 
-							$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-							$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+                            $FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
+                            $FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
 
-							$dpTime = date("D d M Y", strtotime($DepartureTime));
-							$arrTime = date("D d M Y", strtotime($ArrivalTime));
-							
-							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+                            $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                            $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
 
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
-							}
+                            $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                            $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
 
-							// Departure Country
-							$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-							$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+                            $dpTime = date("D d M Y", strtotime($DepartureTime));
+                            $arrTime = date("D d M Y", strtotime($ArrivalTime));
 
-							if(!empty($row1)){
-								$dAirport = $row1['name'];
-								$dCity = $row1['cityName'];
-								$dCountry = $row1['countryCode'];		
-							}
+                            
+                            $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                            $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-							// Departure Country
-							$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-							$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+                            $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                            $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
 
-							if(!empty($row2)){
-								$aAirport = $row2['name'];
-								$aCity = $row2['cityName'];
-								$aCountry = $row2['countryCode'];
-							}
-							
-							
-							$BookingCode = $airPricePoint[0]['airBookingInfo']['@attributes']['BookingCode'];
-							$Seat = $airPricePoint[0]['airBookingInfo']['@attributes']['BookingCount'];
-							$CabinClass = $airPricePoint[0]['airBookingInfo']['@attributes']['CabinClass'];
+                            if(!empty($row)){
+                                $markettingCarrierName = $row['name'];		
+                            }
 
-							$Transit = array("Transit" => "0");
+                            // Departure Country
+                            $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                            $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
 
-							$segment = array(
-											array("marketingcareer"=> "$markettingCarrier",
-													"marketingflight"=> "$markettingFN",
-													"operatingcareer"=> "$markettingCarrier",
-													"operatingflight"=> "$markettingFN",
-													"departure"=> "$DepartureFrom",
-													"departureAirport"=> "$dAirport ",
-													"departureLocation"=> "$dCity , $dCountry",                    
-													"departureTime" => "$DepartureTime",
-													"arrival"=> "$ArrivalTo",                   
-													"arrivalTime" => "$ArrivalTime",
-													"arrivalAirport"=> "$aAirport",
-													"arrivalLocation"=> "$aCity , $aCountry",
-													"flightduration"=> "$TravelTimeHm",
-													"bookingcode"=> "$BookingCode",
-													"seat"=> $Seat,
-													'CabinClass' => $CabinClass,
-													'FareInfoRef' => $FareInfoRef,
-													'SegmentRef' => $SegmentRef,
-													'SegmentDetails' => $airAirSegment[$SegmentRef]
+                            if(!empty($row1)){
+                                $dAirport = $row1['name'];
+                                $dCity = $row1['cityName'];
+                                $dCountry = $row1['countryCode'];		
+                            }
 
-											)
-										);
+                            // Departure Country
+                            $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                            $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
 
-								$basic = array("system" =>"Galileo",
-												"segment"=> "1",
-												"career"=> $validatingCarrierCode,
-												"careerName" => $CarrieerName,
-												"BasePrice" => $BasePrice ,
+                            if(!empty($row2)){
+                                $aAirport = $row2['name'];
+                                $aCity = $row2['cityName'];
+                                $aCountry = $row2['countryCode'];
+                            }
+                            
+                            
+                            $BookingCode = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['BookingCode'];
+                            $Seat = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['BookingCount'];
+                            $CabinClass = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['CabinClass'];
+
+
+                            //Leg 2
+                            
+                            $FareInfoRef1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['FareInfoRef'];
+                            $SegmentRef1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['SegmentRef'];
+
+
+                            $FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
+                            $FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
+
+
+                            $ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
+                            $DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
+
+                            $ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
+                            $DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
+
+                            $dpTime1 = date("D d M Y", strtotime($DepartureTime1));
+                            $arrTime1 = date("D d M Y", strtotime($ArrivalTime1));
+
+                            
+                            $markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
+                            $markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
+
+                            $sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
+                            $rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+
+                            if(!empty($rowmk1)){
+                                $markettingCarrierName1 = $rowmk1['name'];		
+                            }
+
+                            // Departure Country
+                            $sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
+                            $rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
+
+                            if(!empty($row1)){
+                                $dAirport1 = $rowdp1['name'];
+                                $dCity1 = $rowdp1['cityName'];
+                                $dCountry1 = $rowdp1['countryCode'];		
+                            }
+
+                            // Departure Country
+                            $sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
+                            $rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
+
+                            if(!empty($row2)){
+                                $aAirport1 = $rowar2['name'];
+                                $aCity1 = $rowar2['cityName'];
+                                $aCountry1 = $rowar2['countryCode'];
+                            }
+                            
+                            
+                            $BookingCode1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['BookingCode'];
+                            $Seat1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['BookingCount'];
+                            $CabinClass1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['CabinClass'];
+                            
+
+                            $Transits = $TravelTime - ($FlightTime + $FlightTime1);
+                            $TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
+
+                            $Transit = array("transit1"=> $TransitHm);
+
+
+                            $segment = array(
+                                            array("marketingcareer"=> "$markettingCarrier",
+                                                    "marketingflight"=> "$markettingFN",
+                                                    "operatingcareer"=> "$markettingCarrier",
+                                                    "operatingflight"=> "$markettingFN",
+                                                    "departure"=> "$DepartureFrom",
+                                                    "departureAirport"=> "$dAirport ",
+                                                    "departureLocation"=> "$dCity , $dCountry",                    
+                                                    "departureTime" => "$dpTime",
+                                                    "arrival"=> "$ArrivalTo",                   
+                                                    "arrivalTime" => "$ArrivalTime1",
+                                                    "arrivalAirport"=> "$aAirport",
+                                                    "arrivalLocation"=> "$aCity , $aCountry",
+                                                    "flightduration"=> $FlightTimeHm,
+                                                    "bookingcode"=> "$BookingCode",
+                                                    "seat"=> $Seat,
+                                                    'CabinClass' => $CabinClass,
+                                                    'FareInfoRef' => $FareInfoRef,
+                                                    'SegmentRef' => $SegmentRef,
+                                                    'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                            ),array("marketingcareer"=> "$markettingCarrier1",
+                                                    "marketingflight"=> "$markettingFN1",
+                                                    "operatingcareer"=> "$markettingCarrier1",
+                                                    "operatingflight"=> "$markettingFN1",
+                                                    "departure"=> "$DepartureFrom1",
+                                                    "departureAirport"=> "$dAirport1",
+                                                    "departureLocation"=> "$dCity1 , $dCountry",                    
+                                                    "departureTime" => "$dpTime",
+                                                    "arrival"=> "$ArrivalTo1",                   
+                                                    "arrivalTime" => "$arrTime1",
+                                                    "arrivalAirport"=> "$aAirport1",
+                                                    "arrivalLocation"=> "$aCity1 , $aCountry1",
+                                                    "flightduration"=> "$FlightTimeHm1",
+                                                    "bookingcode"=> "$BookingCode1",
+                                                    "seat"=> "$Seat1",
+                                                    'CabinClass' => $CabinClass1,
+                                                    'FareInfoRef' => $FareInfoRef1,
+                                                    'SegmentRef' => $SegmentRef1,
+                                                    'SegmentDetails' => $airAirSegment[$SegmentRef1]
+
+                                            )
+                                        );
+                                    $basic = array("system" =>"Galileo",
+                                                "segment"=> "2",
+												"triptype"=>$TripType,
+                                                "career"=> $validatingCarrierCode,
+                                                "careerName" => "$CarrieerName",
+                                                "BasePrice" => $BasePrice ,
 												"Taxes" => $Taxes,
-												"price" => "$Exact",
-												"airChangePenalty " => $airChangePenalty ,
-												"airCancelPenalty" => $airCancelPenalty,
-												"airFareCalc " => $airFareCalc ,
-												"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-												"airFareInfoRef" => $airFareInfoRef,
-												"LatestTicketingTime" => $LatestTicketingTime ,
-												"departure"=> $From,
-												"departureTime" => substr($DepartureTime,11,5),                  
-												"departureDate" => $dpTime,
-												"arrival"=> "$To",                   
-												"arrivalTime" => substr($ArrivalTime,11,5),
-												"arrivalDate" => $arrTime,
-												"flightduration"=> "$TravelTimeHm",								
-												"bags" => $Bags,
-												"seat" => $Seat,
-												"class" => $CabinClass,											
-												"refundable"=> $Refundable,
-												"segments" => $segment,
-												"traceid" => $TraceId
-											);
+												"price" => $AgentPrice,
+												"clientPrice"=> $TotalPrice,
+												"comission"=> $Commission,
+                                                "pricebreakdown"=> $PriceBreakDown,
+                                                "airChangePenalty " => $airChangePenalty ,
+                                                "airCancelPenalty" => $airCancelPenalty,
+                                                "airFareCalc " => $airFareCalc ,
+                                                "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                                "airFareInfoRef" => $airFareInfoRef,
+                                                "LatestTicketingTime" => $LatestTicketingTime,
+                                                "departure"=> "$From",                   
+                                                "departureTime" => substr($DepartureTime,11,5),
+                                                "departureDate" => "$dpTime",
+                                                "arrival"=> "$To",                   
+                                                "arrivalTime" => substr($ArrivalTime1,11,5),
+                                                "arrivalDate" => "$arrTime1",
+                                                "flightduration"=> $TravelTimeHm,														
+                                                "bags" => $Bags,
+                                                "seat" => "$Seat",
+                                                "class" => "$CabinClass",
+                                                "refundable"=> $Refundable,
+                                                "segments" => $segment,
+                                                "transit" => $Transit,													
+                                                "traceid" => $TraceId
+                                            );
+                                        array_push($All, $basic);
+                                    }
 
-											array_push($All,$basic);
+            }
+            if(isset($airPricePoint[1]) == TRUE){
+                if(isset($airPricePoint[1]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == False){
+                    $FareInfoRef = $airPricePoint[1]['airBookingInfo']['@attributes']['FareInfoRef'];
+                    $SegmentRef = $airPricePoint[1]['airBookingInfo']['@attributes']['SegmentRef'];
+                    $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+                    $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                    $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
 
-
-								}else if(isset($airPricePoint[0]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == True){
-									//Leg1
-				
-									$FareInfoRef = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['FareInfoRef'];
-									$SegmentRef = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['SegmentRef'];
-									
-									$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-									$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-									
-									$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
-
-									$FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
-									$FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
-
-
-									$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-									$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-									$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-									$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-									$dpTime = date("D d M Y", strtotime($DepartureTime));
-									$arrTime = date("D d M Y", strtotime($ArrivalTime));
-
-									
-									$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-									$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-									$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-									$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-									if(!empty($row)){
-										$markettingCarrierName = $row['name'];		
-									}
-
-									// Departure Country
-									$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-									$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-									if(!empty($row1)){
-										$dAirport = $row1['name'];
-										$dCity = $row1['cityName'];
-										$dCountry = $row1['countryCode'];		
-									}
-
-									// Departure Country
-									$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-									$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-									if(!empty($row2)){
-										$aAirport = $row2['name'];
-										$aCity = $row2['cityName'];
-										$aCountry = $row2['countryCode'];
-									}
-									
-									
-									$BookingCode = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['BookingCode'];
-									$Seat = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['BookingCount'];
-									$CabinClass = $airPricePoint[0]['airBookingInfo'][0]['@attributes']['CabinClass'];
+                    $FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
+                    $FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
 
 
-									//Leg 2
-									
-									$FareInfoRef1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['FareInfoRef'];
-									$SegmentRef1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['SegmentRef'];
+                    $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                    $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
+
+                    $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime']; 
+                    $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+
+                    $dpTime = date("D d M Y", strtotime($DepartureTime));
+                    $arrTime = date("D d M Y", strtotime($ArrivalTime));
+                    
+                    $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                    $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
+
+                    $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                    $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+
+                    if(!empty($row)){
+                        $markettingCarrierName = $row['name'];		
+                    }
+
+                    // Departure Country
+                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport = $row1['name'];
+                        $dCity = $row1['cityName'];
+                        $dCountry = $row1['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport = $row2['name'];
+                        $aCity = $row2['cityName'];
+                        $aCountry = $row2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode = $airPricePoint[1]['airBookingInfo']['@attributes']['BookingCode'];
+                    $Seat = $airPricePoint[1]['airBookingInfo']['@attributes']['BookingCount'];
+                    $CabinClass = $airPricePoint[1]['airBookingInfo']['@attributes']['CabinClass'];
+
+                    $segment = array(
+                                    array("marketingcareer"=> "$markettingCarrier",
+                                            "marketingflight"=> "$markettingFN",
+                                            "operatingcareer"=> "$markettingCarrier",
+                                            "operatingflight"=> "$markettingFN",
+                                            "departure"=> "$DepartureFrom",
+                                            "departureAirport"=> "$dAirport ",
+                                            "departureLocation"=> "$dCity , $dCountry",                    
+                                            "departureTime" => $DepartureTime,
+                                            "arrival"=> "$ArrivalTo",                   
+                                            "arrivalTime" => "$ArrivalTime",
+                                            "arrivalAirport"=> "$aAirport",
+                                            "arrivalLocation"=> "$aCity , $aCountry",
+                                            "flightduration"=> "$TravelTimeHm",
+                                            "bookingcode"=> "$BookingCode",
+                                            "seat"=> "$Seat",
+                                            'CabinClass' => $CabinClass,
+                                            'FareInfoRef' => $FareInfoRef,
+                                            'SegmentRef' => $SegmentRef,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                    )
+                                );
+
+                        $basic = array("system" =>"Galileo",
+                                        "segment"=> "1",
+										"triptype"=>$TripType,
+                                        "career"=> $validatingCarrierCode,
+                                        "careerName" => $CarrieerName,
+                                        "BasePrice" => $BasePrice ,
+                                        "Taxes" => $Taxes,
+                                        "price" => $AgentPrice,
+										"clientPrice"=> $TotalPrice,
+										"comission"=> $Commission,
+                                        "pricebreakdown"=> $PriceBreakDown,
+                                        "airChangePenalty " => $airChangePenalty ,
+                                        "airCancelPenalty" => $airCancelPenalty,
+                                        "airFareCalc " => $airFareCalc ,
+                                        "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                        "airFareInfoRef" => $airFareInfoRef,
+                                        "LatestTicketingTime" => $LatestTicketingTime,
+                                        "departure"=> $From,
+                                        "departureTime" => substr($DepartureTime,11,5),                  
+                                        "departureDate" => $dpTime,
+                                        "arrival"=> "$To",                   
+                                        "arrivalTime" => substr($ArrivalTime,11,5),
+                                        "arrivalDate" => $arrTime,
+                                        "flightduration"=> $TravelTimeHm,												
+                                        "bags" => $Bags,
+                                        "seat" => $Seat,
+                                        "class" => $CabinClass,
+                                        "refundable"=> $Refundable,
+                                        "segments" => $segment,											
+                                        "traceid" => $TraceId
+                                    );
+
+                                    array_push($All,$basic);
 
 
-									$FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
-									$FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
+                        }else if(isset($airPricePoint[1]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == True){
+                            //Leg1
+        
+                            $FareInfoRef = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['FareInfoRef'];
+                            $SegmentRef = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['SegmentRef'];
+                            
+                            $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+                            $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                            $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
+
+                            $FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
+                            $FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
 
 
-									$ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
-									$DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
+                            $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                            $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
 
-									$ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
-									$DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
+                            $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                            $departureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
 
-									$dpTime1 = date("D d M Y", strtotime($DepartureTime1));
-									$arrTime1 = date("D d M Y", strtotime($ArrivalTime1));
+                            $fromTime = substr($departureTime,11, 19);
+                            $dpTime = date("D d M Y", strtotime(substr($departureTime,0, 10)." ".$fromTime));
 
-									
-									$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
-									$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
+                            $toTime = substr($ArrivalTime,11, 19);
+                            $arrTime = date("D d M Y", strtotime(substr($departureTime,0, 10)." ".$toTime));
 
-									$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-									$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+                            
+                            $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                            $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-									if(!empty($rowmk1)){
-										$markettingCarrierName1 = $rowmk1['name'];		
-									}
+                            $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                            $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
 
-									// Departure Country
-									$sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
-									$rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
+                            if(!empty($row)){
+                                $markettingCarrierName = $row['name'];		
+                            }
 
-									if(!empty($row1)){
-										$dAirport1 = $rowdp1['name'];
-										$dCity1 = $rowdp1['cityName'];
-										$dCountry1 = $rowdp1['countryCode'];		
-									}
+                            // Departure Country
+                            $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                            $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
 
-									// Departure Country
-									$sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-									$rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
+                            if(!empty($row1)){
+                                $dAirport = $row1['name'];
+                                $dCity = $row1['cityName'];
+                                $dCountry = $row1['countryCode'];		
+                            }
 
-									if(!empty($row2)){
-										$aAirport1 = $rowar2['name'];
-										$aCity1 = $rowar2['cityName'];
-										$aCountry1 = $rowar2['countryCode'];
-									}
-									
-									
-									$BookingCode1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['BookingCode'];
-									$Seat1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['BookingCount'];
-									$CabinClass1 = $airPricePoint[0]['airBookingInfo'][1]['@attributes']['CabinClass'];
-									
+                            // Departure Country
+                            $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                            $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
 
-									$Transits = $TravelTime - ($FlightTime + $FlightTime1);
-									$TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
-
-									$Transit = array("transit"=> $TransitHm);
+                            if(!empty($row2)){
+                                $aAirport = $row2['name'];
+                                $aCity = $row2['cityName'];
+                                $aCountry = $row2['countryCode'];
+                            }
+                            
+                            
+                            $BookingCode = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['BookingCode'];
+                            $Seat = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['BookingCount'];
+                            $CabinClass = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['CabinClass'];
 
 
-									$segment = array(
-													array("marketingcareer"=> "$markettingCarrier",
-															"marketingflight"=> "$markettingFN",
-															"operatingcareer"=> "$markettingCarrier",
-															"operatingflight"=> "$markettingFN",
-															"departure"=> "$DepartureFrom",
-															"departureAirport"=> "$dAirport ",
-															"departureLocation"=> "$dCity , $dCountry",                    
-															"departureTime" => "$dpTime",
-															"arrival"=> "$ArrivalTo",                   
-															"arrivalTime" => "$ArrivalTime1",
-															"arrivalAirport"=> "$aAirport",
-															"arrivalLocation"=> "$aCity , $aCountry",
-															"flightduration"=> $FlightTimeHm,
-															"bookingcode"=> "$BookingCode",
-															"seat"=> $Seat,
-															'CabinClass' => $CabinClass,
-															'FareInfoRef' => $FareInfoRef,
-															'SegmentRef' => $SegmentRef,
-															'SegmentDetails' => $airAirSegment[$SegmentRef]
-
-													),array("marketingcareer"=> "$markettingCarrier1",
-															"marketingflight"=> "$markettingFN1",
-															"operatingcareer"=> "$markettingCarrier1",
-															"operatingflight"=> "$markettingFN1",
-															"departure"=> "$DepartureFrom1",
-															"departureAirport"=> "$dAirport1",
-															"departureLocation"=> "$dCity1 , $dCountry",                    
-															"departureTime" => "$dpTime",
-															"arrival"=> "$ArrivalTo1",                   
-															"arrivalTime" => "$arrTime1",
-															"arrivalAirport"=> "$aAirport1",
-															"arrivalLocation"=> "$aCity1 , $aCountry1",
-															"flightduration"=> "$FlightTimeHm1",
-															"bookingcode"=> "$BookingCode1",
-															"seat"=> "$Seat1",
-															'CabinClass' => $CabinClass1,
-															'FareInfoRef' => $FareInfoRef1,
-															'SegmentRef' => $SegmentRef1,
-															'SegmentDetails' => $airAirSegment[$SegmentRef1]
-
-													)
-												);
-											$basic = array("system" =>"Galileo",
-														"segment"=> "2",
-														"career"=> $validatingCarrierCode,
-														"careerName" => "$CarrieerName",
-														"BasePrice" => $BasePrice ,
-														"Taxes" => $Taxes,
-														"price" => "$Exact",
-														"airChangePenalty " => $airChangePenalty ,
-														"airCancelPenalty" => $airCancelPenalty,
-														"airFareCalc " => $airFareCalc ,
-														"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-														"airFareInfoRef" => $airFareInfoRef,
-														"LatestTicketingTime" => $LatestTicketingTime,
-														"departure"=> "$From",                   
-														"departureTime" => substr($DepartureTime,11,5),
-														"departureDate" => "$dpTime",
-														"arrival"=> "$To",                   
-														"arrivalTime" => substr($ArrivalTime1,11,5),
-														"arrivalDate" => "$arrTime1",
-														"flightduration"=> $TravelTimeHm,														
-														"bags" => $Bags,
-														"seat" => "$Seat",
-														"class" => "$CabinClass",
-														"refundable"=> $Refundable,
-														"segments" => $segment,
-														"transit" => $Transit,													
-														"traceid" => $TraceId
-													);
-												array_push($All, $basic);
-											}
-
-					}
-					if(isset($airPricePoint[1]) == TRUE){
-						if(isset($airPricePoint[1]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == False){
-							$FareInfoRef = $airPricePoint[1]['airBookingInfo']['@attributes']['FareInfoRef'];
-							$SegmentRef = $airPricePoint[1]['airBookingInfo']['@attributes']['SegmentRef'];
-							$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-							$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-							$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
-
-							$FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
-							$FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
+                            //Leg 2
+                            
+                            $FareInfoRef1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['FareInfoRef'];
+                            $SegmentRef1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['SegmentRef'];
 
 
-							$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-							$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-							$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime']; 
-							$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-							$dpTime = date("D d M Y", strtotime($DepartureTime));
-							$arrTime = date("D d M Y", strtotime($ArrivalTime));
-							
-							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
-							}
-
-							// Departure Country
-							$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-							$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-							if(!empty($row1)){
-								$dAirport = $row1['name'];
-								$dCity = $row1['cityName'];
-								$dCountry = $row1['countryCode'];		
-							}
-
-							// Departure Country
-							$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-							$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-							if(!empty($row2)){
-								$aAirport = $row2['name'];
-								$aCity = $row2['cityName'];
-								$aCountry = $row2['countryCode'];
-							}
-							
-							
-							$BookingCode = $airPricePoint[1]['airBookingInfo']['@attributes']['BookingCode'];
-							$Seat = $airPricePoint[1]['airBookingInfo']['@attributes']['BookingCount'];
-							$CabinClass = $airPricePoint[1]['airBookingInfo']['@attributes']['CabinClass'];
+                            $FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
+                            $FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
 
 
-							$Transit = array("Transit" => "0");
-							$segment = array(
-											array("marketingcareer"=> "$markettingCarrier",
-													"marketingflight"=> "$markettingFN",
-													"operatingcareer"=> "$markettingCarrier",
-													"operatingflight"=> "$markettingFN",
-													"departure"=> "$DepartureFrom",
-													"departureAirport"=> "$dAirport ",
-													"departureLocation"=> "$dCity , $dCountry",                    
-													"departureTime" => $DepartureTime,
-													"arrival"=> "$ArrivalTo",                   
-													"arrivalTime" => "$ArrivalTime",
-													"arrivalAirport"=> "$aAirport",
-													"arrivalLocation"=> "$aCity , $aCountry",
-													"flightduration"=> "$TravelTimeHm",
-													"bookingcode"=> "$BookingCode",
-													"seat"=> "$Seat",
-													'CabinClass' => $CabinClass,
-													'FareInfoRef' => $FareInfoRef,
-													'SegmentRef' => $SegmentRef,
-													'SegmentDetails' => $airAirSegment[$SegmentRef]
+                            $ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
+                            $DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
 
-											)
-										);
+                            $ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
+                            $departureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
 
-								$basic = array("system" =>"Galileo",
-												"segment"=> "1",
-												"career"=> $validatingCarrierCode,
-												"careerName" => $CarrieerName,
-												"BasePrice" => $BasePrice ,
+                            $fromTime1 = substr($departureTime1,11, 19);
+                            $dpTime1 = date("D d M Y", strtotime(substr($departureTime1,0, 10)." ".$fromTime1));
+
+                            $toTime1 = substr($ArrivalTime1,11, 19);
+                            $arrTime1 = date("D d M Y", strtotime(substr($departureTime1,0, 10)." ".$toTime1));
+
+                            
+                            $markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
+                            $markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
+
+                            $sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
+                            $rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+
+                            if(!empty($rowmk1)){
+                                $markettingCarrierName1 = $rowmk1['name'];		
+                            }
+
+                            // Departure Country
+                            $sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
+                            $rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
+
+                            if(!empty($row1)){
+                                $dAirport1 = $rowdp1['name'];
+                                $dCity1 = $rowdp1['cityName'];
+                                $dCountry1 = $rowdp1['countryCode'];		
+                            }
+
+                            // Departure Country
+                            $sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
+                            $rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
+
+                            if(!empty($row2)){
+                                $aAirport1 = $rowar2['name'];
+                                $aCity1 = $rowar2['cityName'];
+                                $aCountry1 = $rowar2['countryCode'];
+                            }
+                            
+                            
+                            $BookingCode1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['BookingCode'];
+                            $Seat1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['BookingCount'];
+                            $CabinClass1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['CabinClass'];
+                            
+
+                            $Transits = $TravelTime - ($FlightTime + $FlightTime1);
+                            $TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
+                            $Transit = array("transit1"=> $TransitHm);
+
+                            $segment = array(
+                                            array("marketingcareer"=> "$markettingCarrier",
+                                                    "marketingflight"=> "$markettingFN",
+                                                    "operatingcareer"=> "$markettingCarrier",
+                                                    "operatingflight"=> "$markettingFN",
+                                                    "departure"=> "$DepartureFrom",
+                                                    "departureAirport"=> "$dAirport ",
+                                                    "departureLocation"=> "$dCity , $dCountry",                    
+                                                    "departureTime" => "$dpTime",
+                                                    "arrival"=> "$ArrivalTo",                   
+                                                    "arrivalTime" => "$arrTime",
+                                                    "arrivalAirport"=> "$aAirport",
+                                                    "arrivalLocation"=> "$aCity , $aCountry",
+                                                    "flightduration"=> "$FlightTimeHm",
+                                                    "bookingcode"=> "$BookingCode",
+                                                    "seat"=> "$Seat",
+                                                    'CabinClass' => $CabinClass,
+                                                    'FareInfoRef' => $FareInfoRef,
+                                                    'SegmentRef' => $SegmentRef,
+                                                    'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                            ),array("marketingcareer"=> "$markettingCarrier1",
+                                                    "marketingflight"=> "$markettingFN1",
+                                                    "operatingcareer"=> "$markettingCarrier1",
+                                                    "operatingflight"=> "$markettingFN1",
+                                                    "departure"=> "$DepartureFrom1",
+                                                    "departureAirport"=> "$dAirport1",
+                                                    "departureLocation"=> "$dCity1 , $dCountry",                    
+                                                    "departureTime" => "$dpTime",
+                                                    "arrival"=> "$ArrivalTo1",                   
+                                                    "arrivalTime" => "$arrTime1",
+                                                    "arrivalAirport"=> "$aAirport1",
+                                                    "arrivalLocation"=> "$aCity1 , $aCountry1",
+                                                    "flightduration"=> "$FlightTimeHm1",
+                                                    "bookingcode"=> "$BookingCode1",
+                                                    "seat"=> "$Seat1",
+                                                    'CabinClass' => $CabinClass1,
+                                                    'FareInfoRef' => $FareInfoRef1,
+                                                    'SegmentRef' => $SegmentRef1,
+                                                    'SegmentDetails' => $airAirSegment[$SegmentRef1]
+
+                                            )
+                                        );
+                                    $basic = array("system" =>"Galileo",
+                                                "segment"=> "2",
+												"triptype"=>$TripType,
+                                                "career"=> $validatingCarrierCode,
+                                                "careerName" => "$CarrieerName",
+                                                "BasePrice" => $BasePrice ,
 												"Taxes" => $Taxes,
-												"price" => "$Exact",
-												"airChangePenalty " => $airChangePenalty ,
-												"airCancelPenalty" => $airCancelPenalty,
-												"airFareCalc " => $airFareCalc ,
-												"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-												"airFareInfoRef" => $airFareInfoRef,
-												"LatestTicketingTime" => $LatestTicketingTime,
-												"departure"=> $From,
-												"departureTime" => substr($DepartureTime,11,5),                  
-												"departureDate" => $dpTime,
-												"arrival"=> "$To",                   
-												"arrivalTime" => substr($ArrivalTime,11,5),
-												"arrivalDate" => $arrTime,
-												"flightduration"=> $TravelTimeHm,												
-												"bags" => $Bags,
-												"seat" => $Seat,
-												"class" => $CabinClass,
-												"refundable"=> $Refundable,
-												"segments" => $segment,											
-												"traceid" => $TraceId
-											);
-
-											array_push($All,$basic);
-
-
-								}else if(isset($airPricePoint[1]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == True){
-									//Leg1
-				
-									$FareInfoRef = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['FareInfoRef'];
-									$SegmentRef = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['SegmentRef'];
-									
-									$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-									$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-									$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
-
-									$FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
-									$FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
-
-
-									$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-									$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-									$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-									$departureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-									$fromTime = substr($departureTime,11, 19);
-									$dpTime = date("D d M Y", strtotime(substr($departureTime,0, 10)." ".$fromTime));
-
-									$toTime = substr($ArrivalTime,11, 19);
-									$arrTime = date("D d M Y", strtotime(substr($departureTime,0, 10)." ".$toTime));
-
-									
-									$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-									$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-									$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-									$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-									if(!empty($row)){
-										$markettingCarrierName = $row['name'];		
-									}
-
-									// Departure Country
-									$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-									$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-									if(!empty($row1)){
-										$dAirport = $row1['name'];
-										$dCity = $row1['cityName'];
-										$dCountry = $row1['countryCode'];		
-									}
-
-									// Departure Country
-									$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-									$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-									if(!empty($row2)){
-										$aAirport = $row2['name'];
-										$aCity = $row2['cityName'];
-										$aCountry = $row2['countryCode'];
-									}
-									
-									
-									$BookingCode = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['BookingCode'];
-									$Seat = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['BookingCount'];
-									$CabinClass = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['CabinClass'];
+												"price" => $AgentPrice,
+												"clientPrice"=> $TotalPrice,
+												"comission"=> $Commission,
+                                                "pricebreakdown"=> $PriceBreakDown,
+                                                "airChangePenalty " => $airChangePenalty ,
+                                                "airCancelPenalty" => $airCancelPenalty,
+                                                "airFareCalc " => $airFareCalc ,
+                                                "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                                "airFareInfoRef" => $airFareInfoRef,
+                                                "LatestTicketingTime" => $LatestTicketingTime,
+                                                "departure"=> "$From",                   
+                                                "departureTime" => "$DepartureTime",
+                                                "departureDate" => "$dpTime",
+                                                "arrival"=> "$To",                   
+                                                "arrivalTime" => "$ArrivalTime1",
+                                                "arrivalDate" => "$arrTime1",
+                                                "flightduration"=> $TravelTimeHm,
+                                                
+                                                "bags" => $Bags,
+                                                "seat" => "$Seat",
+                                                "class" => "$CabinClass",
+                                                "refundable"=> $Refundable,
+                                                "segments" => $segment,													
+                                                "transit" => $Transit,
+                                                "traceid" => $TraceId
+                                            );
+                                            array_push($All, $basic);
+                                    }
+            }
+            if(isset($airPricePoint[2]) == TRUE){
+                if(isset($airPricePoint[2]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == False){
+                    $FareInfoRef = $airPricePoint[2]['airBookingInfo']['@attributes']['FareInfoRef'];
+                    $SegmentRef = $airPricePoint[2]['airBookingInfo']['@attributes']['SegmentRef'];
+                    $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+                    $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                    $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
 
 
-									//Leg 2
-									
-									$FareInfoRef1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['FareInfoRef'];
-									$SegmentRef1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['SegmentRef'];
+                    $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                    $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
+
+                    $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                    $departureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+
+                    $fromTime = substr($departureTime,11, 19);
+                    $dpTime = date("D d M Y", strtotime(substr($departureTime,0, 10)." ".$fromTime));
 
 
-									$FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
-									$FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
+                    $toTime = substr($ArrivalTime,11, 19);
+                    $arrTime = date("D d M Y", strtotime(substr($departureTime,0, 10)." ".$toTime));
+
+                    
+                    $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                    $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
+
+                    $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                    $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+
+                    if(!empty($row)){
+                        $markettingCarrierName = $row['name'];		
+                    }
+
+                    // Departure Country
+                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport = $row1['name'];
+                        $dCity = $row1['cityName'];
+                        $dCountry = $row1['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport = $row2['name'];
+                        $aCity = $row2['cityName'];
+                        $aCountry = $row2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode = $airPricePoint[2]['airBookingInfo']['@attributes']['BookingCode'];
+                    $Seat = $airPricePoint[2]['airBookingInfo']['@attributes']['BookingCount'];
+                    $CabinClass = $airPricePoint[2]['airBookingInfo']['@attributes']['CabinClass'];
+
+                    $Transit = array("transit1" => "0");
+
+                    $segment = array(
+                                    array("marketingcareer"=> "$markettingCarrier",
+                                            "marketingflight"=> "$markettingFN",
+                                            "operatingcareer"=> "$markettingCarrier",
+                                            "operatingflight"=> "$markettingFN",
+                                            "departure"=> "$DepartureFrom",
+                                            "departureAirport"=> "$dAirport ",
+                                            "departureLocation"=> "$dCity , $dCountry",                    
+                                            "departureTime" => "$departureTime",
+                                            "arrival"=> "$ArrivalTo",                   
+                                            "arrivalTime" => "$ArrivalTime",
+                                            "arrivalAirport"=> "$aAirport",
+                                            "arrivalLocation"=> "$aCity , $aCountry",
+                                            "flightduration"=> "$TravelTimeHm",
+                                            "bookingcode"=> "$BookingCode",
+                                            "seat"=> "$Seat",
+                                            'CabinClass' => $CabinClass,
+                                            'FareInfoRef' => $FareInfoRef,
+                                            'SegmentRef' => $SegmentRef,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                    )
+                                );
+
+                        $basic = array("system" =>"Galileo",
+                                        "segment"=> "1",
+										"triptype"=>$TripType,
+                                        "career"=> $validatingCarrierCode,
+                                        "careerName" => $CarrieerName,
+                                        "BasePrice" => $BasePrice ,
+                                        "Taxes" => $Taxes,
+                                        "price" => $AgentPrice,
+										"clientPrice"=> $TotalPrice,
+										"comission"=> $Commission,
+                                        "pricebreakdown"=> $PriceBreakDown,
+                                        "airChangePenalty " => $airChangePenalty ,
+                                        "airCancelPenalty" => $airCancelPenalty,
+                                        "airFareCalc " => $airFareCalc ,
+                                        "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                        "airFareInfoRef" => $airFareInfoRef,
+                                        "LatestTicketingTime" => $LatestTicketingTime,
+                                        "departure"=> $From,
+                                        "departureTime" => substr($DepartureTime,11,5),                  
+                                        "departureDate" => $dpTime,
+                                        "arrival"=> "$To",                   
+                                        "arrivalTime" => substr($ArrivalTime,11,5),
+                                        "arrivalDate" => $arrTime,
+                                        "flightduration"=> $TravelTimeHm,
+                                        
+                                        "bags" => $Bags,
+                                        "seat" => $Seat,
+                                        "class" => $CabinClass,
+                                        "refundable"=> $Refundable,
+                                        "segments" => $segment,											
+                                        "traceid" => $TraceId
+                                    );
+
+                        array_push($All,$basic);
 
 
-									$ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
-									$DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
-
-									$ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
-									$departureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
-
-									$fromTime1 = substr($departureTime1,11, 19);
-									$dpTime1 = date("D d M Y", strtotime(substr($departureTime1,0, 10)." ".$fromTime1));
-
-									$toTime1 = substr($ArrivalTime1,11, 19);
-									$arrTime1 = date("D d M Y", strtotime(substr($departureTime1,0, 10)." ".$toTime1));
-
-									
-									$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
-									$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
-
-									$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-									$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
-
-									if(!empty($rowmk1)){
-										$markettingCarrierName1 = $rowmk1['name'];		
-									}
-
-									// Departure Country
-									$sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
-									$rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
-
-									if(!empty($row1)){
-										$dAirport1 = $rowdp1['name'];
-										$dCity1 = $rowdp1['cityName'];
-										$dCountry1 = $rowdp1['countryCode'];		
-									}
-
-									// Departure Country
-									$sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-									$rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
-
-									if(!empty($row2)){
-										$aAirport1 = $rowar2['name'];
-										$aCity1 = $rowar2['cityName'];
-										$aCountry1 = $rowar2['countryCode'];
-									}
-									
-									
-									$BookingCode1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['BookingCode'];
-									$Seat1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['BookingCount'];
-									$CabinClass1 = $airPricePoint[1]['airBookingInfo'][1]['@attributes']['CabinClass'];
-									
-
-									$Transits = $TravelTime - ($FlightTime + $FlightTime1);
-									$TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
-									$Transit = array("transit1"=> $TransitHm);
-
-									$segment = array(
-													array("marketingcareer"=> "$markettingCarrier",
-															"marketingflight"=> "$markettingFN",
-															"operatingcareer"=> "$markettingCarrier",
-															"operatingflight"=> "$markettingFN",
-															"departure"=> "$DepartureFrom",
-															"departureAirport"=> "$dAirport ",
-															"departureLocation"=> "$dCity , $dCountry",                    
-															"departureTime" => "$dpTime",
-															"arrival"=> "$ArrivalTo",                   
-															"arrivalTime" => "$arrTime",
-															"arrivalAirport"=> "$aAirport",
-															"arrivalLocation"=> "$aCity , $aCountry",
-															"flightduration"=> "$FlightTimeHm",
-															"bookingcode"=> "$BookingCode",
-															"seat"=> "$Seat",
-															'CabinClass' => $CabinClass,
-															'FareInfoRef' => $FareInfoRef,
-															'SegmentRef' => $SegmentRef,
-															'SegmentDetails' => $airAirSegment[$SegmentRef]
-
-													),array("marketingcareer"=> "$markettingCarrier1",
-															"marketingflight"=> "$markettingFN1",
-															"operatingcareer"=> "$markettingCarrier1",
-															"operatingflight"=> "$markettingFN1",
-															"departure"=> "$DepartureFrom1",
-															"departureAirport"=> "$dAirport1",
-															"departureLocation"=> "$dCity1 , $dCountry",                    
-															"departureTime" => "$dpTime",
-															"arrival"=> "$ArrivalTo1",                   
-															"arrivalTime" => "$arrTime1",
-															"arrivalAirport"=> "$aAirport1",
-															"arrivalLocation"=> "$aCity1 , $aCountry1",
-															"flightduration"=> "$FlightTimeHm1",
-															"bookingcode"=> "$BookingCode1",
-															"seat"=> "$Seat1",
-															'CabinClass' => $CabinClass1,
-															'FareInfoRef' => $FareInfoRef1,
-															'SegmentRef' => $SegmentRef1,
-															'SegmentDetails' => $airAirSegment[$SegmentRef1]
-
-													)
-												);
-											$basic = array("system" =>"Galileo",
-														"segment"=> "2",
-														"career"=> $validatingCarrierCode,
-														"careerName" => "$CarrieerName",
-														"BasePrice" => $BasePrice ,
-														"Taxes" => $Taxes,
-														"price" => "$Exact",
-														"airChangePenalty " => $airChangePenalty ,
-														"airCancelPenalty" => $airCancelPenalty,
-														"airFareCalc " => $airFareCalc ,
-														"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-														"airFareInfoRef" => $airFareInfoRef,
-														"LatestTicketingTime" => $LatestTicketingTime,
-														"departure"=> "$From",                   
-														"departureTime" => "$DepartureTime",
-														"departureDate" => "$dpTime",
-														"arrival"=> "$To",                   
-														"arrivalTime" => "$ArrivalTime1",
-														"arrivalDate" => "$arrTime1",
-														"flightduration"=> $TravelTimeHm,
-														
-														"bags" => $Bags,
-														"seat" => "$Seat",
-														"class" => "$CabinClass",
-														"refundable"=> $Refundable,
-														"segments" => $segment,													
-														"transit" => $Transit,
-														"traceid" => $TraceId
-													);
-													array_push($All, $basic);
-											}
-					}
-					if(isset($airPricePoint[2]) == TRUE){
-						if(isset($airPricePoint[2]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == False){
-							$FareInfoRef = $airPricePoint[2]['airBookingInfo']['@attributes']['FareInfoRef'];
-							$SegmentRef = $airPricePoint[2]['airBookingInfo']['@attributes']['SegmentRef'];
-							$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-							$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-							$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
+            }else if(isset($airPricePoint[2]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == True){
+                            //Leg1
+        
+                            $FareInfoRef = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['FareInfoRef'];
+                            $SegmentRef = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['SegmentRef'];
+                            
+                            $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+                            $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                            $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
 
 
-							$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-							$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
 
-							$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-							$departureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+                            $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                            $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
 
-							$fromTime = substr($departureTime,11, 19);
-							$dpTime = date("D d M Y", strtotime(substr($departureTime,0, 10)." ".$fromTime));
+                            $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                            $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+
+                            $dpTime = date("D d M Y", strtotime($DepartureTime));
+                            $arrTime = date("D d M Y", strtotime($ArrivalTime));
+
+                            
+                            $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                            $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
+
+                            $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                            $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+
+                            if(!empty($row)){
+                                $markettingCarrierName = $row['name'];		
+                            }
+
+                            // Departure Country
+                            $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                            $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
+                            if(!empty($row1)){
+                                $dAirport = $row1['name'];
+                                $dCity = $row1['cityName'];
+                                $dCountry = $row1['countryCode'];		
+                            }
+
+                            // Departure Country
+                            $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                            $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+
+                            if(!empty($row2)){
+                                $aAirport = $row2['name'];
+                                $aCity = $row2['cityName'];
+                                $aCountry = $row2['countryCode'];
+                            }
+                            
+                            
+                            $BookingCode = $airPricePoint[2]['airBookingInfo'][0]['@attributes']['BookingCode'];
+                            $Seat = $airPricePoint[2]['airBookingInfo'][0]['@attributes']['BookingCount'];
+                            $CabinClass = $airPricePoint[2]['airBookingInfo'][0]['@attributes']['CabinClass'];
 
 
-							$toTime = substr($ArrivalTime,11, 19);
-							$arrTime = date("D d M Y", strtotime(substr($departureTime,0, 10)." ".$toTime));
+                            //Leg 2
+                            
+                            $FareInfoRef1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['FareInfoRef'];
+                            $SegmentRef1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['SegmentRef'];
 
-							
-							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+                            $FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
+                            $FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
 
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
-							}
 
-							// Departure Country
-							$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-							$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+                            $ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
+                            $DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
 
-							if(!empty($row1)){
-								$dAirport = $row1['name'];
-								$dCity = $row1['cityName'];
-								$dCountry = $row1['countryCode'];		
-							}
+                            $ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
+                            $DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
 
-							// Departure Country
-							$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-							$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+                            $dpTime1 = date("D d M Y", strtotime($DepartureTime));
+                            $arrTime1 = date("D d M Y", strtotime($ArrivalTime1));
 
-							if(!empty($row2)){
-								$aAirport = $row2['name'];
-								$aCity = $row2['cityName'];
-								$aCountry = $row2['countryCode'];
-							}
-							
-							
-							$BookingCode = $airPricePoint[2]['airBookingInfo']['@attributes']['BookingCode'];
-							$Seat = $airPricePoint[2]['airBookingInfo']['@attributes']['BookingCount'];
-							$CabinClass = $airPricePoint[2]['airBookingInfo']['@attributes']['CabinClass'];
+                            
+                            $markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
+                            $markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
 
-							$Transit = array("Transit" => "0");
+                            $sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
+                            $rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
 
-							$segment = array(
-											array("marketingcareer"=> "$markettingCarrier",
-													"marketingflight"=> "$markettingFN",
-													"operatingcareer"=> "$markettingCarrier",
-													"operatingflight"=> "$markettingFN",
-													"departure"=> "$DepartureFrom",
-													"departureAirport"=> "$dAirport ",
-													"departureLocation"=> "$dCity , $dCountry",                    
-													"departureTime" => "$departureTime",
-													"arrival"=> "$ArrivalTo",                   
-													"arrivalTime" => "$ArrivalTime",
-													"arrivalAirport"=> "$aAirport",
-													"arrivalLocation"=> "$aCity , $aCountry",
-													"flightduration"=> "$TravelTimeHm",
-													"bookingcode"=> "$BookingCode",
-													"seat"=> "$Seat",
-													'CabinClass' => $CabinClass,
-													'FareInfoRef' => $FareInfoRef,
-													'SegmentRef' => $SegmentRef,
-													'SegmentDetails' => $airAirSegment[$SegmentRef]
+                            if(!empty($rowmk1)){
+                                $markettingCarrierName1 = $rowmk1['name'];		
+                            }
 
-											)
-										);
+                            // Departure Country
+                            $sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
+                            $rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
 
-								$basic = array("system" =>"Galileo",
-												"segment"=> "1",
-												"career"=> $validatingCarrierCode,
-												"careerName" => $CarrieerName,
-												"BasePrice" => $BasePrice ,
+                            if(!empty($row1)){
+                                $dAirport1 = $rowdp1['name'];
+                                $dCity1 = $rowdp1['cityName'];
+                                $dCountry1 = $rowdp1['countryCode'];		
+                            }
+
+                            // Departure Country
+                            $sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
+                            $rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
+
+                            if(!empty($row2)){
+                                $aAirport1 = $rowar2['name'];
+                                $aCity1 = $rowar2['cityName'];
+                                $aCountry1 = $rowar2['countryCode'];
+                            }
+                            
+                            
+                            $BookingCode1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['BookingCode'];
+                            $Seat1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['BookingCount'];
+                            $CabinClass1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['CabinClass'];
+                            
+                            $Transits = $TravelTime - ($FlightTime + $FlightTime1);
+                            $TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
+
+                            $Transit = array("transit1"=> $TransitHm);
+
+                            $segment = array(
+                                            array("marketingcareer"=> "$markettingCarrier",
+                                                    "marketingflight"=> "$markettingFN",
+                                                    "operatingcareer"=> "$markettingCarrier",
+                                                    "operatingflight"=> "$markettingFN",
+                                                    "departure"=> "$DepartureFrom",
+                                                    "departureAirport"=> "$dAirport ",
+                                                    "departureLocation"=> "$dCity , $dCountry",                    
+                                                    "departureTime" => $DepartureTime,
+                                                    "arrival"=> "$ArrivalTo",                   
+                                                    "arrivalTime" => $ArrivalTime,
+                                                    "arrivalAirport"=> "$aAirport",
+                                                    "arrivalLocation"=> "$aCity , $aCountry",
+                                                    "flightduration"=> "$FlightTimeHm",
+                                                    "bookingcode"=> "$BookingCode",
+                                                    "seat"=> "$Seat",
+                                                    'CabinClass' => $CabinClass,
+                                                    'FareInfoRef' => $FareInfoRef,
+                                                    'SegmentRef' => $SegmentRef,
+                                                    'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                            ),array("marketingcareer"=> "$markettingCarrier1",
+                                                    "marketingflight"=> "$markettingFN1",
+                                                    "operatingcareer"=> "$markettingCarrier1",
+                                                    "operatingflight"=> "$markettingFN1",
+                                                    "departure"=> "$DepartureFrom1",
+                                                    "departureAirport"=> "$dAirport1",
+                                                    "departureLocation"=> "$dCity1 , $dCountry",                    
+                                                    "departureTime" => $DepartureTime1,
+                                                    "arrival"=> $ArrivalTo1,                   
+                                                    "arrivalTime" => $ArrivalTime1,
+                                                    "arrivalAirport"=> "$aAirport1",
+                                                    "arrivalLocation"=> "$aCity1 , $aCountry1",
+                                                    "flightduration"=> "$FlightTimeHm1",
+                                                    "bookingcode"=> "$BookingCode1",
+                                                    "seat"=> "$Seat1",
+                                                    'CabinClass' => $CabinClass1,
+                                                    'FareInfoRef' => $FareInfoRef1,
+                                                    'SegmentRef' => $SegmentRef1,
+                                                    'SegmentDetails' => $airAirSegment[$SegmentRef1]
+
+                                            )
+                                        );
+                                    $basic = array("system" =>"Galileo",
+                                                "segment"=> "2",
+												"triptype"=>$TripType,
+                                                "career"=> $validatingCarrierCode,
+                                                "careerName" => "$CarrieerName",
+                                                "BasePrice" => $BasePrice ,
 												"Taxes" => $Taxes,
-												"price" => "$Exact",
-												"airChangePenalty " => $airChangePenalty ,
-												"airCancelPenalty" => $airCancelPenalty,
-												"airFareCalc " => $airFareCalc ,
-												"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-												"airFareInfoRef" => $airFareInfoRef,
-												"LatestTicketingTime" => $LatestTicketingTime,
-												"departure"=> $From,
-												"departureTime" => substr($DepartureTime,11,5),                  
-												"departureDate" => $dpTime,
-												"arrival"=> "$To",                   
-												"arrivalTime" => substr($ArrivalTime,11,5),
-												"arrivalDate" => $arrTime,
-												"flightduration"=> $TravelTimeHm,
-												
-												"bags" => $Bags,
-												"seat" => $Seat,
-												"class" => $CabinClass,
-												"refundable"=> $Refundable,
-												"segments" => $segment,											
-												"traceid" => $TraceId
-											);
-
-								array_push($All,$basic);
-
-
-								}else if(isset($airPricePoint[2]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == True){
-									//Leg1
-				
-									$FareInfoRef = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['FareInfoRef'];
-									$SegmentRef = $airPricePoint[1]['airBookingInfo'][0]['@attributes']['SegmentRef'];
-									
-									$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-									$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-									$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
-
-
-
-									$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-									$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-									$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-									$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-									$dpTime = date("D d M Y", strtotime($DepartureTime));
-									$arrTime = date("D d M Y", strtotime($ArrivalTime));
-
-									
-									$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-									$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-									$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-									$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-									if(!empty($row)){
-										$markettingCarrierName = $row['name'];		
-									}
-
-									// Departure Country
-									$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-									$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-									if(!empty($row1)){
-										$dAirport = $row1['name'];
-										$dCity = $row1['cityName'];
-										$dCountry = $row1['countryCode'];		
-									}
-
-									// Departure Country
-									$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-									$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-									if(!empty($row2)){
-										$aAirport = $row2['name'];
-										$aCity = $row2['cityName'];
-										$aCountry = $row2['countryCode'];
-									}
-									
-									
-									$BookingCode = $airPricePoint[2]['airBookingInfo'][0]['@attributes']['BookingCode'];
-									$Seat = $airPricePoint[2]['airBookingInfo'][0]['@attributes']['BookingCount'];
-									$CabinClass = $airPricePoint[2]['airBookingInfo'][0]['@attributes']['CabinClass'];
+												"price" => $AgentPrice,
+												"clientPrice"=> $TotalPrice,
+												"comission"=> $Commission,
+                                                "pricebreakdown"=> $PriceBreakDown,
+                                                "airChangePenalty " => $airChangePenalty ,
+                                                "airCancelPenalty" => $airCancelPenalty,
+                                                "airFareCalc " => $airFareCalc ,
+                                                "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                                "airFareInfoRef" => $airFareInfoRef,
+                                                "LatestTicketingTime" => $LatestTicketingTime,
+                                                "departure"=> "$From",                   
+                                                "departureTime" => substr($DepartureTime,11,5),
+                                                "departureDate" => "$dpTime",
+                                                "arrival"=> "$To",                   
+                                                "arrivalTime" => substr($ArrivalTime,11,5),
+                                                "arrivalDate" => "$arrTime1",
+                                                "flightduration"=> $TravelTimeHm,                                              
+                                                "bags" => $Bags,
+                                                "seat" => "$Seat",
+                                                "class" => "$CabinClass",
+                                                "refundable"=> $Refundable,
+                                                "segments" => $segment,
+                                                
+                                                "transit" => $Transit,
+                                                "traceid" => $TraceId
+                                            );
+                                            array_push($All, $basic);
+                                    }
+            }
+            if(isset($airPricePoint[3]) == TRUE){
+                if(isset($airPricePoint[3]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == False){
+                    $FareInfoRef = $airPricePoint[3]['airBookingInfo']['@attributes']['FareInfoRef'];
+                    $SegmentRef = $airPricePoint[3]['airBookingInfo']['@attributes']['SegmentRef'];
+                    $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+                    $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                    $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
 
 
-									//Leg 2
-									
-									$FareInfoRef1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['FareInfoRef'];
-									$SegmentRef1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['SegmentRef'];
+                    $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                    $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
+
+                    $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                    $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+
+                    $fromTime = substr($DepartureTime,11, 19);
+                    $dpTime = date("D d M Y", strtotime(substr($DepartureTime,0, 10)." ".$fromTime));
 
 
-									$FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
-									$FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
+                    $toTime = substr($ArrivalTime,11, 19);
+                    $arrTime = date("D d M Y", strtotime(substr($ArrivalTime,0, 10)." ".$toTime));
+
+                    
+                    $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                    $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
+
+                    $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                    $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+
+                    if(!empty($row)){
+                        $markettingCarrierName = $row['name'];		
+                    }
+
+                    // Departure Country
+                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport = $row1['name'];
+                        $dCity = $row1['cityName'];
+                        $dCountry = $row1['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport = $row2['name'];
+                        $aCity = $row2['cityName'];
+                        $aCountry = $row2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode = $airPricePoint[3]['airBookingInfo']['@attributes']['BookingCode'];
+                    $Seat = $airPricePoint[3]['airBookingInfo']['@attributes']['BookingCount'];
+                    $CabinClass = $airPricePoint[3]['airBookingInfo']['@attributes']['CabinClass'];
+                    $Transit = array("transit1" => "0");
+
+                    $segment = array(
+                                    array("marketingcareer"=> "$markettingCarrier",
+                                            "marketingflight"=> "$markettingFN",
+                                            "operatingcareer"=> "$markettingCarrier",
+                                            "operatingflight"=> "$markettingFN",
+                                            "departure"=> "$DepartureFrom",
+                                            "departureAirport"=> "$dAirport ",
+                                            "departureLocation"=> "$dCity , $dCountry",                    
+                                            "departureTime" => "$DepartureTime",
+                                            "arrival"=> "$ArrivalTo",                   
+                                            "arrivalTime" => "$ArrivalTime",
+                                            "arrivalAirport"=> "$aAirport",
+                                            "arrivalLocation"=> "$aCity , $aCountry",
+                                            "flightduration"=> "$TravelTimeHm",
+                                            "bookingcode"=> "$BookingCode",
+                                            "seat"=> "$Seat",
+                                            'CabinClass' => $CabinClass,
+                                            'FareInfoRef' => $FareInfoRef,
+                                            'SegmentRef' => $SegmentRef,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                    )
+                                );
+
+                        $basic = array("system" =>"Galileo",
+                                        "segment"=> "1",
+										"triptype"=>$TripType,
+                                        "career"=> $validatingCarrierCode,
+                                        "careerName" => $CarrieerName,
+                                        "BasePrice" => $BasePrice ,
+                                        "Taxes" => $Taxes,
+                                        "price" => $AgentPrice,
+										"clientPrice"=> $TotalPrice,
+										"comission"=> $Commission,
+                                        "pricebreakdown"=> $PriceBreakDown,
+                                        "airChangePenalty " => $airChangePenalty ,
+                                        "airCancelPenalty" => $airCancelPenalty,
+                                        "airFareCalc " => $airFareCalc ,
+                                        "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                        "airFareInfoRef" => $airFareInfoRef,
+                                        "LatestTicketingTime" => $LatestTicketingTime,
+                                        "departure"=> $From,
+                                        "departureTime" => substr($DepartureTime,11,5),                  
+                                        "departureDate" => $dpTime,
+                                        "arrival"=> $To,                   
+                                        "arrivalTime" => substr($ArrivalTime,11,5),
+                                        "arrivalDate" => $arrTime,
+                                        "flightduration"=> $TravelTimeHm,												
+                                        "bags" => $Bags,
+                                        "seat" => $Seat,
+                                        "class" => $CabinClass,
+                                        "refundable"=> $Refundable,
+                                        "segments" => $segment,																							
+                                        "traceid" => $TraceId
+                                    );
+
+                                    array_push($All,$basic);
 
 
-									$ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
-									$DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
+                        }else if(isset($airPricePoint[3]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == True){
+                            //Leg1
+        
+                            $FareInfoRef = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['FareInfoRef'];
+                            $SegmentRef = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['SegmentRef'];
+                            
+                            $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+                            $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                            $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
 
-									$ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
-									$DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
+                            $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                            $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
 
-									$dpTime1 = date("D d M Y", strtotime($DepartureTime));
-									$arrTime1 = date("D d M Y", strtotime($ArrivalTime1));
+                            $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                            $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
 
-									
-									$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
-									$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
+                            $fromTime = substr($departureTime,11, 19);
+                            $dpTime = date("D d M Y", strtotime(substr($DepartureTime,0, 10)." ".$fromTime));
 
-									$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-									$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+                            $toTime = substr($ArrivalTime,11, 19);
+                            $arrTime = date("D d M Y", strtotime(substr($ArrivalTime,0, 10)." ".$toTime));
 
-									if(!empty($rowmk1)){
-										$markettingCarrierName1 = $rowmk1['name'];		
-									}
+                            
+                            $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                            $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-									// Departure Country
-									$sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
-									$rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
+                            $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                            $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
 
-									if(!empty($row1)){
-										$dAirport1 = $rowdp1['name'];
-										$dCity1 = $rowdp1['cityName'];
-										$dCountry1 = $rowdp1['countryCode'];		
-									}
+                            if(!empty($row)){
+                                $markettingCarrierName = $row['name'];		
+                            }
 
-									// Departure Country
-									$sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-									$rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
+                            // Departure Country
+                            $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                            $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
 
-									if(!empty($row2)){
-										$aAirport1 = $rowar2['name'];
-										$aCity1 = $rowar2['cityName'];
-										$aCountry1 = $rowar2['countryCode'];
-									}
-									
-									
-									$BookingCode1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['BookingCode'];
-									$Seat1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['BookingCount'];
-									$CabinClass1 = $airPricePoint[2]['airBookingInfo'][1]['@attributes']['CabinClass'];
-									
-									$Transits = $TravelTime - ($FlightTime + $FlightTime1);
-									$TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
+                            if(!empty($row1)){
+                                $dAirport = $row1['name'];
+                                $dCity = $row1['cityName'];
+                                $dCountry = $row1['countryCode'];		
+                            }
 
-									$Transit = array("transit1"=> $TransitHm);
+                            // Departure Country
+                            $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                            $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
 
-									$segment = array(
-													array("marketingcareer"=> "$markettingCarrier",
-															"marketingflight"=> "$markettingFN",
-															"operatingcareer"=> "$markettingCarrier",
-															"operatingflight"=> "$markettingFN",
-															"departure"=> "$DepartureFrom",
-															"departureAirport"=> "$dAirport ",
-															"departureLocation"=> "$dCity , $dCountry",                    
-															"departureTime" => $DepartureTime,
-															"arrival"=> "$ArrivalTo",                   
-															"arrivalTime" => $ArrivalTime,
-															"arrivalAirport"=> "$aAirport",
-															"arrivalLocation"=> "$aCity , $aCountry",
-															"flightduration"=> "$FlightTimeHm",
-															"bookingcode"=> "$BookingCode",
-															"seat"=> "$Seat",
-															'CabinClass' => $CabinClass,
-															'FareInfoRef' => $FareInfoRef,
-															'SegmentRef' => $SegmentRef,
-															'SegmentDetails' => $airAirSegment[$SegmentRef]
-
-													),array("marketingcareer"=> "$markettingCarrier1",
-															"marketingflight"=> "$markettingFN1",
-															"operatingcareer"=> "$markettingCarrier1",
-															"operatingflight"=> "$markettingFN1",
-															"departure"=> "$DepartureFrom1",
-															"departureAirport"=> "$dAirport1",
-															"departureLocation"=> "$dCity1 , $dCountry",                    
-															"departureTime" => $DepartureTime1,
-															"arrival"=> $ArrivalTo1,                   
-															"arrivalTime" => $ArrivalTime1,
-															"arrivalAirport"=> "$aAirport1",
-															"arrivalLocation"=> "$aCity1 , $aCountry1",
-															"flightduration"=> "$FlightTimeHm1",
-															"bookingcode"=> "$BookingCode1",
-															"seat"=> "$Seat1",
-															'CabinClass' => $CabinClass1,
-															'FareInfoRef' => $FareInfoRef1,
-															'SegmentRef' => $SegmentRef1,
-															'SegmentDetails' => $airAirSegment[$SegmentRef1]
-
-													)
-												);
-											$basic = array("system" =>"Galileo",
-														"segment"=> "2",
-														"career"=> $validatingCarrierCode,
-														"careerName" => "$CarrieerName",
-														"BasePrice" => $BasePrice ,
-														"Taxes" => $Taxes,
-														"price" => "$Exact",
-														"airChangePenalty " => $airChangePenalty ,
-														"airCancelPenalty" => $airCancelPenalty,
-														"airFareCalc " => $airFareCalc ,
-														"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-														"airFareInfoRef" => $airFareInfoRef,
-														"LatestTicketingTime" => $LatestTicketingTime,
-														"departure"=> "$From",                   
-														"departureTime" => substr($DepartureTime,11,5),
-														"departureDate" => "$dpTime",
-														"arrival"=> "$To",                   
-														"arrivalTime" => substr($ArrivalTime,11,5),
-														"arrivalDate" => "$arrTime1",
-														"flightduration"=> $TravelTimeHm,
-														
-														"bags" => $Bags,
-														"seat" => "$Seat",
-														"class" => "$CabinClass",
-														"refundable"=> $Refundable,
-														"segments" => $segment,
-														
-														"transit" => $Transit,
-														"traceid" => $TraceId
-													);
-													array_push($All, $basic);
-											}
-					}
-					if(isset($airPricePoint[3]) == TRUE){
-						if(isset($airPricePoint[3]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == False){
-							$FareInfoRef = $airPricePoint[3]['airBookingInfo']['@attributes']['FareInfoRef'];
-							$SegmentRef = $airPricePoint[3]['airBookingInfo']['@attributes']['SegmentRef'];
-							$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-							$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-							$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
+                            if(!empty($row2)){
+                                $aAirport = $row2['name'];
+                                $aCity = $row2['cityName'];
+                                $aCountry = $row2['countryCode'];
+                            }
+                            
+                            
+                            $BookingCode = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['BookingCode'];
+                            $Seat = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['BookingCount'];
+                            $CabinClass = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['CabinClass'];
 
 
-							$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-							$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-							$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-							$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-							$fromTime = substr($DepartureTime,11, 19);
-							$dpTime = date("D d M Y", strtotime(substr($DepartureTime,0, 10)." ".$fromTime));
+                            //Leg 2
+                            
+                            $FareInfoRef1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['FareInfoRef'];
+                            $SegmentRef1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['SegmentRef'];
 
 
-							$toTime = substr($ArrivalTime,11, 19);
-							$arrTime = date("D d M Y", strtotime(substr($ArrivalTime,0, 10)." ".$toTime));
+                            $FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
+                            $FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
 
-							
-							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+                            $ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
+                            $DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
 
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
-							}
+                            $ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
+                            $DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
 
-							// Departure Country
-							$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-							$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+                            $fromTime1 = substr($DepartureTime1,11, 19);
+                            $dpTime1 = date("D d M Y", strtotime($DepartureTime1));
 
-							if(!empty($row1)){
-								$dAirport = $row1['name'];
-								$dCity = $row1['cityName'];
-								$dCountry = $row1['countryCode'];		
-							}
+                            $toTime1 = substr($ArrivalTime1,11, 19);
+                            $arrTime1 = date("D d M Y", strtotime($ArrivalTime1));
 
-							// Departure Country
-							$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-							$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+                            
+                            $markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
+                            $markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
 
-							if(!empty($row2)){
-								$aAirport = $row2['name'];
-								$aCity = $row2['cityName'];
-								$aCountry = $row2['countryCode'];
-							}
-							
-							
-							$BookingCode = $airPricePoint[3]['airBookingInfo']['@attributes']['BookingCode'];
-							$Seat = $airPricePoint[3]['airBookingInfo']['@attributes']['BookingCount'];
-							$CabinClass = $airPricePoint[3]['airBookingInfo']['@attributes']['CabinClass'];
-							$Transit = array("transit" => "0");
+                            $sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
+                            $rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
 
-							$segment = array(
-											array("marketingcareer"=> "$markettingCarrier",
-													"marketingflight"=> "$markettingFN",
-													"operatingcareer"=> "$markettingCarrier",
-													"operatingflight"=> "$markettingFN",
-													"departure"=> "$DepartureFrom",
-													"departureAirport"=> "$dAirport ",
-													"departureLocation"=> "$dCity , $dCountry",                    
-													"departureTime" => "$DepartureTime",
-													"arrival"=> "$ArrivalTo",                   
-													"arrivalTime" => "$ArrivalTime",
-													"arrivalAirport"=> "$aAirport",
-													"arrivalLocation"=> "$aCity , $aCountry",
-													"flightduration"=> "$TravelTimeHm",
-													"bookingcode"=> "$BookingCode",
-													"seat"=> "$Seat",
-													'CabinClass' => $CabinClass,
-													'FareInfoRef' => $FareInfoRef,
-													'SegmentRef' => $SegmentRef,
-													'SegmentDetails' => $airAirSegment[$SegmentRef]
+                            if(!empty($rowmk1)){
+                                $markettingCarrierName1 = $rowmk1['name'];		
+                            }
 
-											)
-										);
+                            // Departure Country
+                            $sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
+                            $rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
 
-								$basic = array("system" =>"Galileo",
-												"segment"=> "1",
-												"career"=> $validatingCarrierCode,
-												"careerName" => $CarrieerName,
-												"BasePrice" => $BasePrice ,
+                            if(!empty($row1)){
+                                $dAirport1 = $rowdp1['name'];
+                                $dCity1 = $rowdp1['cityName'];
+                                $dCountry1 = $rowdp1['countryCode'];		
+                            }
+
+                            // Departure Country
+                            $sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
+                            $rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
+
+                            if(!empty($row2)){
+                                $aAirport1 = $rowar2['name'];
+                                $aCity1 = $rowar2['cityName'];
+                                $aCountry1 = $rowar2['countryCode'];
+                            }
+                            
+                            
+                            $BookingCode1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['BookingCode'];
+                            $Seat1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['BookingCount'];
+                            $CabinClass1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['CabinClass'];
+                            
+
+                            $Transits = $TravelTime - ($FlightTime + $FlightTime1);
+                            $TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
+                            $Transit = array("transit1"=> $TransitHm);
+
+                            $segment = array(
+                                            array("marketingcareer"=> "$markettingCarrier",
+                                                    "marketingflight"=> "$markettingFN",
+                                                    "operatingcareer"=> "$markettingCarrier",
+                                                    "operatingflight"=> "$markettingFN",
+                                                    "departure"=> "$DepartureFrom",
+                                                    "departureAirport"=> "$dAirport ",
+                                                    "departureLocation"=> "$dCity , $dCountry",                    
+                                                    "departureTime" => $DepartureTime,
+                                                    "arrival"=> "$ArrivalTo",                   
+                                                    "arrivalTime" => $ArrivalTime,
+                                                    "arrivalAirport"=> "$aAirport",
+                                                    "arrivalLocation"=> "$aCity , $aCountry",
+                                                    "flightduration"=> "$FlightTimeHm",
+                                                    "bookingcode"=> "$BookingCode",
+                                                    "seat"=> "$Seat",
+                                                    'CabinClass' => $CabinClass,
+                                                    'FareInfoRef' => $FareInfoRef,
+                                                    'SegmentRef' => $SegmentRef,
+                                                    'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                            ),array("marketingcareer"=> "$markettingCarrier1",
+                                                    "marketingflight"=> "$markettingFN1",
+                                                    "operatingcareer"=> "$markettingCarrier1",
+                                                    "operatingflight"=> "$markettingFN1",
+                                                    "departure"=> "$DepartureFrom1",
+                                                    "departureAirport"=> "$dAirport1",
+                                                    "departureLocation"=> "$dCity1 , $dCountry",                    
+                                                    "departureTime" => $DepartureTime1,
+                                                    "arrival"=> "$ArrivalTo1",                   
+                                                    "arrivalTime" => $ArrivalTime1,
+                                                    "arrivalAirport"=> "$aAirport1",
+                                                    "arrivalLocation"=> "$aCity1 , $aCountry1",
+                                                    "flightduration"=> "$FlightTimeHm1",
+                                                    "bookingcode"=> "$BookingCode1",
+                                                    "seat"=> "$Seat1",
+                                                    'CabinClass' => $CabinClass1,
+                                                    'FareInfoRef' => $FareInfoRef1,
+                                                    'SegmentRef' => $SegmentRef1,
+                                                    'SegmentDetails' => $airAirSegment[$SegmentRef1]
+
+                                            )
+                                        );
+                                    $basic = array("system" =>"Galileo",
+                                                "segment"=> "2",
+												"triptype"=>$TripType,
+                                                "career"=> $validatingCarrierCode,
+                                                "careerName" => "$CarrieerName",
+                                                "BasePrice" => $BasePrice ,
 												"Taxes" => $Taxes,
-												"price" => "$Exact",
-												"airChangePenalty " => $airChangePenalty ,
-												"airCancelPenalty" => $airCancelPenalty,
-												"airFareCalc " => $airFareCalc ,
-												"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-												"airFareInfoRef" => $airFareInfoRef,
-												"LatestTicketingTime" => $LatestTicketingTime,
-												"departure"=> $From,
-												"departureTime" => substr($DepartureTime,11,5),                  
-												"departureDate" => $dpTime,
-												"arrival"=> $To,                   
-												"arrivalTime" => substr($ArrivalTime,11,5),
-												"arrivalDate" => $arrTime,
-												"flightduration"=> $TravelTimeHm,												
-												"bags" => $Bags,
-												"seat" => $Seat,
-												"class" => $CabinClass,
-												"refundable"=> $Refundable,
-												"segments" => $segment,																							
-												"traceid" => $TraceId
-											);
-
-											array_push($All,$basic);
-
-
-								}else if(isset($airPricePoint[3]['airBookingInfo'][0]['@attributes']['FareInfoRef']) == True){
-									//Leg1
-				
-									$FareInfoRef = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['FareInfoRef'];
-									$SegmentRef = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['SegmentRef'];
-									
-									$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-									$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-									$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
-
-									$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-									$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-									$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-									$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-									$fromTime = substr($departureTime,11, 19);
-									$dpTime = date("D d M Y", strtotime(substr($DepartureTime,0, 10)." ".$fromTime));
-
-									$toTime = substr($ArrivalTime,11, 19);
-									$arrTime = date("D d M Y", strtotime(substr($ArrivalTime,0, 10)." ".$toTime));
-
-									
-									$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-									$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-									$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-									$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-									if(!empty($row)){
-										$markettingCarrierName = $row['name'];		
-									}
-
-									// Departure Country
-									$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-									$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-									if(!empty($row1)){
-										$dAirport = $row1['name'];
-										$dCity = $row1['cityName'];
-										$dCountry = $row1['countryCode'];		
-									}
-
-									// Departure Country
-									$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-									$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-									if(!empty($row2)){
-										$aAirport = $row2['name'];
-										$aCity = $row2['cityName'];
-										$aCountry = $row2['countryCode'];
-									}
-									
-									
-									$BookingCode = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['BookingCode'];
-									$Seat = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['BookingCount'];
-									$CabinClass = $airPricePoint[3]['airBookingInfo'][0]['@attributes']['CabinClass'];
-
-
-									//Leg 2
-									
-									$FareInfoRef1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['FareInfoRef'];
-									$SegmentRef1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['SegmentRef'];
-
-
-									$FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
-									$FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
-
-
-									$ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
-									$DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
-
-									$ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
-									$DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
-
-									$fromTime1 = substr($DepartureTime1,11, 19);
-									$dpTime1 = date("D d M Y", strtotime($DepartureTime1));
-
-									$toTime1 = substr($ArrivalTime1,11, 19);
-									$arrTime1 = date("D d M Y", strtotime($ArrivalTime1));
-
-									
-									$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
-									$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
-
-									$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-									$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
-
-									if(!empty($rowmk1)){
-										$markettingCarrierName1 = $rowmk1['name'];		
-									}
-
-									// Departure Country
-									$sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
-									$rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
-
-									if(!empty($row1)){
-										$dAirport1 = $rowdp1['name'];
-										$dCity1 = $rowdp1['cityName'];
-										$dCountry1 = $rowdp1['countryCode'];		
-									}
-
-									// Departure Country
-									$sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-									$rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
-
-									if(!empty($row2)){
-										$aAirport1 = $rowar2['name'];
-										$aCity1 = $rowar2['cityName'];
-										$aCountry1 = $rowar2['countryCode'];
-									}
-									
-									
-									$BookingCode1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['BookingCode'];
-									$Seat1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['BookingCount'];
-									$CabinClass1 = $airPricePoint[3]['airBookingInfo'][1]['@attributes']['CabinClass'];
-									
-
-									$Transits = $TravelTime - ($FlightTime + $FlightTime1);
-									$TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
-									$Transit = array("transit1"=> $TransitHm);
-
-									$segment = array(
-													array("marketingcareer"=> "$markettingCarrier",
-															"marketingflight"=> "$markettingFN",
-															"operatingcareer"=> "$markettingCarrier",
-															"operatingflight"=> "$markettingFN",
-															"departure"=> "$DepartureFrom",
-															"departureAirport"=> "$dAirport ",
-															"departureLocation"=> "$dCity , $dCountry",                    
-															"departureTime" => $DepartureTime,
-															"arrival"=> "$ArrivalTo",                   
-															"arrivalTime" => $ArrivalTime,
-															"arrivalAirport"=> "$aAirport",
-															"arrivalLocation"=> "$aCity , $aCountry",
-															"flightduration"=> "$FlightTimeHm",
-															"bookingcode"=> "$BookingCode",
-															"seat"=> "$Seat",
-															'CabinClass' => $CabinClass,
-															'FareInfoRef' => $FareInfoRef,
-															'SegmentRef' => $SegmentRef,
-															'SegmentDetails' => $airAirSegment[$SegmentRef]
-
-													),array("marketingcareer"=> "$markettingCarrier1",
-															"marketingflight"=> "$markettingFN1",
-															"operatingcareer"=> "$markettingCarrier1",
-															"operatingflight"=> "$markettingFN1",
-															"departure"=> "$DepartureFrom1",
-															"departureAirport"=> "$dAirport1",
-															"departureLocation"=> "$dCity1 , $dCountry",                    
-															"departureTime" => $DepartureTime1,
-															"arrival"=> "$ArrivalTo1",                   
-															"arrivalTime" => $ArrivalTime1,
-															"arrivalAirport"=> "$aAirport1",
-															"arrivalLocation"=> "$aCity1 , $aCountry1",
-															"flightduration"=> "$FlightTimeHm1",
-															"bookingcode"=> "$BookingCode1",
-															"seat"=> "$Seat1",
-															'CabinClass' => $CabinClass1,
-															'FareInfoRef' => $FareInfoRef1,
-															'SegmentRef' => $SegmentRef1,
-															'SegmentDetails' => $airAirSegment[$SegmentRef1]
-
-													)
-												);
-											$basic = array("system" =>"Galileo",
-														"segment"=> "2",
-														"career"=> $validatingCarrierCode,
-														"careerName" => "$CarrieerName",
-														"BasePrice" => $BasePrice ,
-														"Taxes" => $Taxes,
-														"price" => "$Exact",
-														"airChangePenalty " => $airChangePenalty ,
-														"airCancelPenalty" => $airCancelPenalty,
-														"airFareCalc " => $airFareCalc ,
-														"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-														"airFareInfoRef" => $airFareInfoRef,
-														"LatestTicketingTime" => $LatestTicketingTime,
-														"departure"=> "$From",                   
-														"departureTime" => "$fromTime",
-														"departureDate" => "$dpTime",
-														"arrival"=> "$To",                   
-														"arrivalTime" => "$toTime1",
-														"arrivalDate" => "$arrTime1",
-														"flightduration"=> $TravelTimeHm,
-														"bags" => $Bags,
-														"seat" => "$Seat",
-														"class" => "$CabinClass",
-														"refundable"=> $Refundable,
-														"segments" => $segment,
-														
-														"transit" => $Transit,
-														"traceid" => $TraceId
-													);
-													array_push($All, $basic);
-											}
-					}
-
-						
-				}else if(isset($airPricePoint['airBookingInfo']) == TRUE){
-					if(isset($airPricePoint['airBookingInfo'][0]) == TRUE){
-						$sgcount = count($airPricePoint['airBookingInfo']);
-						if($sgcount == 1){
-
-							$FareInfoRef = $airPricePoint['airBookingInfo'][0]['@attributes']['FareInfoRef'];
-							$SegmentRef = $airPricePoint['airBookingInfo'][0]['@attributes']['SegmentRef'];
-							$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-							$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-							$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
-
-							$FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
-							$FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
-
-
-							$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-							$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-							$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-							$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-							$dpTime = date("D d M Y", strtotime($DepartureTime));
-							$arrTime = date("D d M Y", strtotime($ArrivalTime));
-
-							
-							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
-							}
-
-							// Departure Country
-							$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-							$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-							if(!empty($row1)){
-								$dAirport = $row1['name'];
-								$dCity = $row1['cityName'];
-								$dCountry = $row1['countryCode'];		
-							}
-
-							// Departure Country
-							$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-							$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-							if(!empty($row2)){
-								$aAirport = $row2['name'];
-								$aCity = $row2['cityName'];
-								$aCountry = $row2['countryCode'];
-							}
-							
-							
-							$BookingCode = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCode'];
-							$Seat = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCount'];
-							$CabinClass = $airPricePoint['airBookingInfo'][0]['@attributes']['CabinClass'];
-
-
-							$segment = array(
-											array("marketingcareer"=> "$markettingCarrier",
-													"marketingflight"=> "$markettingFN",
-													"operatingcareer"=> "$markettingCarrier",
-													"operatingflight"=> "$markettingFN",
-													"departure"=> "$DepartureFrom",
-													"departureAirport"=> "$dAirport ",
-													"departureLocation"=> "$dCity , $dCountry",                    
-													"departureTime" => "$dpTime",
-													"arrival"=> "$ArrivalTo",                   
-													"arrivalTime" => "$ArrivalTime",
-													"arrivalAirport"=> "$aAirport",
-													"arrivalLocation"=> "$aCity , $aCountry",
-													"flightduration"=> "$TravelTimeHm",
-													"bookingcode"=> "$BookingCode",
-													"seat"=> $Seat,
-													'CabinClass' => $CabinClass,
-													'FareInfoRef' => $FareInfoRef,
-													'SegmentRef' => $SegmentRef,
-													'SegmentDetails' => $airAirSegment[$SegmentRef]
-
-											)
-										);
-							$basic = array("system" =>"Galileo",
-										"segment"=> "$sgcount",
-										"career"=> $validatingCarrierCode,
-										"careerName" => $CarrieerName,
-										"BasePrice" => $BasePrice ,
-										"Taxes" => $Taxes,
-										"price" => "$Exact",
-										"airChangePenalty " => $airChangePenalty ,
-										"airCancelPenalty" => $airCancelPenalty,
-										"airFareCalc " => $airFareCalc ,
-										"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-										"airFareInfoRef" => $airFareInfoRef,
-										"LatestTicketingTime" => $LatestTicketingTime,
-										"departure"=> $From,                   
-										"departureDate" => $dpTime,
-										"departureTime"=> substr($DepartureTime,11,5),
-										"arrival"=> "$To",                   
-										"arrivalTime" => substr($ArrivalTime,11,5),
-										"arrivalDate" => "$arrTime",
-										"flightduration"=> $TravelTimeHm,
-										"bags" => $Bag,
-										"seat" => $Seat,
-										"class" => $CabinClass,
-										"refundable"=> $Refundable,
-										"segments" => $segment,
-										"traceid" => $TraceId
-									);
-
-
-						}else if($sgcount == 2){
-							//Leg1
-							
-							$FareInfoRef = $airPricePoint['airBookingInfo'][0]['@attributes']['FareInfoRef'];
-							$SegmentRef = $airPricePoint['airBookingInfo'][0]['@attributes']['SegmentRef'];
-							
-							$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-							$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-							$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
-
-							$FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
-							$FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
-
-
-							$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-							$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-							$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-							$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-							$fromTime = substr($DepartureTime,11, 19);
-							$dpTime = date("D d M Y", strtotime(substr($DepartureTime,0, 10)." ".$fromTime));
-
-							$toTime = substr($ArrivalTime,11, 19);
-							$arrTime = date("D d M Y", strtotime(substr($ArrivalTime,0, 10)." ".$toTime));
-
-							
-							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
-							}
-
-							// Departure Country
-							$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-							$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-							if(!empty($row1)){
-								$dAirport = $row1['name'];
-								$dCity = $row1['cityName'];
-								$dCountry = $row1['countryCode'];		
-							}
-
-							// Departure Country
-							$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-							$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-							if(!empty($row2)){
-								$aAirport = $row2['name'];
-								$aCity = $row2['cityName'];
-								$aCountry = $row2['countryCode'];
-							}
-							
-							
-							$BookingCode = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCode'];
-							$Seat = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCount'];
-							$CabinClass = $airPricePoint['airBookingInfo'][0]['@attributes']['CabinClass'];
-
-
-							//Leg 2
-							
-							$FareInfoRef1 = $airPricePoint['airBookingInfo'][1]['@attributes']['FareInfoRef'];
-							$SegmentRef1 = $airPricePoint['airBookingInfo'][1]['@attributes']['SegmentRef'];
-
-
-							$FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
-							$FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
-
-
-							$ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
-							$DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
-
-							$ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
-							$DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
-
-							$fromTime1 = substr($DepartureTime1,11, 19);
-							$dpTime1 = date("D d M Y", strtotime(substr($DepartureTime1,0, 10)." ".$fromTime1));
-
-							$toTime1 = substr($ArrivalTime1,11, 19);
-							$arrTime1 = date("D d M Y", strtotime(substr($ArrivalTime1,0, 10)." ".$toTime1));
-
-							
-							$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
-							$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
-
-							$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-							$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
-
-							if(!empty($rowmk1)){
-								$markettingCarrierName1 = $rowmk1['name'];		
-							}
-
-							// Departure Country
-							$sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
-							$rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
-
-							if(!empty($row1)){
-								$dAirport1 = $rowdp1['name'];
-								$dCity1 = $rowdp1['cityName'];
-								$dCountry1 = $rowdp1['countryCode'];		
-							}
-
-							// Departure Country
-							$sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-							$rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
-
-							if(!empty($row2)){
-								$aAirport1 = $rowar2['name'];
-								$aCity1 = $rowar2['cityName'];
-								$aCountry1 = $rowar2['countryCode'];
-							}
-							
-							
-							$BookingCode1 = $airPricePoint['airBookingInfo'][1]['@attributes']['BookingCode'];
-							$Seat1 = $airPricePoint['airBookingInfo'][1]['@attributes']['BookingCount'];
-							$CabinClass1 = $airPricePoint['airBookingInfo'][1]['@attributes']['CabinClass'];
-							
-							$Transits = $TravelTime - ($FlightTime + $FlightTime1);
-							$TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
-
-							$Transit = array("transit1"=> $TransitHm);
-
-							$segment = array(
-											array("marketingcareer"=> "$markettingCarrier",
-													"marketingflight"=> "$markettingFN",
-													"operatingcareer"=> "$markettingCarrier",
-													"operatingflight"=> "$markettingFN",
-													"departure"=> "$DepartureFrom",
-													"departureAirport"=> "$dAirport ",
-													"departureLocation"=> "$dCity , $dCountry",                    
-													"departureTime" => "$dpTime",
-													"arrival"=> "$ArrivalTo",                   
-													"arrivalTime" => "$arrTime",
-													"arrivalAirport"=> "$aAirport",
-													"arrivalLocation"=> "$aCity , $aCountry",
-													"flightduration"=> "$FlightTimeHm",
-													"bookingcode"=> "$BookingCode",
-													"seat"=> "$Seat",
-													'CabinClass' => $CabinClass,
-													'FareInfoRef' => $FareInfoRef,
-													'SegmentRef' => $SegmentRef,
-													'SegmentDetails' => $airAirSegment[$SegmentRef]
-
-											),array("marketingcareer"=> "$markettingCarrier1",
-													"marketingflight"=> "$markettingFN1",
-													"operatingcareer"=> "$markettingCarrier1",
-													"operatingflight"=> "$markettingFN1",
-													"departure"=> "$DepartureFrom1",
-													"departureAirport"=> "$dAirport1",
-													"departureLocation"=> "$dCity1 , $dCountry1",                    
-													"departureTime" => "$dpTime",
-													"arrival"=> "$ArrivalTo1",                   
-													"arrivalTime" => "$arrTime1",
-													"arrivalAirport"=> "$aAirport1",
-													"arrivalLocation"=> "$aCity1 , $aCountry1",
-													"flightduration"=> "$FlightTimeHm1",
-													"bookingcode"=> "$BookingCode1",
-													"seat"=> "$Seat1",
-													'CabinClass' => $CabinClass1,
-													'FareInfoRef' => $FareInfoRef1,
-													'SegmentRef' => $SegmentRef1,
-													'SegmentDetails' => $airAirSegment[$SegmentRef1]
-
-											)
-										);
-							$basic = array("system" =>"Galileo",
-										"segment"=> "2",
-										"career"=> $validatingCarrierCode,
-										"careerName" => "$CarrieerName",
-										"BasePrice" => $BasePrice ,
-										"Taxes" => $Taxes,
-										"price" => "$Exact",
-										"airChangePenalty " => $airChangePenalty ,
-										"airCancelPenalty" => $airCancelPenalty,
-										"airFareCalc " => $airFareCalc ,
-										"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-										"airFareInfoRef" => $airFareInfoRef,
-										"LatestTicketingTime" => $LatestTicketingTime,
-										"departure"=> "$From",                   
-										"departureTime" => substr($DepartureTime,11,5),
-										"departureDate" => "$dpTime",
-										"arrival"=> "$To",                   
-										"arrivalTime" => $ArrivalTime1,
-										"arrivalDate" => "$arrTime1",
-										"flightduration"=> $TravelTimeHm,										
-										"bags" => $Bags,
-										"seat" => "$Seat",
-										"class" => "$CabinClass",
-										"refundable"=> $Refundable,
-										"segments" => $segment,									
-										"transit" => $Transit,
-										"traceid" => $TraceId
-									);
-
-
-						}else if($sgcount == 3){
-
-							//Leg1
-							
-							$FareInfoRef = $airPricePoint['airBookingInfo'][0]['@attributes']['FareInfoRef'];
-							$SegmentRef = $airPricePoint['airBookingInfo'][0]['@attributes']['SegmentRef'];
-							
-							$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-							$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
-
-							$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-
-							$FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
-							$FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
-
-
-							$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-							$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-							$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-							$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-							$fromTime = substr($DepartureTime,11, 19);
-							$dpTime = date("D d M Y", strtotime(substr($DepartureTime,0, 10)." ".$fromTime));
-
-							$toTime = substr($ArrivalTime,11, 19);
-							$arrTime = date("D d M Y", strtotime(substr($ArrivalTime,0, 10)." ".$toTime));
-
-							
-							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
-							}
-
-							// Departure Country
-							$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-							$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-							if(!empty($row1)){
-								$dAirport = $row1['name'];
-								$dCity = $row1['cityName'];
-								$dCountry = $row1['countryCode'];		
-							}
-
-							// Departure Country
-							$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-							$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-							if(!empty($row2)){
-								$aAirport = $row2['name'];
-								$aCity = $row2['cityName'];
-								$aCountry = $row2['countryCode'];
-							}
-							
-							
-							$BookingCode = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCode'];
-							$Seat = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCount'];
-							$CabinClass = $airPricePoint['airBookingInfo'][0]['@attributes']['CabinClass'];
-
-
-							//Leg 2
-							
-							$FareInfoRef1 = $airPricePoint['airBookingInfo'][1]['@attributes']['FareInfoRef'];
-							$SegmentRef1 = $airPricePoint['airBookingInfo'][1]['@attributes']['SegmentRef'];
-
-
-							$FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
-							$FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
-
-
-							$ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
-							$DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
-
-							$ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
-							$DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
-
-							$fromTime1 = substr($DepartureTime1,11, 19);
-							$dpTime1 = date("D d M Y", strtotime(substr($DepartureTime1,0, 10)." ".$fromTime1));
-
-							$toTime1 = substr($ArrivalTime1,11, 19);
-							$arrTime1 = date("D d M Y", strtotime(substr($ArrivalTime1,0, 10)." ".$toTime1));
-
-							
-							$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
-							$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
-
-							$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-							$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
-
-							if(!empty($rowmk1)){
-								$markettingCarrierName1 = $rowmk1['name'];		
-							}
-
-							// Departure Country
-							$sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
-							$rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
-
-							if(!empty($row1)){
-								$dAirport1 = $rowdp1['name'];
-								$dCity1 = $rowdp1['cityName'];
-								$dCountry1 = $rowdp1['countryCode'];		
-							}
-
-							// Departure Country
-							$sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-							$rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
-
-							if(!empty($row2)){
-								$aAirport1 = $rowar2['name'];
-								$aCity1 = $rowar2['cityName'];
-								$aCountry1 = $rowar2['countryCode'];
-							}
-							
-							
-							$BookingCode1 = $airPricePoint['airBookingInfo'][1]['@attributes']['BookingCode'];
-							$Seat1 = $airPricePoint['airBookingInfo'][1]['@attributes']['BookingCount'];
-							$CabinClass1 = $airPricePoint['airBookingInfo'][1]['@attributes']['CabinClass'];
-
-
-							//Leg 3
-							
-							$FareInfoRef2 = $airPricePoint['airBookingInfo'][2]['@attributes']['FareInfoRef'];
-							$SegmentRef2 = $airPricePoint['airBookingInfo'][2]['@attributes']['SegmentRef'];
-
-
-							$FlightTime2 = $airAirSegment[$SegmentRef2]['FlightTime'];
-							$FlightTimeHm2 = floor($FlightTime2 / 60)."H ".($FlightTime2 - ((floor($FlightTime2 / 60)) * 60))."Min";
-
-
-							$ArrivalTo2 = $airAirSegment[$SegmentRef2]['Destination'];
-							$DepartureFrom2 = $airAirSegment[$SegmentRef2]['Origin'];
-
-							$ArrivalTime2 = $airAirSegment[$SegmentRef2]['ArrivalTime'];
-							$DepartureTime2 = $airAirSegment[$SegmentRef2]['DepartureTime'];
-
-							$fromTime2 = substr($DepartureTime2,11, 19);
-							$dpTime2 = date("D d M Y", strtotime(substr($DepartureTime2,0, 10)." ".$fromTime2));
-
-							$toTime2 = substr($ArrivalTime2,11, 19);
-							$arrTime2 = date("D d M Y", strtotime(substr($ArrivalTime2,0, 10)." ".$toTime2));
-
-							
-							$markettingCarrier2 = $airAirSegment[$SegmentRef2]['Carrier'];
-							$markettingFN2 = $airAirSegment[$SegmentRef2]['FlightNumber'];
-
-							$sqlmk1 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier2' ");
-							$rowmk1 = mysqli_fetch_array($sqlmk1,MYSQLI_ASSOC);
-
-							if(!empty($rowmk1)){
-								$markettingCarrierName2 = $rowmk1['name'];		
-							}
-
-							// Departure Country
-							$sqldp2 = mysqli_query($conn,"$Airportsql code='$DepartureFrom2' ");
-							$rowdp2 = mysqli_fetch_array($sqldp2,MYSQLI_ASSOC);
-
-							if(!empty($row1)){
-								$dAirport2 = $rowdp2['name'];
-								$dCity2 = $rowdp2['cityName'];
-								$dCountry2 = $rowdp2['countryCode'];		
-							}
-
-							// Departure Country
-							$sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-							$rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
-
-							if(!empty($row2)){
-								$aAirport2 = $rowar2['name'];
-								$aCity2 = $rowar2['cityName'];
-								$aCountry2 = $rowar2['countryCode'];
-							}
-							
-							
-							$BookingCode2 = $airPricePoint['airBookingInfo'][2]['@attributes']['BookingCode'];
-							$Seat2 = $airPricePoint['airBookingInfo'][2]['@attributes']['BookingCount'];
-							$CabinClass2 = $airPricePoint['airBookingInfo'][2]['@attributes']['CabinClass'];
-
-							$since_start1 =(new DateTime($DepartureTime1))->diff(new DateTime($ArrivalTime));
-							$since_start2 =(new DateTime($DepartureTime2))->diff(new DateTime($ArrivalTime1));
-
-							$Transit = array("transit1"=> "$since_start1->h H $since_start1->m Min",
-											"transit2"=> "$since_start2->h H $since_start2->m Min");
-							
-
-							$segment = array(
-											array("marketingcareer"=> "$markettingCarrier",
-													"marketingflight"=> "$markettingFN",
-													"operatingcareer"=> "$markettingCarrier",
-													"operatingflight"=> "$markettingFN",
-													"departure"=> "$DepartureFrom",
-													"departureAirport"=> "$dAirport ",
-													"departureLocation"=> "$dCity , $dCountry",                    
-													"departureTime" => $DepartureTime,
-													"arrival"=> "$ArrivalTo",                   
-													"arrivalTime" => $ArrivalTime,
-													"arrivalAirport"=> "$aAirport",
-													"arrivalLocation"=> "$aCity , $aCountry",
-													"flightduration"=> "$FlightTimeHm",
-													"bookingcode"=> "$BookingCode",
-													"seat"=> "$Seat",
-													'CabinClass' => $CabinClass,
-													'FareInfoRef' => $FareInfoRef,
-													'SegmentRef' => $SegmentRef,
-													'SegmentDetails' => $airAirSegment[$SegmentRef]
-
-											),array("marketingcareer"=> "$markettingCarrier1",
-													"marketingflight"=> "$markettingFN1",
-													"operatingcareer"=> "$markettingCarrier1",
-													"operatingflight"=> "$markettingFN1",
-													"departure"=> "$DepartureFrom1",
-													"departureAirport"=> "$dAirport1",
-													"departureLocation"=> "$dCity1 , $dCountry",                    
-													"departureTime" => $DepartureTime1,
-													"arrival"=> "$ArrivalTo1",                   
-													"arrivalTime" => $ArrivalTime1,
-													"arrivalAirport"=> "$aAirport1",
-													"arrivalLocation"=> "$aCity1 , $aCountry1",
-													"flightduration"=> "$FlightTimeHm1",
-													"bookingcode"=> "$BookingCode1",
-													"seat"=> "$Seat1",
-													'CabinClass' => $CabinClass1,
-													'FareInfoRef' => $FareInfoRef1,
-													'SegmentRef' => $SegmentRef1,
-													'SegmentDetails' => $airAirSegment[$SegmentRef1]
-
-										),
-										array("marketingcareer"=> "$markettingCarrier2",
-													"marketingflight"=> "$markettingFN2",
-													"operatingcareer"=> "$markettingCarrier2",
-													"operatingflight"=> "$markettingFN2",
-													"departure"=> "$DepartureFrom2",
-													"departureAirport"=> "$dAirport2",
-													"departureLocation"=> "$dCity2 , $dCountry2",                    
-													"departureTime" => $DepartureTime2,
-													"arrival"=> "$ArrivalTo2",                   
-													"arrivalTime" => $ArrivalTime2,
-													"arrivalAirport"=> "$aAirport2",
-													"arrivalLocation"=> "$aCity2 , $aCountry2",
-													"flightduration"=> "$FlightTimeHm2",
-													"bookingcode"=> "$BookingCode2",
-													"seat"=> "$Seat2",
-													'CabinClass' => $CabinClass2,
-													'FareInfoRef' => $FareInfoRef2,
-													'SegmentRef' => $SegmentRef2,
-													'SegmentDetails' => $airAirSegment[$SegmentRef2]
-
-											)
-										);
-							$basic = array("system" =>"Galileo",
-										"segment"=> "3",
-										"career"=> $validatingCarrierCode,
-										"careerName" => "$CarrieerName",
-										"BasePrice" => $BasePrice ,
-										"Taxes" => $Taxes,
-										"price" => "$Exact",
-										"airChangePenalty " => $airChangePenalty ,
-										"airCancelPenalty" => $airCancelPenalty,
-										"airFareCalc " => $airFareCalc ,
-										"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-										"airFareInfoRef" => $airFareInfoRef,
-										"LatestTicketingTime" => $LatestTicketingTime,
-										"departure"=> "$From",                   
-										"departureTime" => "$fromTime",
-										"departureDate" => "$dpTime1",
-										"arrival"=> "$To",                   
-										"arrivalTime" => "$toTime2",
-										"arrivalDate" => "$arrTime2",
-										"flightduration"=> $TravelTimeHm,										
-										"bags" => $Bags,
-										"seat" => "$Seat",
-										"class" => "$CabinClass",
-										"refundable"=> $Refundable,
-										"segments" => $segment,									
-										"transit" => $Transit,
-										"traceid" => $TraceId
-									);
-
-
-						}
-
-						array_push($All,$basic);
-
-					}else if(isset($airPricePoint['airBookingInfo']['@attributes']['SegmentRef'])){
-						
-				$FareInfoRef = $airPricePoint['airBookingInfo']['@attributes']['FareInfoRef'];
-				$SegmentRef = $airPricePoint['airBookingInfo']['@attributes']['SegmentRef'];
-				$Bags = $airFareInfo[$FareInfoRef]['Bags'];
-
-				$FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
-				$FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
-
-
-				$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-				$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-				$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-				$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-				
-				$dpTime = date("D d M Y", strtotime($DepartureTime));
-
-				$arrTime = date("D d M Y", strtotime($ArrivalTime));
-
-				
-				$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-				$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-				$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-				$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-				if(!empty($row)){
-					$markettingCarrierName = $row['name'];		
-				}
-
-				// Departure Country
-				$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-				$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-				if(!empty($row1)){
-					$dAirport = $row1['name'];
-					$dCity = $row1['cityName'];
-					$dCountry = $row1['countryCode'];		
-				}
-
-				// Departure Country
-				$sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-				$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-				if(!empty($row2)){
-					$aAirport = $row2['name'];
-					$aCity = $row2['cityName'];
-					$aCountry = $row2['countryCode'];
-				}
-				
-				
-				$BookingCode = $airPricePoint['airBookingInfo']['@attributes']['BookingCode'];
-				$Seat = $airPricePoint['airBookingInfo']['@attributes']['BookingCount'];
-				$CabinClass = $airPricePoint['airBookingInfo']['@attributes']['CabinClass'];
-
-
-				$segment = array(
-								array("marketingcareer"=> "$markettingCarrier",
-										"marketingflight"=> "$markettingFN",
-										"operatingcareer"=> "$markettingCarrier",
-										"operatingflight"=> "$markettingFN",
-										"departure"=> "$DepartureFrom",
-										"departureAirport"=> "$dAirport ",
-										"departureLocation"=> "$dCity , $dCountry",                    
-										"departureTime" => $DepartureTime,
-										"arrival"=> "$ArrivalTo",                   
-										"arrivalTime" => "$ArrivalTime",
-										"arrivalAirport"=> "$aAirport",
-										"arrivalLocation"=> "$aCity , $aCountry",
-										"flightduration"=> $FlightTimeHm,
-										"bookingcode"=> "$BookingCode",
-										"seat"=> "$Seat",
-										'CabinClass' => $CabinClass,
-										'FareInfoRef' => $FareInfoRef,
-										'SegmentRef' => $SegmentRef,
-										'SegmentDetails' => $airAirSegment[$SegmentRef]
-
-								)
-							);
-				$basic = array("system" =>"Galileo",
-							"segment"=> "1",
-							"career"=> $validatingCarrierCode,
-							"careerName" => $CarrieerName,
-							"BasePrice" => $BasePrice ,
-							"Taxes" => $Taxes,
-							"price" => "$Exact",
-							"airChangePenalty " => $airChangePenalty ,
-							"airCancelPenalty" => $airCancelPenalty,
-							"airFareCalc " => $airFareCalc ,
-							"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-							"airFareInfoRef" => $airFareInfoRef,
-							"LatestTicketingTime" => $LatestTicketingTime,
-							"departure"=> $From,
-							"departureTime" => substr($DepartureTime,11,5),                  
-							"departureDate" => $dpTime,
-							"arrival"=> "$To",                   
-							"arrivalTime" => substr($ArrivalTime,11,5),
-							"arrivalDate" => $dpTime,
-							"flightduration"=> $FlightTimeHm,							
-							"bags" => $Bags,
-							"seat" => $Seat,
-							"class" => $CabinClass,
-							"refundable"=> $Refundable,
-							"segments" => $segment,
-							"traceid" => $TraceId	);
-
-						array_push($All,$basic);
-						
-						}
-
-
-					}
-
-			}
-	}
-	else{
-				if($adult  > 0 && $child == 0){	
-						$airPricePointOptions = $airAirPricePointList['airAirPricingInfo'];
-				}else{
-					$airPricePointOptions = $airAirPricePointList['airAirPricingInfo'][0];		
-				}
-
-				$airPricePoint = $airPricePointOptions['airFlightOptionsList']['airFlightOption']['airOption']; 
-					
-				$key = $airPricePointOptions['@attributes']['Key'];
-				$TotalPrice = $airPricePointOptions['@attributes']['TotalPrice'];
-				$validatingCarrierCode = $airPricePointOptions['@attributes']['PlatingCarrier'];
-				$Exact = (int) filter_var($TotalPrice, FILTER_SANITIZE_NUMBER_INT);
-
-				
-				if(isset($airAirPricePointList['@attributes']['EquivalentBasePrice'])){
-					$BasePrice = (int) filter_var($airAirPricePointList['@attributes']['EquivalentBasePrice'], FILTER_SANITIZE_NUMBER_INT);
-				}else{
-					$BasePrice = (int) filter_var($airAirPricePointList['@attributes']['BasePrice'], FILTER_SANITIZE_NUMBER_INT);
-				}
-								
-				$Taxes = $airAirPricePointList['@attributes']['Taxes'];
-				
-				if(isset($airAirPricePointList['airFareInfoRef'][0])){
-					$airFareInfoRef =  $airPricePointOptions['airFareInfoRef'][0];
-				}else{
-					$airFareInfoRef =  $airPricePointOptions['airFareInfoRef']['@attributes']['Key'];
-				}
-				
-					$airFareCalc =  $airPricePointOptions['airFareCalc'];
-
-				if(isset($airPricePointOptions['airChangePenalty']['airAmount']) == TRUE){
-					$airChangePenalty =  $airPricePointOptions['airChangePenalty']['airAmount'];
-				}else if(isset($airPricePointOptions['airChangePenalty']['airPercentage']) == TRUE){
-					$airChangePenalty =  $airPricePointOptions['airChangePenalty']['airPercentage'];
-				}else{
-					//print_r($airPricePointOptions['airChangePenalty']);
-				}
-
-				if(isset($airPricePointOptions['airCancelPenalty']['airAmount']) == TRUE){
-					$airCancelPenalty =  $airPricePointOptions['airCancelPenalty']['airAmount'];
-				}else if(isset($airPricePointOptions['airCancelPenalty']['airPercentage']) ==TRUE){
-						$airCancelPenalty =  $airPricePointOptions['airCancelPenalty']['airPercentage'];
-				}else{
-						//print_r($airPricePointOptions['airCancelPenalty']);
-				}
-				
-							
-				if(isset($airPricePointOptions['@attributes']['Refundable'])){
-					$Refundable = "Refundable";
-				}else{
-					$Refundable = "Nonrefundable";
-
-				}
-				
-				$From = $result['airRouteList']['airRoute']['airLeg']['@attributes']['Origin'];
-				$To = $result['airRouteList']['airRoute']['airLeg']['@attributes']['Destination'];
-
-
-				$sql = mysqli_query($conn,"SELECT nameBangla, name FROM airlines WHERE code='$validatingCarrierCode'");
-				$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-				if(!empty($row)){
-					$CarrieerName = $row['name'];		
-				}
-
-				$AirDetails = $airPricePoint['airBookingInfo']['@attributes'];
-
-				if(isset($AirDetails)){
-
-							$FareInfoRef = $AirDetails['FareInfoRef'];
-							$SegmentRef = $AirDetails['SegmentRef'];
-							$TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
-							$TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
-
-							$FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
-							$FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
-
-
-							$ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
-							$DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
-
-							$ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
-							$DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
-
-							$dpTime = date("D d M Y", strtotime($DepartureTime));
-							$arrTime = date("D d M Y", strtotime($ArrivalTime));
-
-							
-							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
-							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
-
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
-							}
-
-							// Departure Country
-							$sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-							$row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
-
-							if(!empty($row1)){
-								$dAirport = $row1['name'];
-								$dCity = $row1['cityName'];
-								$dCountry = $row1['countryCode'];		
-							}
-
-							// Departure Country
-							$sql2 = mysqli_query($conn,"$Airportsql code='$ArrivalTo' ");
-							$row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
-
-							if(!empty($row2)){
-								$aAirport = $row2['name'];
-								$aCity = $row2['cityName'];
-								$aCountry = $row2['countryCode'];
-							}
-							
-							
-							$BookingCode = $AirDetails['BookingCode'];
-							$Seat = $AirDetails['BookingCount'];
-							$CabinClass = $AirDetails['CabinClass'];
-
-
-							$segment = array(
-											array("marketingcareer"=> "$markettingCarrier",
-													"marketingflight"=> "$markettingFN",
-													"operatingcareer"=> "$markettingCarrier",
-													"operatingflight"=> "$markettingFN",
-													"departure"=> "$DepartureFrom",
-													"departureAirport"=> "$dAirport ",
-													"departureLocation"=> "$dCity , $dCountry",                    
-													"departureTime" => "$dpTime",
-													"arrival"=> "$ArrivalTo",                   
-													"arrivalTime" => "$ArrivalTime",
-													"arrivalAirport"=> "$aAirport",
-													"arrivalLocation"=> "$aCity , $aCountry",
-													"flightduration"=> "$TravelTimeHm",
-													"bookingcode"=> "$BookingCode",
-													"seat"=> $Seat,
-													'CabinClass' => $CabinClass,
-													'FareInfoRef' => $FareInfoRef,
-													'SegmentRef' => $SegmentRef,
-													'SegmentDetails' => $airAirSegment[$SegmentRef]
-
-											)
-										);
-							$basic = array("system" =>"Galileo",
-										"segment"=> "1",
-										"career"=> $validatingCarrierCode,
-										"careerName" => $CarrieerName,
-										"BasePrice" => $BasePrice ,
-										"Taxes" => $Taxes,
-										"price" => "$Exact",
-										"airChangePenalty " => $airChangePenalty ,
-										"airCancelPenalty" => $airCancelPenalty,
-										"airFareCalc " => $airFareCalc ,
-										"FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
-										"airFareInfoRef" => $airFareInfoRef,
-										"departure"=> $From,                   
-										"departureDate" => $dpTime,
-										"departureTime"=> substr($DepartureTime,11,5),
-										"arrival"=> "$To",                   
-										"arrivalTime" => substr($ArrivalTime,11,5),
-										"arrivalDate" => "$arrTime",
-										"flightduration"=> $TravelTimeHm,
-										"bags" => "No Baggae",
-										"seat" => $Seat,
-										"class" => $CabinClass,
-										"refundable"=> $Refundable,
-										"segments" => $segment,
-										"traceid" => $TraceId
-									);
-
-				}
-				array_push($All,$basic);
-	}
-	}
-						
-
+												"price" => $AgentPrice,
+												"clientPrice"=> $TotalPrice,
+												"comission"=> $Commission,
+                                                "pricebreakdown"=> $PriceBreakDown,
+                                                "airChangePenalty " => $airChangePenalty ,
+                                                "airCancelPenalty" => $airCancelPenalty,
+                                                "airFareCalc " => $airFareCalc ,
+                                                "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                                "airFareInfoRef" => $airFareInfoRef,
+                                                "LatestTicketingTime" => $LatestTicketingTime,
+                                                "departure"=> "$From",                   
+                                                "departureTime" => "$fromTime",
+                                                "departureDate" => "$dpTime",
+                                                "arrival"=> "$To",                   
+                                                "arrivalTime" => "$toTime1",
+                                                "arrivalDate" => "$arrTime1",
+                                                "flightduration"=> $TravelTimeHm,
+                                                "bags" => $Bags,
+                                                "seat" => "$Seat",
+                                                "class" => "$CabinClass",
+                                                "refundable"=> $Refundable,
+                                                "segments" => $segment,                                              
+                                                "transit" => $Transit,
+                                                "traceid" => $TraceId
+                                            );
+                                            array_push($All, $basic);
+                                    }
+            }
+
+                
+        }else if(isset($airPricePoint['airBookingInfo']) == TRUE){
+            if(isset($airPricePoint['airBookingInfo'][0]) == TRUE){
+                $sgcount = count($airPricePoint['airBookingInfo']);
+                if($sgcount == 1){
+
+                    $FareInfoRef = $airPricePoint['airBookingInfo'][0]['@attributes']['FareInfoRef'];
+                    $SegmentRef = $airPricePoint['airBookingInfo'][0]['@attributes']['SegmentRef'];
+                    $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+                    $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                    $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
+
+                    $FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
+                    $FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
+
+
+                    $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                    $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
+
+                    $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                    $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+
+                    $dpTime = date("D d M Y", strtotime($DepartureTime));
+                    $arrTime = date("D d M Y", strtotime($ArrivalTime));
+
+                    
+                    $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                    $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
+
+                    $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                    $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+
+                    if(!empty($row)){
+                        $markettingCarrierName = $row['name'];		
+                    }
+
+                    // Departure Country
+                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport = $row1['name'];
+                        $dCity = $row1['cityName'];
+                        $dCountry = $row1['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport = $row2['name'];
+                        $aCity = $row2['cityName'];
+                        $aCountry = $row2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCode'];
+                    $Seat = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCount'];
+                    $CabinClass = $airPricePoint['airBookingInfo'][0]['@attributes']['CabinClass'];
+
+
+                    $segment = array(
+                                    array("marketingcareer"=> "$markettingCarrier",
+                                            "marketingflight"=> "$markettingFN",
+                                            "operatingcareer"=> "$markettingCarrier",
+                                            "operatingflight"=> "$markettingFN",
+                                            "departure"=> "$DepartureFrom",
+                                            "departureAirport"=> "$dAirport ",
+                                            "departureLocation"=> "$dCity , $dCountry",                    
+                                            "departureTime" => "$dpTime",
+                                            "arrival"=> "$ArrivalTo",                   
+                                            "arrivalTime" => "$ArrivalTime",
+                                            "arrivalAirport"=> "$aAirport",
+                                            "arrivalLocation"=> "$aCity , $aCountry",
+                                            "flightduration"=> "$TravelTimeHm",
+                                            "bookingcode"=> "$BookingCode",
+                                            "seat"=> $Seat,
+                                            'CabinClass' => $CabinClass,
+                                            'FareInfoRef' => $FareInfoRef,
+                                            'SegmentRef' => $SegmentRef,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                    )
+                                );
+                    $basic = array("system" =>"Galileo",
+                                "segment"=> "$sgcount",
+								"triptype"=>$TripType,
+                                "career"=> $validatingCarrierCode,
+                                "careerName" => $CarrieerName,
+                                "BasePrice" => $BasePrice ,
+								"Taxes" => $Taxes,
+								"price" => $AgentPrice,
+								"clientPrice"=> $TotalPrice,
+								"comission"=> $Commission,
+                                "pricebreakdown"=> $PriceBreakDown,
+                                "airChangePenalty " => $airChangePenalty ,
+                                "airCancelPenalty" => $airCancelPenalty,
+                                "airFareCalc " => $airFareCalc ,
+                                "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                "airFareInfoRef" => $airFareInfoRef,
+                                "LatestTicketingTime" => $LatestTicketingTime,
+                                "departure"=> $From,                   
+                                "departureDate" => $dpTime,
+                                "departureTime"=> substr($DepartureTime,11,5),
+                                "arrival"=> "$To",                   
+                                "arrivalTime" => substr($ArrivalTime,11,5),
+                                "arrivalDate" => "$arrTime",
+                                "flightduration"=> $TravelTimeHm,
+                                "bags" => $Bag,
+                                "seat" => $Seat,
+                                "class" => $CabinClass,
+                                "refundable"=> $Refundable,
+                                "segments" => $segment,
+                                "traceid" => $TraceId
+                            );
+
+
+                }else if($sgcount == 2){
+                    //Leg1
+                    
+                    $FareInfoRef = $airPricePoint['airBookingInfo'][0]['@attributes']['FareInfoRef'];
+                    $SegmentRef = $airPricePoint['airBookingInfo'][0]['@attributes']['SegmentRef'];
+                    
+                    $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+                    $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                    $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
+
+                    $FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
+                    $FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
+
+
+                    $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                    $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
+
+                    $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                    $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+
+                    $fromTime = substr($DepartureTime,11, 19);
+                    $dpTime = date("D d M Y", strtotime(substr($DepartureTime,0, 10)." ".$fromTime));
+
+                    $toTime = substr($ArrivalTime,11, 19);
+                    $arrTime = date("D d M Y", strtotime(substr($ArrivalTime,0, 10)." ".$toTime));
+
+                    
+                    $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                    $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
+
+                    $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                    $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+
+                    if(!empty($row)){
+                        $markettingCarrierName = $row['name'];		
+                    }
+
+                    // Departure Country
+                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport = $row1['name'];
+                        $dCity = $row1['cityName'];
+                        $dCountry = $row1['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport = $row2['name'];
+                        $aCity = $row2['cityName'];
+                        $aCountry = $row2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCode'];
+                    $Seat = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCount'];
+                    $CabinClass = $airPricePoint['airBookingInfo'][0]['@attributes']['CabinClass'];
+
+
+                    //Leg 2
+                    
+                    $FareInfoRef1 = $airPricePoint['airBookingInfo'][1]['@attributes']['FareInfoRef'];
+                    $SegmentRef1 = $airPricePoint['airBookingInfo'][1]['@attributes']['SegmentRef'];
+
+
+                    $FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
+                    $FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
+
+
+                    $ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
+                    $DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
+
+                    $ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
+                    $DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
+
+                    $fromTime1 = substr($DepartureTime1,11, 19);
+                    $dpTime1 = date("D d M Y", strtotime(substr($DepartureTime1,0, 10)." ".$fromTime1));
+
+                    $toTime1 = substr($ArrivalTime1,11, 19);
+                    $arrTime1 = date("D d M Y", strtotime(substr($ArrivalTime1,0, 10)." ".$toTime1));
+
+                    
+                    $markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
+                    $markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
+
+                    $sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
+                    $rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+
+                    if(!empty($rowmk1)){
+                        $markettingCarrierName1 = $rowmk1['name'];		
+                    }
+
+                    // Departure Country
+                    $sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
+                    $rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport1 = $rowdp1['name'];
+                        $dCity1 = $rowdp1['cityName'];
+                        $dCountry1 = $rowdp1['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
+                    $rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport1 = $rowar2['name'];
+                        $aCity1 = $rowar2['cityName'];
+                        $aCountry1 = $rowar2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode1 = $airPricePoint['airBookingInfo'][1]['@attributes']['BookingCode'];
+                    $Seat1 = $airPricePoint['airBookingInfo'][1]['@attributes']['BookingCount'];
+                    $CabinClass1 = $airPricePoint['airBookingInfo'][1]['@attributes']['CabinClass'];
+                    
+                    $Transits = $TravelTime - ($FlightTime + $FlightTime1);
+                    $TransitHm = floor($Transits / 60)."H ".($Transits - ((floor($Transits / 60)) * 60))."Min";
+
+                    $Transit = array("transit1"=> $TransitHm);
+
+                    $segment = array(
+                                    array("marketingcareer"=> "$markettingCarrier",
+                                            "marketingflight"=> "$markettingFN",
+                                            "operatingcareer"=> "$markettingCarrier",
+                                            "operatingflight"=> "$markettingFN",
+                                            "departure"=> "$DepartureFrom",
+                                            "departureAirport"=> "$dAirport ",
+                                            "departureLocation"=> "$dCity , $dCountry",                    
+                                            "departureTime" => "$dpTime",
+                                            "arrival"=> "$ArrivalTo",                   
+                                            "arrivalTime" => "$arrTime",
+                                            "arrivalAirport"=> "$aAirport",
+                                            "arrivalLocation"=> "$aCity , $aCountry",
+                                            "flightduration"=> "$FlightTimeHm",
+                                            "bookingcode"=> "$BookingCode",
+                                            "seat"=> "$Seat",
+                                            'CabinClass' => $CabinClass,
+                                            'FareInfoRef' => $FareInfoRef,
+                                            'SegmentRef' => $SegmentRef,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                    ),array("marketingcareer"=> "$markettingCarrier1",
+                                            "marketingflight"=> "$markettingFN1",
+                                            "operatingcareer"=> "$markettingCarrier1",
+                                            "operatingflight"=> "$markettingFN1",
+                                            "departure"=> "$DepartureFrom1",
+                                            "departureAirport"=> "$dAirport1",
+                                            "departureLocation"=> "$dCity1 , $dCountry1",                    
+                                            "departureTime" => "$dpTime",
+                                            "arrival"=> "$ArrivalTo1",                   
+                                            "arrivalTime" => "$arrTime1",
+                                            "arrivalAirport"=> "$aAirport1",
+                                            "arrivalLocation"=> "$aCity1 , $aCountry1",
+                                            "flightduration"=> "$FlightTimeHm1",
+                                            "bookingcode"=> "$BookingCode1",
+                                            "seat"=> "$Seat1",
+                                            'CabinClass' => $CabinClass1,
+                                            'FareInfoRef' => $FareInfoRef1,
+                                            'SegmentRef' => $SegmentRef1,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef1]
+
+                                    )
+                                );
+                    $basic = array("system" =>"Galileo",
+                                "segment"=> "2",
+								"triptype"=>$TripType,
+                                "career"=> $validatingCarrierCode,
+                                "careerName" => "$CarrieerName",
+                                "BasePrice" => $BasePrice ,
+								"Taxes" => $Taxes,
+								"price" => $AgentPrice,
+								"clientPrice"=> $TotalPrice,
+								"comission"=> $Commission,
+                                "pricebreakdown"=> $PriceBreakDown,
+                                "airChangePenalty " => $airChangePenalty ,
+                                "airCancelPenalty" => $airCancelPenalty,
+                                "airFareCalc " => $airFareCalc ,
+                                "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                "airFareInfoRef" => $airFareInfoRef,
+                                "LatestTicketingTime" => $LatestTicketingTime,
+                                "departure"=> "$From",                   
+                                "departureTime" => substr($DepartureTime,11,5),
+                                "departureDate" => "$dpTime",
+                                "arrival"=> "$To",                   
+                                "arrivalTime" => $ArrivalTime1,
+                                "arrivalDate" => "$arrTime1",
+                                "flightduration"=> $TravelTimeHm,										
+                                "bags" => $Bags,
+                                "seat" => "$Seat",
+                                "class" => "$CabinClass",
+                                "refundable"=> $Refundable,
+                                "segments" => $segment,									
+                                "transit" => $Transit,
+                                "traceid" => $TraceId
+                            );
+
+
+                }else if($sgcount == 3){
+
+                    //Leg1
+                    
+                    $FareInfoRef = $airPricePoint['airBookingInfo'][0]['@attributes']['FareInfoRef'];
+                    $SegmentRef = $airPricePoint['airBookingInfo'][0]['@attributes']['SegmentRef'];
+                    
+                    $TravelTime = $airAirSegment[$SegmentRef]['TravelTime'];
+                    $TravelTimeHm = floor($TravelTime / 60)."H ".($TravelTime - ((floor($TravelTime / 60)) * 60))."Min";
+
+                    $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+
+                    $FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
+                    $FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
+
+
+                    $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+                    $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
+
+                    $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+                    $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+
+                    $fromTime = substr($DepartureTime,11, 19);
+                    $dpTime = date("D d M Y", strtotime(substr($DepartureTime,0, 10)." ".$fromTime));
+
+                    $toTime = substr($ArrivalTime,11, 19);
+                    $arrTime = date("D d M Y", strtotime(substr($ArrivalTime,0, 10)." ".$toTime));
+
+                    
+                    $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+                    $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
+
+                    $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+                    $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+
+                    if(!empty($row)){
+                        $markettingCarrierName = $row['name'];		
+                    }
+
+                    // Departure Country
+                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport = $row1['name'];
+                        $dCity = $row1['cityName'];
+                        $dCountry = $row1['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport = $row2['name'];
+                        $aCity = $row2['cityName'];
+                        $aCountry = $row2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCode'];
+                    $Seat = $airPricePoint['airBookingInfo'][0]['@attributes']['BookingCount'];
+                    $CabinClass = $airPricePoint['airBookingInfo'][0]['@attributes']['CabinClass'];
+
+
+                    //Leg 2
+                    
+                    $FareInfoRef1 = $airPricePoint['airBookingInfo'][1]['@attributes']['FareInfoRef'];
+                    $SegmentRef1 = $airPricePoint['airBookingInfo'][1]['@attributes']['SegmentRef'];
+
+
+                    $FlightTime1 = $airAirSegment[$SegmentRef1]['FlightTime'];
+                    $FlightTimeHm1 = floor($FlightTime1 / 60)."H ".($FlightTime1 - ((floor($FlightTime1 / 60)) * 60))."Min";
+
+
+                    $ArrivalTo1 = $airAirSegment[$SegmentRef1]['Destination'];
+                    $DepartureFrom1 = $airAirSegment[$SegmentRef1]['Origin'];
+
+                    $ArrivalTime1 = $airAirSegment[$SegmentRef1]['ArrivalTime'];
+                    $DepartureTime1 = $airAirSegment[$SegmentRef1]['DepartureTime'];
+
+                    $fromTime1 = substr($DepartureTime1,11, 19);
+                    $dpTime1 = date("D d M Y", strtotime(substr($DepartureTime1,0, 10)." ".$fromTime1));
+
+                    $toTime1 = substr($ArrivalTime1,11, 19);
+                    $arrTime1 = date("D d M Y", strtotime(substr($ArrivalTime1,0, 10)." ".$toTime1));
+
+                    
+                    $markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
+                    $markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
+
+                    $sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
+                    $rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+
+                    if(!empty($rowmk1)){
+                        $markettingCarrierName1 = $rowmk1['name'];		
+                    }
+
+                    // Departure Country
+                    $sqldp1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
+                    $rowdp1 = mysqli_fetch_array($sqldp1,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport1 = $rowdp1['name'];
+                        $dCity1 = $rowdp1['cityName'];
+                        $dCountry1 = $rowdp1['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
+                    $rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport1 = $rowar2['name'];
+                        $aCity1 = $rowar2['cityName'];
+                        $aCountry1 = $rowar2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode1 = $airPricePoint['airBookingInfo'][1]['@attributes']['BookingCode'];
+                    $Seat1 = $airPricePoint['airBookingInfo'][1]['@attributes']['BookingCount'];
+                    $CabinClass1 = $airPricePoint['airBookingInfo'][1]['@attributes']['CabinClass'];
+
+
+                    //Leg 3
+                    
+                    $FareInfoRef2 = $airPricePoint['airBookingInfo'][2]['@attributes']['FareInfoRef'];
+                    $SegmentRef2 = $airPricePoint['airBookingInfo'][2]['@attributes']['SegmentRef'];
+
+
+                    $FlightTime2 = $airAirSegment[$SegmentRef2]['FlightTime'];
+                    $FlightTimeHm2 = floor($FlightTime2 / 60)."H ".($FlightTime2 - ((floor($FlightTime2 / 60)) * 60))."Min";
+
+
+                    $ArrivalTo2 = $airAirSegment[$SegmentRef2]['Destination'];
+                    $DepartureFrom2 = $airAirSegment[$SegmentRef2]['Origin'];
+
+                    $ArrivalTime2 = $airAirSegment[$SegmentRef2]['ArrivalTime'];
+                    $DepartureTime2 = $airAirSegment[$SegmentRef2]['DepartureTime'];
+
+                    $fromTime2 = substr($DepartureTime2,11, 19);
+                    $dpTime2 = date("D d M Y", strtotime(substr($DepartureTime2,0, 10)." ".$fromTime2));
+
+                    $toTime2 = substr($ArrivalTime2,11, 19);
+                    $arrTime2 = date("D d M Y", strtotime(substr($ArrivalTime2,0, 10)." ".$toTime2));
+
+                    
+                    $markettingCarrier2 = $airAirSegment[$SegmentRef2]['Carrier'];
+                    $markettingFN2 = $airAirSegment[$SegmentRef2]['FlightNumber'];
+
+                    $sqlmk1 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier2' ");
+                    $rowmk1 = mysqli_fetch_array($sqlmk1,MYSQLI_ASSOC);
+
+                    if(!empty($rowmk1)){
+                        $markettingCarrierName2 = $rowmk1['name'];		
+                    }
+
+                    // Departure Country
+                    $sqldp2 = mysqli_query($conn,"$Airportsql code='$DepartureFrom2' ");
+                    $rowdp2 = mysqli_fetch_array($sqldp2,MYSQLI_ASSOC);
+
+                    if(!empty($row1)){
+                        $dAirport2 = $rowdp2['name'];
+                        $dCity2 = $rowdp2['cityName'];
+                        $dCountry2 = $rowdp2['countryCode'];		
+                    }
+
+                    // Departure Country
+                    $sqlar2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
+                    $rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
+
+                    if(!empty($row2)){
+                        $aAirport2 = $rowar2['name'];
+                        $aCity2 = $rowar2['cityName'];
+                        $aCountry2 = $rowar2['countryCode'];
+                    }
+                    
+                    
+                    $BookingCode2 = $airPricePoint['airBookingInfo'][2]['@attributes']['BookingCode'];
+                    $Seat2 = $airPricePoint['airBookingInfo'][2]['@attributes']['BookingCount'];
+                    $CabinClass2 = $airPricePoint['airBookingInfo'][2]['@attributes']['CabinClass'];
+
+                    $since_start1 =(new DateTime($DepartureTime1))->diff(new DateTime($ArrivalTime));
+                    $since_start2 =(new DateTime($DepartureTime2))->diff(new DateTime($ArrivalTime1));
+
+                    $Transit = array("transit1"=> "$since_start1->h H $since_start1->m Min",
+                                        "transit2"=> "$since_start2->h H $since_start2->m Min");
+                    
+
+                    $segment = array(
+                                    array("marketingcareer"=> "$markettingCarrier",
+                                            "marketingflight"=> "$markettingFN",
+                                            "operatingcareer"=> "$markettingCarrier",
+                                            "operatingflight"=> "$markettingFN",
+                                            "departure"=> "$DepartureFrom",
+                                            "departureAirport"=> "$dAirport ",
+                                            "departureLocation"=> "$dCity , $dCountry",                    
+                                            "departureTime" => $DepartureTime,
+                                            "arrival"=> "$ArrivalTo",                   
+                                            "arrivalTime" => $ArrivalTime,
+                                            "arrivalAirport"=> "$aAirport",
+                                            "arrivalLocation"=> "$aCity , $aCountry",
+                                            "flightduration"=> "$FlightTimeHm",
+                                            "bookingcode"=> "$BookingCode",
+                                            "seat"=> "$Seat",
+                                            'CabinClass' => $CabinClass,
+                                            'FareInfoRef' => $FareInfoRef,
+                                            'SegmentRef' => $SegmentRef,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                                    ),array("marketingcareer"=> "$markettingCarrier1",
+                                            "marketingflight"=> "$markettingFN1",
+                                            "operatingcareer"=> "$markettingCarrier1",
+                                            "operatingflight"=> "$markettingFN1",
+                                            "departure"=> "$DepartureFrom1",
+                                            "departureAirport"=> "$dAirport1",
+                                            "departureLocation"=> "$dCity1 , $dCountry",                    
+                                            "departureTime" => $DepartureTime1,
+                                            "arrival"=> "$ArrivalTo1",                   
+                                            "arrivalTime" => $ArrivalTime1,
+                                            "arrivalAirport"=> "$aAirport1",
+                                            "arrivalLocation"=> "$aCity1 , $aCountry1",
+                                            "flightduration"=> "$FlightTimeHm1",
+                                            "bookingcode"=> "$BookingCode1",
+                                            "seat"=> "$Seat1",
+                                            'CabinClass' => $CabinClass1,
+                                            'FareInfoRef' => $FareInfoRef1,
+                                            'SegmentRef' => $SegmentRef1,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef1]
+
+                                ),
+                                array("marketingcareer"=> "$markettingCarrier2",
+                                            "marketingflight"=> "$markettingFN2",
+                                            "operatingcareer"=> "$markettingCarrier2",
+                                            "operatingflight"=> "$markettingFN2",
+                                            "departure"=> "$DepartureFrom2",
+                                            "departureAirport"=> "$dAirport2",
+                                            "departureLocation"=> "$dCity2 , $dCountry2",                    
+                                            "departureTime" => $DepartureTime2,
+                                            "arrival"=> "$ArrivalTo2",                   
+                                            "arrivalTime" => $ArrivalTime2,
+                                            "arrivalAirport"=> "$aAirport2",
+                                            "arrivalLocation"=> "$aCity2 , $aCountry2",
+                                            "flightduration"=> "$FlightTimeHm2",
+                                            "bookingcode"=> "$BookingCode2",
+                                            "seat"=> "$Seat2",
+                                            'CabinClass' => $CabinClass2,
+                                            'FareInfoRef' => $FareInfoRef2,
+                                            'SegmentRef' => $SegmentRef2,
+                                            'SegmentDetails' => $airAirSegment[$SegmentRef2]
+
+                                    )
+                                );
+                    $basic = array("system" =>"Galileo",
+                                "segment"=> "3",
+								"triptype"=>$TripType,
+                                "career"=> $validatingCarrierCode,
+                                "careerName" => "$CarrieerName",
+                                "BasePrice" => $BasePrice ,
+								"Taxes" => $Taxes,
+								"price" => $AgentPrice,
+								"clientPrice"=> $TotalPrice,
+								"comission"=> $Commission,
+                                "pricebreakdown"=> $PriceBreakDown,
+                                "airChangePenalty " => $airChangePenalty ,
+                                "airCancelPenalty" => $airCancelPenalty,
+                                "airFareCalc " => $airFareCalc ,
+                                "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                "airFareInfoRef" => $airFareInfoRef,
+                                "LatestTicketingTime" => $LatestTicketingTime,
+                                "departure"=> "$From",                   
+                                "departureTime" => "$fromTime",
+                                "departureDate" => "$dpTime1",
+                                "arrival"=> "$To",                   
+                                "arrivalTime" => "$toTime2",
+                                "arrivalDate" => "$arrTime2",
+                                "flightduration"=> $TravelTimeHm,										
+                                "bags" => $Bags,
+                                "seat" => "$Seat",
+                                "class" => "$CabinClass",
+                                "refundable"=> $Refundable,
+                                "segments" => $segment,									
+                                "transit" => $Transit,
+                                "traceid" => $TraceId
+                            );
+
+
+                }
+
+                array_push($All,$basic);
+
+            }else if(isset($airPricePoint['airBookingInfo']['@attributes']['SegmentRef'])){
+                
+        $FareInfoRef = $airPricePoint['airBookingInfo']['@attributes']['FareInfoRef'];
+        $SegmentRef = $airPricePoint['airBookingInfo']['@attributes']['SegmentRef'];
+        $Bags = $airFareInfo[$FareInfoRef]['Bags'];
+
+        $FlightTime = $airAirSegment[$SegmentRef]['FlightTime'];
+        $FlightTimeHm = floor($FlightTime / 60)."H ".($FlightTime - ((floor($FlightTime / 60)) * 60))."Min";
+
+
+        $ArrivalTo = $airAirSegment[$SegmentRef]['Destination'];
+        $DepartureFrom = $airAirSegment[$SegmentRef]['Origin'];
+
+        $ArrivalTime = $airAirSegment[$SegmentRef]['ArrivalTime'];
+        $DepartureTime = $airAirSegment[$SegmentRef]['DepartureTime'];
+        
+        $dpTime = date("D d M Y", strtotime($DepartureTime));
+
+        $arrTime = date("D d M Y", strtotime($ArrivalTime));
+
+        
+        $markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
+        $markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
+
+        $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+        $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+
+        if(!empty($row)){
+            $markettingCarrierName = $row['name'];		
+        }
+
+        // Departure Country
+        $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
+        $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+
+        if(!empty($row1)){
+            $dAirport = $row1['name'];
+            $dCity = $row1['cityName'];
+            $dCountry = $row1['countryCode'];		
+        }
+
+        // Departure Country
+        $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
+        $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+
+        if(!empty($row2)){
+            $aAirport = $row2['name'];
+            $aCity = $row2['cityName'];
+            $aCountry = $row2['countryCode'];
+        }
+        
+        
+        $BookingCode = $airPricePoint['airBookingInfo']['@attributes']['BookingCode'];
+        $Seat = $airPricePoint['airBookingInfo']['@attributes']['BookingCount'];
+        $CabinClass = $airPricePoint['airBookingInfo']['@attributes']['CabinClass'];
+
+
+        $segment = array(
+                        array("marketingcareer"=> "$markettingCarrier",
+                                "marketingflight"=> "$markettingFN",
+                                "operatingcareer"=> "$markettingCarrier",
+                                "operatingflight"=> "$markettingFN",
+                                "departure"=> "$DepartureFrom",
+                                "departureAirport"=> "$dAirport ",
+                                "departureLocation"=> "$dCity , $dCountry",                    
+                                "departureTime" => $DepartureTime,
+                                "arrival"=> "$ArrivalTo",                   
+                                "arrivalTime" => "$ArrivalTime",
+                                "arrivalAirport"=> "$aAirport",
+                                "arrivalLocation"=> "$aCity , $aCountry",
+                                "flightduration"=> $FlightTimeHm,
+                                "bookingcode"=> "$BookingCode",
+                                "seat"=> "$Seat",
+                                'CabinClass' => $CabinClass,
+                                'FareInfoRef' => $FareInfoRef,
+                                'SegmentRef' => $SegmentRef,
+                                'SegmentDetails' => $airAirSegment[$SegmentRef]
+
+                        )
+                    );
+        $basic = array("system" =>"Galileo",
+                    "segment"=> "1",
+					"triptype"=>$TripType,
+                    "career"=> $validatingCarrierCode,
+                    "careerName" => $CarrieerName,
+                    "BasePrice" => $BasePrice ,
+					"Taxes" => $Taxes,
+					"price" => $AgentPrice,
+					"clientPrice"=> $TotalPrice,
+					"comission"=> $Commission,
+                    "pricebreakdown"=> $PriceBreakDown,
+                    "airChangePenalty " => $airChangePenalty ,
+                    "airCancelPenalty" => $airCancelPenalty,
+                    "airFareCalc " => $airFareCalc ,
+                    "FareBasisCode"=> $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                    "airFareInfoRef" => $airFareInfoRef,
+                    "LatestTicketingTime" => $LatestTicketingTime,
+                    "departure"=> $From,
+                    "departureTime" => substr($DepartureTime,11,5),                  
+                    "departureDate" => $dpTime,
+                    "arrival"=> "$To",                   
+                    "arrivalTime" => substr($ArrivalTime,11,5),
+                    "arrivalDate" => $dpTime,
+                    "flightduration"=> $FlightTimeHm,							
+                    "bags" => $Bags,
+                    "seat" => $Seat,
+                    "class" => $CabinClass,
+                    "refundable"=> $Refundable,
+                    "segments" => $segment,
+                    "traceid" => $TraceId	);
+
+                array_push($All,$basic);
+                
+                }
+
+
+        }
+
+    }
+        
 	
-	
+}
+
 
 }
 
 		
 		
 
-if($FlyHub == 1){
+	if($FlyHub == 1){
 
-	$FlyHubRequest ='{
-	"AdultQuantity": "'.$adult.'",
-	"ChildQuantity": "'.$child.'",
-	"InfantQuantity": "'.$infants.'",
-	"EndUserIp": "85.187.128.34",
-	"JourneyType": "1",
-	"Segments": [
-		{
-		"Origin": "'.$From.'",
-		"Destination": "'.$To.'",
-		"CabinClass": "Economy",
-		"DepartureDateTime": "'.$Date.'"
-		}
-	],
-	"PreferredAirlines": [
-		""
-	]
-	}';
+		$FlyHubRequest ='{
+		"AdultQuantity": "'.$adult.'",
+		"ChildQuantity": "'.$child.'",
+		"InfantQuantity": "'.$infants.'",
+		"EndUserIp": "85.187.128.34",
+		"JourneyType": "1",
+		"Segments": [
+			{
+			"Origin": "'.$From.'",
+			"Destination": "'.$To.'",
+			"CabinClass": "Economy",
+			"DepartureDateTime": "'.$Date.'"
+			}
+		],
+		"PreferredAirlines": [
+			""
+		]
+		}';
 
-	//echo $FlyHubRequest;
+		//echo $FlyHubRequest;
 
 
-	//Fly Hub
+		//Fly Hub
 
-	$curlflyhubauth = curl_init();
+		$curlflyhubauth = curl_init();
 
-	curl_setopt_array($curlflyhubauth, array(
-	CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
-	CURLOPT_RETURNTRANSFER => true,
-	CURLOPT_ENCODING => '',
-	CURLOPT_MAXREDIRS => 10,
-	CURLOPT_TIMEOUT => 0,
-	CURLOPT_FOLLOWLOCATION => true,
-	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-	CURLOPT_CUSTOMREQUEST => 'POST',
-	CURLOPT_POSTFIELDS =>'{
-	"username": "ceo@flyfarint.com",
-	"apikey": "ENex7c5Ge+0~SGc1t71iccr1xXacDPdK51g=iTm9SlL+de39HF"
-	}',
-	CURLOPT_HTTPHEADER => array(
-		'Content-Type: application/json'
-	),
-	));
+		curl_setopt_array($curlflyhubauth, array(
+		CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS =>'{
+		"username": "ceo@flyfarint.com",
+		"apikey": "ENex7c5Ge+0~SGc1t71iccr1xXacDPdK51g=iTm9SlL+de39HF"
+		}',
+		CURLOPT_HTTPHEADER => array(
+			'Content-Type: application/json'
+		),
+		));
 
-	$response = curl_exec($curlflyhubauth);
+		$response = curl_exec($curlflyhubauth);
 
-	$TokenJson = json_decode($response,true);
+		$TokenJson = json_decode($response,true);
 
-	$FlyhubToken  = $TokenJson['TokenId'];
+		$FlyhubToken  = $TokenJson['TokenId'];
 
-	$curlflyhusearch = curl_init();
+		$curlflyhusearch = curl_init();
 
-	curl_setopt_array($curlflyhusearch, array(
-	CURLOPT_URL => 'https://api.flyhub.com/api/v1/AirSearch',
-	CURLOPT_RETURNTRANSFER => true,
-	CURLOPT_ENCODING => '',
-	CURLOPT_MAXREDIRS => 10,
-	CURLOPT_TIMEOUT => 0,
-	CURLOPT_FOLLOWLOCATION => true,
-	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-	CURLOPT_CUSTOMREQUEST => 'POST',
-	CURLOPT_POSTFIELDS => $FlyHubRequest,
-	CURLOPT_HTTPHEADER => array(
-		'Content-Type: application/json',
-		"Authorization: Bearer $FlyhubToken"
-	),
-	));
+		curl_setopt_array($curlflyhusearch, array(
+		CURLOPT_URL => 'https://api.flyhub.com/api/v1/AirSearch',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => $FlyHubRequest,
+		CURLOPT_HTTPHEADER => array(
+			'Content-Type: application/json',
+			"Authorization: Bearer $FlyhubToken"
+		),
+		));
 
-	$flyhubresponse = curl_exec($curlflyhusearch);
+		$flyhubresponse = curl_exec($curlflyhusearch);
 
-	curl_close($curlflyhusearch);
+		curl_close($curlflyhusearch);
 
-	//echo $flyhubresponse;
-	
-	// Decode the JSON file
-	$Result = json_decode($flyhubresponse,true);
+		//echo $flyhubresponse;
 		
-	$FlightListFlyHub = $Result['Results'];
-	$SearchID = $Result['SearchId'];
-	$FlyHubResponse = array();
-
-    //print_r($FlightListFlyHub);
-	
-	foreach($FlightListFlyHub as $flight){
-		$Validatingcarrier = $flight['Validatingcarrier'];
-		$segments = count($flight['segments']);
-		$TotalFare = $flight['TotalFare'];
-		$Refundable = $flight['IsRefundable'];
-		$Hold = $flight['HoldAllowed'];
-
-		if($adult>0 && $child>0 && $infants >0 ){
-			$BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare'] * $child + $flight['Fares'][2]['BaseFare'] * $infants;
-			$Taxes = $flight['Fares'][0]['Tax'] * $adult + $flight['Fares'][1]['Tax'] * $child + $flight['Fares'][2]['Tax'] * $infants;
-			$Taxes += $flight['Fares'][0]['OtherCharges']* $adult + $flight['Fares'][1]['OtherCharges'] * $child + $flight['Fares'][2]['OtherCharges'] * $infants;		
-			$Taxes +=  $flight['Fares'][0]['ServiceFee']* $adult + $flight['Fares'][1]['ServiceFee'] * $child + $flight['Fares'][2]['ServiceFee'] * $infants;
+		// Decode the JSON file
+		$Result = json_decode($flyhubresponse,true);
 			
-			$adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
-			$adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
+		$FlightListFlyHub = $Result['Results'];
+		$SearchID = $Result['SearchId'];
+		$FlyHubResponse = array();
 
-			$childBasePrice = $flight['Fares'][1]['BaseFare'] + $flight['Fares'][1]['ServiceFee'];
-			$childTaxAmount = $flight['Fares'][1]['Tax'] + $flight['Fares'][1]['OtherCharges'];
+		//print_r($FlightListFlyHub);
+		$f=0;
+		foreach($FlightListFlyHub as $flight){
+			$Validatingcarrier = $flight['Validatingcarrier'];
+			$segments = count($flight['segments']);
+			$Refundable = $flight['IsRefundable'];
+			$Hold = $flight['HoldAllowed'];
 
-			$infantBasePrice = $flight['Fares'][2]['BaseFare'] + $flight['Fares'][2]['ServiceFee'];
-			$infantTaxAmount = $flight['Fares'][2]['Tax'] + $flight['Fares'][2]['OtherCharges'];
+			if($adult> 0 && $child>0 && $infants >0 ){
+				$BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare'] * $child + $flight['Fares'][2]['BaseFare'] * $infants;
+				$Taxes = $flight['Fares'][0]['Tax'] * $adult + $flight['Fares'][1]['Tax'] * $child + $flight['Fares'][2]['Tax'] * $infants;
+				$Taxes += $flight['Fares'][0]['OtherCharges']* $adult + $flight['Fares'][1]['OtherCharges'] * $child + $flight['Fares'][2]['OtherCharges'] * $infants;		
+				$Taxes +=  $flight['Fares'][0]['ServiceFee']* $adult + $flight['Fares'][1]['ServiceFee'] * $child + $flight['Fares'][2]['ServiceFee'] * $infants;
+				
+				$adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
+				$adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
 
-			$PriceBreakDown = array("0" =>
-							array("BaseFare"=> "$adultBasePrice",
-								"Tax"=> "$adultTaxAmount",
-								"PaxCount"=> $adult,
-								"PaxType"=> "ADT",
-								"Discount"=> "0",
-								"OtherCharges"=> "0",
-								"ServiceFee"=> "0")
-								,
-							"1" =>
-							array("BaseFare"=> "$childBasePrice",
-								"Tax"=> "$childTaxAmount",
-								"PaxCount"=> $child,
-								"PaxType"=> "CNN",
-								"Discount"=> "0",
-								"OtherCharges"=> "0",
-								"ServiceFee"=> "0"),
-							"2" =>
-							array("BaseFare"=> "$infantBasePrice",
-								"Tax"=> "$infantTaxAmount",
-								"PaxCount"=> $infants,
-								"PaxType"=> "INF",
-								"Discount"=> "0",
-								"OtherCharges"=> "0",
-								"ServiceFee"=> "0")                                         
-						);
-						
+				$childBasePrice = $flight['Fares'][1]['BaseFare'] + $flight['Fares'][1]['ServiceFee'];
+				$childTaxAmount = $flight['Fares'][1]['Tax'] + $flight['Fares'][1]['OtherCharges'];
+
+				$infantBasePrice = $flight['Fares'][2]['BaseFare'] + $flight['Fares'][2]['ServiceFee'];
+				$infantTaxAmount = $flight['Fares'][2]['Tax'] + $flight['Fares'][2]['OtherCharges'];
+
+				$PriceBreakDown = array("0" =>
+								array("BaseFare"=> "$adultBasePrice",
+									"Tax"=> "$adultTaxAmount",
+									"PaxCount"=> $adult,
+									"PaxType"=> "ADT",
+									"Discount"=> "0",
+									"OtherCharges"=> "0",
+									"ServiceFee"=> "0")
+									,
+								"1" =>
+								array("BaseFare"=> "$childBasePrice",
+									"Tax"=> "$childTaxAmount",
+									"PaxCount"=> $child,
+									"PaxType"=> "CNN",
+									"Discount"=> "0",
+									"OtherCharges"=> "0",
+									"ServiceFee"=> "0"),
+								"2" =>
+								array("BaseFare"=> "$infantBasePrice",
+									"Tax"=> "$infantTaxAmount",
+									"PaxCount"=> $infants,
+									"PaxType"=> "INF",
+									"Discount"=> "0",
+									"OtherCharges"=> "0",
+									"ServiceFee"=> "0")                                         
+							);
+							
+				
+			}else if($adult> 0 && $child> 0){
+				$BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare']* $child ;
+				$Taxes = $flight['Fares'][0]['Tax']  * $adult + $flight['Fares'][1]['Tax']* $child;
+				$Taxes += $flight['Fares'][0]['OtherCharges'] * $adult + $flight['Fares'][1]['OtherCharges'] * $child ;
+				$Taxes +=  $flight['Fares'][0]['ServiceFee'] * $adult + $flight['Fares'][1]['ServiceFee'] * $child ;
+
+				$adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
+				$adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
+
+				$childBasePrice = $flight['Fares'][1]['BaseFare'] + $flight['Fares'][1]['ServiceFee'];
+				$childTaxAmount = $flight['Fares'][1]['Tax'] + $flight['Fares'][1]['OtherCharges'];
+
+				$PriceBreakDown = array("0" =>
+								array("BaseFare"=> "$adultBasePrice",
+									"Tax"=> "$adultTaxAmount",
+									"PaxCount"=> $adult,
+									"PaxType"=> "ADT",
+									"Discount"=> "0",
+									"OtherCharges"=> "0",
+									"ServiceFee"=> "0")
+									,
+								"1" =>
+								array("BaseFare"=> "$childBasePrice",
+									"Tax"=> "$childTaxAmount",
+									"PaxCount"=> $child,
+									"PaxType"=> "CNN",
+									"Discount"=> "0",
+									"OtherCharges"=> "0",
+									"ServiceFee"=> "0")                                     
+							);
+				
+				
+				
+			}else if($adult>0 && $infants>0){
+				$BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare']* $infants ;
+				$Taxes = $flight['Fares'][0]['Tax']  * $adult + $flight['Fares'][1]['Tax']* $infants;
+				$Taxes += $flight['Fares'][0]['OtherCharges'] * $adult + $flight['Fares'][1]['OtherCharges'] * $infants ;
+				$Taxes +=  $flight['Fares'][0]['ServiceFee'] * $adult + $flight['Fares'][1]['ServiceFee'] * $infants ;
+
+				$adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
+				$adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
+
+
+				$infantBasePrice = $flight['Fares'][1]['BaseFare'] + $flight['Fares'][1]['ServiceFee'];
+				$infantTaxAmount = $flight['Fares'][1]['Tax'] + $flight['Fares'][1]['OtherCharges'];
+
+				$PriceBreakDown = array("0" =>
+								array("BaseFare"=> "$adultBasePrice",
+									"Tax"=> "$adultTaxAmount",
+									"PaxCount"=> $adult,
+									"PaxType"=> "ADT",
+									"Discount"=> "0",
+									"OtherCharges"=> "0",
+									"ServiceFee"=> "0"),
+								"1" =>
+								array("BaseFare"=> "$infantBasePrice",
+									"Tax"=> "$infantTaxAmount",
+									"PaxCount"=> $infants,
+									"PaxType"=> "INF",
+									"Discount"=> "0",
+									"OtherCharges"=> "0",
+									"ServiceFee"=> "0")                                         
+							);
+				
+
+			}else if(isset($flight['Fares'][0])){
+				$BasePrice = $flight['Fares'][0]['BaseFare']  * $adult;
+				$Taxes = $flight['Fares'][0]['Tax']  * $adult;					
+				$Taxes += $flight['Fares'][0]['OtherCharges']  * $adult;
+				$Taxes +=  $flight['Fares'][0]['ServiceFee']  * $adult;
+
+				$adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
+				$adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
+				$PriceBreakDown = array("0" =>
+								array("BaseFare"=> "$adultBasePrice",
+									"Tax"=> "$adultTaxAmount",
+									"PaxCount"=> $adult,
+									"PaxType"=> "ADT",
+									"Discount"=> "0",
+									"OtherCharges"=> "0",
+									"ServiceFee"=> "0")								                                       
+							);
 			
-		}else if($adult> 0 && $child> 0){
-			$BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare']* $child ;
-			$Taxes = $flight['Fares'][0]['Tax']  * $adult + $flight['Fares'][1]['Tax']* $child;
-			$Taxes += $flight['Fares'][0]['OtherCharges'] * $adult + $flight['Fares'][1]['OtherCharges'] * $child ;
-			$Taxes +=  $flight['Fares'][0]['ServiceFee'] * $adult + $flight['Fares'][1]['ServiceFee'] * $child ;
-
-			$adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
-			$adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
-
-			$childBasePrice = $flight['Fares'][1]['BaseFare'] + $flight['Fares'][1]['ServiceFee'];
-			$childTaxAmount = $flight['Fares'][1]['Tax'] + $flight['Fares'][1]['OtherCharges'];
-
-			$PriceBreakDown = array("0" =>
-							array("BaseFare"=> "$adultBasePrice",
-								"Tax"=> "$adultTaxAmount",
-								"PaxCount"=> $adult,
-								"PaxType"=> "ADT",
-								"Discount"=> "0",
-								"OtherCharges"=> "0",
-								"ServiceFee"=> "0")
-								,
-							"1" =>
-							array("BaseFare"=> "$childBasePrice",
-								"Tax"=> "$childTaxAmount",
-								"PaxCount"=> $child,
-								"PaxType"=> "CNN",
-								"Discount"=> "0",
-								"OtherCharges"=> "0",
-								"ServiceFee"=> "0")                                     
-						);
-			
-			
-			
-		}else if($adult>0 && $infants>0){
-			$BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare']* $infants ;
-			$Taxes = $flight['Fares'][0]['Tax']  * $adult + $flight['Fares'][1]['Tax']* $infants;
-			$Taxes += $flight['Fares'][0]['OtherCharges'] * $adult + $flight['Fares'][1]['OtherCharges'] * $infants ;
-			$Taxes +=  $flight['Fares'][0]['ServiceFee'] * $adult + $flight['Fares'][1]['ServiceFee'] * $infants ;
-
-			$adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
-			$adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
-
-
-			$infantBasePrice = $flight['Fares'][1]['BaseFare'] + $flight['Fares'][1]['ServiceFee'];
-			$infantTaxAmount = $flight['Fares'][1]['Tax'] + $flight['Fares'][1]['OtherCharges'];
-
-			$PriceBreakDown = array("0" =>
-							array("BaseFare"=> "$adultBasePrice",
-								"Tax"=> "$adultTaxAmount",
-								"PaxCount"=> $adult,
-								"PaxType"=> "ADT",
-								"Discount"=> "0",
-								"OtherCharges"=> "0",
-								"ServiceFee"=> "0"),
-							"1" =>
-							array("BaseFare"=> "$infantBasePrice",
-								"Tax"=> "$infantTaxAmount",
-								"PaxCount"=> $infants,
-								"PaxType"=> "INF",
-								"Discount"=> "0",
-								"OtherCharges"=> "0",
-								"ServiceFee"=> "0")                                         
-						);
-			
-
-		}else if(isset($flight['Fares'][0])){
-			$BasePrice = $flight['Fares'][0]['BaseFare']  * $adult;
-			$Taxes = $flight['Fares'][0]['Tax']  * $adult;					
-			$Taxes += $flight['Fares'][0]['OtherCharges']  * $adult;
-		    $Taxes +=  $flight['Fares'][0]['ServiceFee']  * $adult;
-
-			$adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
-			$adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
-			$PriceBreakDown = array("0" =>
-							array("BaseFare"=> "$adultBasePrice",
-								"Tax"=> "$adultTaxAmount",
-								"PaxCount"=> $adult,
-								"PaxType"=> "ADT",
-								"Discount"=> "0",
-								"OtherCharges"=> "0",
-								"ServiceFee"=> "0")								                                       
-						);
-		
-		}
-
-		
-
-		$ClientFare = $BasePrice + $Taxes;
-		$Commission = $ClientFare - $TotalFare;
-
-		
-
-		if($flight['IsRefundable'] == 1){
-			$Refundable = "Refundable";
-		}else{
-			$Refundable = "Nonrefundable";
-		}
-		$Availabilty = $flight['Availabilty'];		
-		$ResultID = $flight['ResultID'];
-
-		$sql = mysqli_query($conn,"SELECT name, commission FROM airlines WHERE code='$Validatingcarrier' ");
-		$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
-
-		if(!empty($row)){
-			$CarrieerName = $row['name'];
-			$fareRate = $row['commission'];                       
-		} 
-	
-		
-		if($segments == 1){
-			$dAirportCode = $flight['segments'][0]['Origin']['Airport']['AirportCode'];
-			$dAirportName = $flight['segments'][0]['Origin']['Airport']['AirportName'];
-			$dCityName = $flight['segments'][0]['Origin']['Airport']['CityName'];
-			$dCountryCode = $flight['segments'][0]['Origin']['Airport']['CountryCode'];
-
-			$aAirportCode = $flight['segments'][0]['Destination']['Airport']['AirportCode'];
-			$aAirportName = $flight['segments'][0]['Destination']['Airport']['AirportName'];
-			$aCityName = $flight['segments'][0]['Destination']['Airport']['CityName'];
-			$aCountryCode = $flight['segments'][0]['Destination']['Airport']['CountryCode'];
-
-
-			$DepTime = $flight['segments'][0]['Origin']['DepTime'];
-			$ArrTime = $flight['segments'][0]['Destination']['ArrTime'];
-
-			$AirlineCode = $flight['segments'][0]['Airline']['AirlineCode'];
-			$AirlineName = $flight['segments'][0]['Airline']['AirlineName'];
-			$FlightNumber = $flight['segments'][0]['Airline']['FlightNumber'];
-			$BookingClass = $flight['segments'][0]['Airline']['BookingClass'];
-			$CabinClass= $flight['segments'][0]['Airline']['CabinClass'];
-			$OperatingCarrier = $flight['segments'][0]['Airline']['OperatingCarrier'];
-
-			if(isset($flight['segments'][0]['baggageDetails'][0]['Checkin'])){				
-				$Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
-			} else {
-				$Baggage = 0;
 			}
 
-			//$Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
+			$markup = 0;
+			if($Validatingcarrier == '6E'){
+				$markup = 500;
+			}else{
+			    $markup = 0;
+			}
+
+			$TotalFare = (int)$flight['TotalFare'] + $markup;
+
+			$ClientFare = $BasePrice + $Taxes + $markup;
+			$Commission = $ClientFare - $TotalFare;
+
 			
-			$JourneyDuration = $flight['segments'][0]['JourneyDuration'];
-			$Duration = floor($JourneyDuration / 60)."H ".($JourneyDuration - ((floor($JourneyDuration / 60)) * 60))."Min";
 
-			$transitDetails = array("transit1" => "0");
+			if($flight['IsRefundable'] == 1){
+				$Refundable = "Refundable";
+			}else{
+				$Refundable = "Nonrefundable";
+			}
+			$Availabilty = $flight['Availabilty'];		
+			$ResultID = $flight['ResultID'];
 
-			$segment = array("0" =>
-								array("marketingcareer"=> "$AirlineCode",
-								"marketingcareerName"=> "$AirlineName",
-									"marketingflight"=> "$FlightNumber",
-									"operatingcareer"=> "$OperatingCarrier",
-									"operatingflight"=> "$FlightNumber",
-									"departure"=> "$dAirportCode",
-									"departureAirport"=> "$dAirportName ",
-									"departureLocation"=> "$dCityName , $dCountryCode",                    
-									"departureTime" => "$DepTime",
-									"arrival"=> "$aAirportCode",                   
-									"arrivalTime" => "$ArrTime",
-									"arrivalAirport"=> "$aAirportName",
-									"arrivalLocation"=> "$aCityName , $aCountryCode",
-									"flightduration"=> "$Duration",
-									"bookingcode"=> "$BookingClass",
-									"seat"=> "$Availabilty")                                           
+			$sql = mysqli_query($conn,"SELECT name, commission FROM airlines WHERE code='$Validatingcarrier' ");
+			$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+
+			if(!empty($row)){
+				$CarrieerName = $row['name'];
+				$fareRate = $row['commission'];                       
+			} 
+		
+			$uId = sha1(md5(time()).''.rand());
+			
+			if($segments == 1){
+				$dAirportCode = $flight['segments'][0]['Origin']['Airport']['AirportCode'];
+				$dAirportName = $flight['segments'][0]['Origin']['Airport']['AirportName'];
+				$dCityName = $flight['segments'][0]['Origin']['Airport']['CityName'];
+				$dCountryCode = $flight['segments'][0]['Origin']['Airport']['CountryCode'];
+
+				$aAirportCode = $flight['segments'][0]['Destination']['Airport']['AirportCode'];
+				$aAirportName = $flight['segments'][0]['Destination']['Airport']['AirportName'];
+				$aCityName = $flight['segments'][0]['Destination']['Airport']['CityName'];
+				$aCountryCode = $flight['segments'][0]['Destination']['Airport']['CountryCode'];
+
+
+				$DepTime = $flight['segments'][0]['Origin']['DepTime'];
+				$ArrTime = $flight['segments'][0]['Destination']['ArrTime'];
+
+				$AirlineCode = $flight['segments'][0]['Airline']['AirlineCode'];
+				$AirlineName = $flight['segments'][0]['Airline']['AirlineName'];
+				$FlightNumber = $flight['segments'][0]['Airline']['FlightNumber'];
+				$BookingClass = $flight['segments'][0]['Airline']['BookingClass'];
+				$CabinClass= $flight['segments'][0]['Airline']['CabinClass'];
+				$OperatingCarrier = $flight['segments'][0]['Airline']['OperatingCarrier'];
+
+				if(isset($flight['segments'][0]['baggageDetails'][0]['Checkin'])){				
+					$Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
+				} else {
+					$Baggage = 0;
+				}
+
+				//$Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
+				
+				$JourneyDuration = $flight['segments'][0]['JourneyDuration'];
+				$Duration = floor($JourneyDuration / 60)."H ".($JourneyDuration - ((floor($JourneyDuration / 60)) * 60))."Min";
+
+				$transitDetails = array("transit1" => "0");
+
+				$segment = array("0" =>
+									array("marketingcareer"=> "$AirlineCode",
+									"marketingcareerName"=> "$AirlineName",
+										"marketingflight"=> "$FlightNumber",
+										"operatingcareer"=> "$OperatingCarrier",
+										"operatingflight"=> "$FlightNumber",
+										"departure"=> "$dAirportCode",
+										"departureAirport"=> "$dAirportName ",
+										"departureLocation"=> "$dCityName , $dCountryCode",                    
+										"departureTime" => "$DepTime",
+										"arrival"=> "$aAirportCode",                   
+										"arrivalTime" => "$ArrTime",
+										"arrivalAirport"=> "$aAirportName",
+										"arrivalLocation"=> "$aCityName , $aCountryCode",
+										"flightduration"=> "$Duration",
+										"bookingcode"=> "$BookingClass",
+										"seat"=> "$Availabilty")                                           
+									);
+
+								$basic = array("system"=>"FlyHub",
+													"segment"=> "1",
+													"uId"=> $uId,
+													"triptype"=>$TripType,
+													"career"=> "$Validatingcarrier",
+													"careerName" => "$CarrieerName",
+													"BasePrice" => "$BasePrice",
+													"Taxes" => "$Taxes",
+													"price" => "$TotalFare",
+													"clientPrice"=> "$ClientFare",
+													"comission"=> "$Commission",
+													"pricebreakdown"=> $PriceBreakDown,
+													"departure"=> $dAirportCode,                   
+													"departureTime" => substr($DepTime,11,5),
+													"departureDate" => date("D d M Y", strtotime($DepTime)),
+													"arrival"=> "$aAirportCode",                   
+													"arrivalTime" => substr($ArrTime,11,5),
+													"arrivalDate" => date("D d M Y", strtotime($ArrTime)),
+													"flightduration"=> "$Duration",
+													"transit" => $transitDetails,
+													"bags" => "$Baggage",
+													"seat" => "$Availabilty",
+													"class" => "$CabinClass",
+													"refundable"=> "$Refundable",
+													"segments" => $segment,
+													"hold"=> "$Hold",												
+													"SearchID"=> $SearchID,
+													"ResultID"=> $ResultID
+													
+											);
+					array_push($FlyHubResponse, $basic);
+				
+			}else if($segments == 2){
+
+				///Leg 1
+				$dAirportCode = $flight['segments'][0]['Origin']['Airport']['AirportCode'];
+				$dAirportName = $flight['segments'][0]['Origin']['Airport']['AirportName'];
+				$dCityName = $flight['segments'][0]['Origin']['Airport']['CityName'];
+				$dCountryCode = $flight['segments'][0]['Origin']['Airport']['CountryCode'];
+
+				$aAirportCode = $flight['segments'][0]['Destination']['Airport']['AirportCode'];
+				$aAirportName = $flight['segments'][0]['Destination']['Airport']['AirportName'];
+				$aCityName = $flight['segments'][0]['Destination']['Airport']['CityName'];
+				$aCountryCode = $flight['segments'][0]['Destination']['Airport']['CountryCode'];
+
+
+				$DepTime = $flight['segments'][0]['Origin']['DepTime'];
+				$ArrTime = $flight['segments'][0]['Destination']['ArrTime'];
+
+				$AirlineCode = $flight['segments'][0]['Airline']['AirlineCode'];
+				$AirlineName = $flight['segments'][0]['Airline']['AirlineName'];
+				$FlightNumber = $flight['segments'][0]['Airline']['FlightNumber'];
+				$BookingClass = $flight['segments'][0]['Airline']['BookingClass'];
+				$CabinClass= $flight['segments'][0]['Airline']['CabinClass'];
+				$OperatingCarrier = $flight['segments'][0]['Airline']['OperatingCarrier'];
+
+				if(isset($flight['segments'][0]['baggageDetails'][0]['Checkin'])){				
+					$Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
+				} else {
+					$Baggage = 0;
+				}
+				$JourneyDuration = $flight['segments'][0]['JourneyDuration'];
+				$Duration = floor($JourneyDuration / 60)."H ".($JourneyDuration - ((floor($JourneyDuration / 60)) * 60))."Min";
+
+
+				// Leg 2
+				$dAirportCode1 = $flight['segments'][1]['Origin']['Airport']['AirportCode'];
+				$dAirportName1 = $flight['segments'][1]['Origin']['Airport']['AirportName'];
+				$dCityName1 = $flight['segments'][1]['Origin']['Airport']['AirportCode'];
+				$dCountryCode1 = $flight['segments'][1]['Origin']['Airport']['CountryCode'];
+
+				$aAirportCode1 = $flight['segments'][1]['Destination']['Airport']['AirportCode'];
+				$aAirportName1 = $flight['segments'][1]['Destination']['Airport']['AirportName'];
+				$aCityName1 = $flight['segments'][1]['Destination']['Airport']['CityName'];
+				$aCountryCode1 = $flight['segments'][1]['Destination']['Airport']['CountryCode'];
+
+
+				$DepTime1 = $flight['segments'][1]['Origin']['DepTime'];
+				$ArrTime1 = $flight['segments'][1]['Destination']['ArrTime'];
+
+				$AirlineCode1 = $flight['segments'][1]['Airline']['AirlineCode'];
+				$AirlineName1 = $flight['segments'][1]['Airline']['AirlineName'];
+				$FlightNumber1 = $flight['segments'][1]['Airline']['FlightNumber'];
+				$BookingClass1 = $flight['segments'][1]['Airline']['BookingClass'];
+				$CabinClass1 = $flight['segments'][1]['Airline']['CabinClass'];
+				$OperatingCarrier1 = $flight['segments'][1]['Airline']['OperatingCarrier'];
+
+
+				$JourneyDuration1 = $flight['segments'][1]['JourneyDuration'];
+				$Duration1 = floor($JourneyDuration1 / 60)."H ".($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60))."Min";
+
+				
+				$segment = array("0" =>
+									array("marketingcareer"=> "$AirlineCode",
+										"marketingcareerName"=> "$AirlineName",
+										"marketingflight"=> "$FlightNumber",
+										"operatingcareer"=> "$OperatingCarrier",
+										"operatingflight"=> "$FlightNumber",
+										"departure"=> "$dAirportCode",
+										"departureAirport"=> "$dAirportName ",
+										"departureLocation"=> "$dCityName , $dCountryCode",                    
+										"departureTime" => "$DepTime",
+										"arrival"=> "$aAirportCode",                   
+										"arrivalTime" => "$ArrTime",
+										"arrivalAirport"=> "$aAirportName",
+										"arrivalLocation"=> "$aCityName , $aCountryCode",
+										"flightduration"=> "$Duration",
+										"bookingcode"=> "$BookingClass",
+										"seat"=> "$Availabilty"),
+								"1" =>
+									array("marketingcareer"=> "$AirlineCode1",
+									"marketingcareerName"=> "$AirlineName1",
+										"marketingflight"=> "$FlightNumber1",
+										"operatingcareer"=> "$OperatingCarrier1",
+										"operatingflight"=> "$FlightNumber1",
+										"departure"=> "$dAirportCode1",
+										"departureAirport"=> "$dAirportName1",
+										"departureLocation"=> "$dCityName1 , $dCountryCode1",                    
+										"departureTime" => "$DepTime1",
+										"arrival"=> "$aAirportCode1",                   
+										"arrivalTime" => "$ArrTime1",
+										"arrivalAirport"=> "$aAirportName1",
+										"arrivalLocation"=> "$aCityName1 , $aCountryCode1",
+										"flightduration"=> "$Duration1",
+										"bookingcode"=> "$BookingClass1",
+										"seat"=> "$Availabilty")                                          
 								);
 
-							$basic = array("system"=>"FlyHub",
-												"segment"=> "1",
+								$TransitTime = round(abs(strtotime($DepTime1) - strtotime($ArrTime)) / 60,2);
+								$TransitDuration = floor($TransitTime / 60)."H ".($TransitTime - ((floor($TransitTime / 60)) * 60))."Min";
+								
+								$JourneyTime = $JourneyDuration + $JourneyDuration1 + $TransitTime;
+								$TotalDuration = floor($JourneyTime / 60)."H ".($JourneyTime - ((floor($JourneyTime / 60)) * 60))."Min";
+								
+								$transitDetails = array("transit1"=> $TransitDuration);
+
+								$basic = array("system"=>"FlyHub",
+													"segment"=> "2",
+													"uId"=> $uId,
+													"triptype"=>$TripType,
+													"career"=> "$Validatingcarrier",
+													"careerName" => "$CarrieerName",
+													"BasePrice" => "$BasePrice",
+													"Taxes" => "$Taxes",
+													"price" => "$TotalFare",
+													"clientPrice"=> "$ClientFare",
+													"comission"=> "$Commission",
+													"pricebreakdown"=> $PriceBreakDown,
+													"departure"=> "$dAirportCode",                   
+													"departureTime" => substr($DepTime,11,5),
+													"departureDate" => date("D d M Y", strtotime($DepTime)),
+													"arrival"=> "$aAirportCode1",                   
+													"arrivalTime" => substr($ArrTime1,11,5),
+													"arrivalDate" => date("D d M Y", strtotime($ArrTime1)),
+													"flightduration"=> "$TotalDuration",
+													"transit" => $transitDetails,
+													"bags" => "$Baggage",
+													"seat" => "$Availabilty",
+													"class" => "$CabinClass",
+													"refundable"=> "$Refundable",
+													"segments" => $segment,
+													"hold"=> "$Hold",												
+													"SearchID"=> $SearchID,
+													"ResultID"=> $ResultID
+													
+											);
+					array_push($FlyHubResponse, $basic);
+
+
+			}else if($segments == 3){
+
+				///Leg 1
+				$dAirportCode = $flight['segments'][0]['Origin']['Airport']['AirportCode'];
+				$dAirportName = $flight['segments'][0]['Origin']['Airport']['AirportName'];
+				$dCityName = $flight['segments'][0]['Origin']['Airport']['CityName'];
+				$dCountryCode = $flight['segments'][0]['Origin']['Airport']['CountryCode'];
+
+				$aAirportCode = $flight['segments'][0]['Destination']['Airport']['AirportCode'];
+				$aAirportName = $flight['segments'][0]['Destination']['Airport']['AirportName'];
+				$aCityName = $flight['segments'][0]['Destination']['Airport']['CityName'];
+				$aCountryCode = $flight['segments'][0]['Destination']['Airport']['CountryCode'];
+
+
+				$DepTime = $flight['segments'][0]['Origin']['DepTime'];
+				$ArrTime = $flight['segments'][0]['Destination']['ArrTime'];
+
+				$AirlineCode = $flight['segments'][0]['Airline']['AirlineCode'];
+				$AirlineName = $flight['segments'][0]['Airline']['AirlineName'];
+				$FlightNumber = $flight['segments'][0]['Airline']['FlightNumber'];
+				$BookingClass = $flight['segments'][0]['Airline']['BookingClass'];
+				$CabinClass= $flight['segments'][0]['Airline']['CabinClass'];
+				$OperatingCarrier = $flight['segments'][0]['Airline']['OperatingCarrier'];
+
+				if(isset($flight['segments'][0]['baggageDetails'][0]['Checkin'])){				
+					$Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
+				} else {
+					$Baggage = 0;
+				}
+				
+				$JourneyDuration = $flight['segments'][0]['JourneyDuration'];
+				$Duration = floor($JourneyDuration / 60)."H ".($JourneyDuration - ((floor($JourneyDuration / 60)) * 60))."Min";
+
+
+				// Leg 2
+				$dAirportCode1 = $flight['segments'][1]['Origin']['Airport']['AirportCode'];
+				$dAirportName1 = $flight['segments'][1]['Origin']['Airport']['AirportName'];
+				$dCityName1 = $flight['segments'][1]['Origin']['Airport']['CityName'];
+				$dCountryCode1 = $flight['segments'][1]['Origin']['Airport']['CountryCode'];
+
+				$aAirportCode1 = $flight['segments'][1]['Destination']['Airport']['AirportCode'];
+				$aAirportName1 = $flight['segments'][1]['Destination']['Airport']['AirportName'];
+				$aCityName1 = $flight['segments'][1]['Destination']['Airport']['CityName'];
+				$aCountryCode1 = $flight['segments'][1]['Destination']['Airport']['CountryCode'];
+
+
+				$DepTime1 = $flight['segments'][1]['Origin']['DepTime'];
+				$ArrTime1 = $flight['segments'][1]['Destination']['ArrTime'];
+
+				$AirlineCode1 = $flight['segments'][1]['Airline']['AirlineCode'];
+				$AirlineName1 = $flight['segments'][1]['Airline']['AirlineName'];
+				$FlightNumber1 = $flight['segments'][1]['Airline']['FlightNumber'];
+				$BookingClass1 = $flight['segments'][1]['Airline']['BookingClass'];
+				$CabinClass1 = $flight['segments'][1]['Airline']['CabinClass'];
+				$OperatingCarrier1 = $flight['segments'][1]['Airline']['OperatingCarrier'];
+
+				//$Baggage1 = $flight['segments'][1]['Baggage'];
+				$JourneyDuration1 = $flight['segments'][1]['JourneyDuration'];
+				$Duration1 = floor($JourneyDuration1 / 60)."H ".($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60))."Min";
+
+
+				// Leg 3
+				$dAirportCode2 = $flight['segments'][2]['Origin']['Airport']['AirportCode'];
+				$dAirportName2 = $flight['segments'][2]['Origin']['Airport']['AirportName'];
+				$dCityName2 = $flight['segments'][2]['Origin']['Airport']['AirportCode'];
+				$dCountryCode2 = $flight['segments'][2]['Origin']['Airport']['CountryCode'];
+
+				$aAirportCode2 = $flight['segments'][2]['Destination']['Airport']['AirportCode'];
+				$aAirportName2 = $flight['segments'][2]['Destination']['Airport']['AirportName'];
+				$aCityName2 = $flight['segments'][2]['Destination']['Airport']['CityName'];
+				$aCountryCode2 = $flight['segments'][2]['Destination']['Airport']['CountryCode'];
+
+
+				$DepTime2 = $flight['segments'][2]['Origin']['DepTime'];
+				$ArrTime2 = $flight['segments'][2]['Destination']['ArrTime'];
+
+				$AirlineCode2 = $flight['segments'][2]['Airline']['AirlineCode'];
+				$AirlineName2 = $flight['segments'][2]['Airline']['AirlineName'];
+				$FlightNumber2 = $flight['segments'][2]['Airline']['FlightNumber'];
+				$BookingClass2 = $flight['segments'][2]['Airline']['BookingClass'];
+				$CabinClass2 = $flight['segments'][2]['Airline']['CabinClass'];
+				$OperatingCarrier2 = $flight['segments'][2]['Airline']['OperatingCarrier'];
+
+				//$Baggag2 = $flight['segments'][2]['Baggage'];
+				$JourneyDuration2 = $flight['segments'][2]['JourneyDuration'];
+				$Duration2 = floor($JourneyDuration1 / 60)."H ".($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60))."Min";
+
+
+				$segment = array("0" => array("marketingcareer"=> "$OperatingCarrier",
+										"marketingcareerName"=> "$AirlineName",
+										"marketingflight"=> "$FlightNumber",
+										"operatingcareer"=> "$OperatingCarrier",
+										"operatingflight"=> "$FlightNumber",
+										"departure"=> "$dAirportCode",
+										"departureAirport"=> "$dAirportName ",
+										"departureLocation"=> "$dCityName , $dCountryCode",                    
+										"departureTime" => "$DepTime",
+										"arrival"=> "$aAirportCode",                   
+										"arrivalTime" => "$ArrTime",
+										"arrivalAirport"=> "$aAirportName",
+										"arrivalLocation"=> "$aCityName , $aCountryCode",
+										"flightduration"=> "$Duration",
+										"bookingcode"=> "$BookingClass",
+										"seat"=> "$Availabilty"),
+								"1" =>
+									array("marketingcareer"=> "$OperatingCarrier1",
+										"marketingcareerName"=> "$AirlineName1",
+										"marketingflight"=> "$FlightNumber1",
+										"operatingcareer"=> "$OperatingCarrier1",
+										"operatingflight"=> "$FlightNumber1",
+										"departure"=> "$dAirportCode1",
+										"departureAirport"=> "$dAirportName1 ",
+										"departureLocation"=> "$dCityName1 , $dCountryCode1",                    
+										"departureTime" => "$DepTime1",
+										"arrival"=> "$aAirportCode1",                   
+										"arrivalTime" => "$ArrTime1",
+										"arrivalAirport"=> "$aAirportName1",
+										"arrivalLocation"=> "$aCityName1 , $aCountryCode1",
+										"flightduration"=> "$Duration1",
+										"bookingcode"=> "$BookingClass1",
+										"seat"=> "$Availabilty"),                                          
+										
+								"2" =>array("marketingcareer"=> "$OperatingCarrier2",
+											"marketingcareerName"=> "$AirlineName2",
+											"marketingflight"=> "$FlightNumber2",
+											"operatingcareer"=> "$OperatingCarrier2",
+											"operatingflight"=> "$FlightNumber2",
+											"departure"=> "$dAirportCode2",
+											"departureAirport"=> "$dAirportName2",
+											"departureLocation"=> "$dCityName2 , $dCountryCode2",                    
+											"departureTime" => "$DepTime2",
+											"arrival"=> "$aAirportCode2",                   
+											"arrivalTime" => "$ArrTime2",
+											"arrivalAirport"=> "$aAirportName2",
+											"arrivalLocation"=> "$aCityName2 , $aCountryCode2",
+											"flightduration"=> "$Duration2",
+											"bookingcode"=> "$BookingClass2",
+											"seat"=> "$Availabilty"),								
+									);
+
+								$TransitTime = round(abs(strtotime($DepTime1) - strtotime($ArrTime)) / 60,2);
+								$TransitDuration = floor($TransitTime / 60)."H ".($TransitTime - ((floor($TransitTime / 60)) * 60))."Min";
+
+								$TransitTime1 = round(abs(strtotime($DepTime2) - strtotime($ArrTime1)) / 60,2);
+								$TransitDuration1 = floor($TransitTime1 / 60)."H ".($TransitTime1 - ((floor($TransitTime1 / 60)) * 60))."Min";
+
+								$JourneyTime = $JourneyDuration + $JourneyDuration1 + $JourneyDuration2 + $TransitTime + $TransitTime1;
+								$TotalDuration = floor($JourneyTime / 60)."H ".($JourneyTime - ((floor($JourneyTime / 60)) * 60))."Min";
+								
+								$transitDetails = array("transit1"=> $TransitDuration,
+														"transit2"=> $TransitDuration1);
+								
+
+								$basic = array("system"=>"FlyHub",
+												"segment"=> "3",
+												"uId"=> $uId,
 												"triptype"=>$TripType,
-												"career"=> "$Validatingcarrier",
-												"careerName" => "$CarrieerName",
-												"BasePrice" => "$BasePrice",
-												"Taxes" => "$Taxes",
-												"price" => "$TotalFare",
-												"clientPrice"=> "$ClientFare",
-												"comission"=> "$Commission",
-												"pricebreakdown"=> $PriceBreakDown,
-												"departure"=> $dAirportCode,                   
-												"departureTime" => substr($DepTime,11,5),
-												"departureDate" => date("D d M Y", strtotime($DepTime)),
-												"arrival"=> "$aAirportCode",                   
-												"arrivalTime" => substr($ArrTime,11,5),
-												"arrivalDate" => date("D d M Y", strtotime($ArrTime)),
-												"flightduration"=> "$Duration",
-												"transit" => $transitDetails,
-												"bags" => "$Baggage",
-												"seat" => "$Availabilty",
-												"class" => "$CabinClass",
-												"refundable"=> "$Refundable",
-												"segments" => $segment,
-												"hold"=> "$Hold",												
-												"SearchID"=> $SearchID,
-												"ResultID"=> $ResultID
-												
-										);
-				array_push($FlyHubResponse, $basic);
-			
-		}else if($segments == 2){
-
-			///Leg 1
-			$dAirportCode = $flight['segments'][0]['Origin']['Airport']['AirportCode'];
-			$dAirportName = $flight['segments'][0]['Origin']['Airport']['AirportName'];
-			$dCityName = $flight['segments'][0]['Origin']['Airport']['CityName'];
-			$dCountryCode = $flight['segments'][0]['Origin']['Airport']['CountryCode'];
-
-			$aAirportCode = $flight['segments'][0]['Destination']['Airport']['AirportCode'];
-			$aAirportName = $flight['segments'][0]['Destination']['Airport']['AirportName'];
-			$aCityName = $flight['segments'][0]['Destination']['Airport']['CityName'];
-			$aCountryCode = $flight['segments'][0]['Destination']['Airport']['CountryCode'];
-
-
-			$DepTime = $flight['segments'][0]['Origin']['DepTime'];
-			$ArrTime = $flight['segments'][0]['Destination']['ArrTime'];
-
-			$AirlineCode = $flight['segments'][0]['Airline']['AirlineCode'];
-			$AirlineName = $flight['segments'][0]['Airline']['AirlineName'];
-			$FlightNumber = $flight['segments'][0]['Airline']['FlightNumber'];
-			$BookingClass = $flight['segments'][0]['Airline']['BookingClass'];
-			$CabinClass= $flight['segments'][0]['Airline']['CabinClass'];
-			$OperatingCarrier = $flight['segments'][0]['Airline']['OperatingCarrier'];
-
-			if(isset($flight['segments'][0]['baggageDetails'][0]['Checkin'])){				
-				$Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
-			} else {
-				$Baggage = 0;
-			}
-			$JourneyDuration = $flight['segments'][0]['JourneyDuration'];
-			$Duration = floor($JourneyDuration / 60)."H ".($JourneyDuration - ((floor($JourneyDuration / 60)) * 60))."Min";
-
-
-			// Leg 2
-			$dAirportCode1 = $flight['segments'][1]['Origin']['Airport']['AirportCode'];
-			$dAirportName1 = $flight['segments'][1]['Origin']['Airport']['AirportName'];
-			$dCityName1 = $flight['segments'][1]['Origin']['Airport']['AirportCode'];
-			$dCountryCode1 = $flight['segments'][1]['Origin']['Airport']['CountryCode'];
-
-			$aAirportCode1 = $flight['segments'][1]['Destination']['Airport']['AirportCode'];
-			$aAirportName1 = $flight['segments'][1]['Destination']['Airport']['AirportName'];
-			$aCityName1 = $flight['segments'][1]['Destination']['Airport']['CityName'];
-			$aCountryCode1 = $flight['segments'][1]['Destination']['Airport']['CountryCode'];
-
-
-			$DepTime1 = $flight['segments'][1]['Origin']['DepTime'];
-			$ArrTime1 = $flight['segments'][1]['Destination']['ArrTime'];
-
-			$AirlineCode1 = $flight['segments'][1]['Airline']['AirlineCode'];
-			$AirlineName1 = $flight['segments'][1]['Airline']['AirlineName'];
-			$FlightNumber1 = $flight['segments'][1]['Airline']['FlightNumber'];
-			$BookingClass1 = $flight['segments'][1]['Airline']['BookingClass'];
-			$CabinClass1 = $flight['segments'][1]['Airline']['CabinClass'];
-			$OperatingCarrier1 = $flight['segments'][1]['Airline']['OperatingCarrier'];
-
-
-			$JourneyDuration1 = $flight['segments'][1]['JourneyDuration'];
-			$Duration1 = floor($JourneyDuration1 / 60)."H ".($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60))."Min";
-
-			
-			$segment = array("0" =>
-								array("marketingcareer"=> "$AirlineCode",
-									 "marketingcareerName"=> "$AirlineName",
-									"marketingflight"=> "$FlightNumber",
-									"operatingcareer"=> "$OperatingCarrier",
-									"operatingflight"=> "$FlightNumber",
-									"departure"=> "$dAirportCode",
-									"departureAirport"=> "$dAirportName ",
-									"departureLocation"=> "$dCityName , $dCountryCode",                    
-									"departureTime" => "$DepTime",
-									"arrival"=> "$aAirportCode",                   
-									"arrivalTime" => "$ArrTime",
-									"arrivalAirport"=> "$aAirportName",
-									"arrivalLocation"=> "$aCityName , $aCountryCode",
-									"flightduration"=> "$Duration",
-									"bookingcode"=> "$BookingClass",
-									"seat"=> "$Availabilty"),
-							"1" =>
-								array("marketingcareer"=> "$AirlineCode1",
-								"marketingcareerName"=> "$AirlineName1",
-									"marketingflight"=> "$FlightNumber1",
-									"operatingcareer"=> "$OperatingCarrier1",
-									"operatingflight"=> "$FlightNumber1",
-									"departure"=> "$dAirportCode1",
-									"departureAirport"=> "$dAirportName1",
-									"departureLocation"=> "$dCityName1 , $dCountryCode1",                    
-									"departureTime" => "$DepTime1",
-									"arrival"=> "$aAirportCode1",                   
-									"arrivalTime" => "$ArrTime1",
-									"arrivalAirport"=> "$aAirportName1",
-									"arrivalLocation"=> "$aCityName1 , $aCountryCode1",
-									"flightduration"=> "$Duration1",
-									"bookingcode"=> "$BookingClass1",
-									"seat"=> "$Availabilty")                                          
-							);
-
-							$TransitTime = round(abs(strtotime($DepTime1) - strtotime($ArrTime)) / 60,2);
-							$TransitDuration = floor($TransitTime / 60)."H ".($TransitTime - ((floor($TransitTime / 60)) * 60))."Min";
-							
-							$JourneyTime = $JourneyDuration + $JourneyDuration1 + $TransitTime;
-							$TotalDuration = floor($JourneyTime / 60)."H ".($JourneyTime - ((floor($JourneyTime / 60)) * 60))."Min";
-							
-							$transitDetails = array("transit1"=> $TransitDuration);
-
-							$basic = array("system"=>"FlyHub",
-												"segment"=> "2",
-												"triptype"=>$TripType,
-												"career"=> "$Validatingcarrier",
+												"career"=> $Validatingcarrier,
 												"careerName" => "$CarrieerName",
 												"BasePrice" => "$BasePrice",
 												"Taxes" => "$Taxes",
@@ -5705,9 +6070,9 @@ if($FlyHub == 1){
 												"departure"=> "$dAirportCode",                   
 												"departureTime" => substr($DepTime,11,5),
 												"departureDate" => date("D d M Y", strtotime($DepTime)),
-												"arrival"=> "$aAirportCode1",                   
-												"arrivalTime" => substr($ArrTime1,11,5),
-												"arrivalDate" => date("D d M Y", strtotime($ArrTime1)),
+												"arrival"=> "$aAirportCode2",                   
+												"arrivalTime" => substr($ArrTime2,11,5),
+												"arrivalDate" => date("D d M Y", strtotime($ArrTime2)),
 												"flightduration"=> "$TotalDuration",
 												"transit" => $transitDetails,
 												"bags" => "$Baggage",
@@ -5715,205 +6080,20 @@ if($FlyHub == 1){
 												"class" => "$CabinClass",
 												"refundable"=> "$Refundable",
 												"segments" => $segment,
-												"hold"=> "$Hold",												
+												"hold"=> "$Hold",											
 												"SearchID"=> $SearchID,
 												"ResultID"=> $ResultID
 												
-										);
-				array_push($FlyHubResponse, $basic);
+													
+											);
+							array_push($FlyHubResponse, $basic);
 
 
-		}else if($segments == 3){
-
-			///Leg 1
-			$dAirportCode = $flight['segments'][0]['Origin']['Airport']['AirportCode'];
-			$dAirportName = $flight['segments'][0]['Origin']['Airport']['AirportName'];
-			$dCityName = $flight['segments'][0]['Origin']['Airport']['CityName'];
-			$dCountryCode = $flight['segments'][0]['Origin']['Airport']['CountryCode'];
-
-			$aAirportCode = $flight['segments'][0]['Destination']['Airport']['AirportCode'];
-			$aAirportName = $flight['segments'][0]['Destination']['Airport']['AirportName'];
-			$aCityName = $flight['segments'][0]['Destination']['Airport']['CityName'];
-			$aCountryCode = $flight['segments'][0]['Destination']['Airport']['CountryCode'];
-
-
-			$DepTime = $flight['segments'][0]['Origin']['DepTime'];
-			$ArrTime = $flight['segments'][0]['Destination']['ArrTime'];
-
-			$AirlineCode = $flight['segments'][0]['Airline']['AirlineCode'];
-			$AirlineName = $flight['segments'][0]['Airline']['AirlineName'];
-			$FlightNumber = $flight['segments'][0]['Airline']['FlightNumber'];
-			$BookingClass = $flight['segments'][0]['Airline']['BookingClass'];
-			$CabinClass= $flight['segments'][0]['Airline']['CabinClass'];
-			$OperatingCarrier = $flight['segments'][0]['Airline']['OperatingCarrier'];
-
-			if(isset($flight['segments'][0]['baggageDetails'][0]['Checkin'])){				
-				$Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
-			} else {
-				$Baggage = 0;
 			}
-			
-			$JourneyDuration = $flight['segments'][0]['JourneyDuration'];
-			$Duration = floor($JourneyDuration / 60)."H ".($JourneyDuration - ((floor($JourneyDuration / 60)) * 60))."Min";
+		}
+					
 
-
-			// Leg 2
-			$dAirportCode1 = $flight['segments'][1]['Origin']['Airport']['AirportCode'];
-			$dAirportName1 = $flight['segments'][1]['Origin']['Airport']['AirportName'];
-			$dCityName1 = $flight['segments'][1]['Origin']['Airport']['CityName'];
-			$dCountryCode1 = $flight['segments'][1]['Origin']['Airport']['CountryCode'];
-
-			$aAirportCode1 = $flight['segments'][1]['Destination']['Airport']['AirportCode'];
-			$aAirportName1 = $flight['segments'][1]['Destination']['Airport']['AirportName'];
-			$aCityName1 = $flight['segments'][1]['Destination']['Airport']['CityName'];
-			$aCountryCode1 = $flight['segments'][1]['Destination']['Airport']['CountryCode'];
-
-
-			$DepTime1 = $flight['segments'][1]['Origin']['DepTime'];
-			$ArrTime1 = $flight['segments'][1]['Destination']['ArrTime'];
-
-			$AirlineCode1 = $flight['segments'][1]['Airline']['AirlineCode'];
-			$AirlineName1 = $flight['segments'][1]['Airline']['AirlineName'];
-			$FlightNumber1 = $flight['segments'][1]['Airline']['FlightNumber'];
-			$BookingClass1 = $flight['segments'][1]['Airline']['BookingClass'];
-			$CabinClass1 = $flight['segments'][1]['Airline']['CabinClass'];
-			$OperatingCarrier1 = $flight['segments'][1]['Airline']['OperatingCarrier'];
-
-			//$Baggage1 = $flight['segments'][1]['Baggage'];
-			$JourneyDuration1 = $flight['segments'][1]['JourneyDuration'];
-			$Duration1 = floor($JourneyDuration1 / 60)."H ".($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60))."Min";
-
-
-			// Leg 3
-			$dAirportCode2 = $flight['segments'][2]['Origin']['Airport']['AirportCode'];
-			$dAirportName2 = $flight['segments'][2]['Origin']['Airport']['AirportName'];
-			$dCityName2 = $flight['segments'][2]['Origin']['Airport']['AirportCode'];
-			$dCountryCode2 = $flight['segments'][2]['Origin']['Airport']['CountryCode'];
-
-			$aAirportCode2 = $flight['segments'][2]['Destination']['Airport']['AirportCode'];
-			$aAirportName2 = $flight['segments'][2]['Destination']['Airport']['AirportName'];
-			$aCityName2 = $flight['segments'][2]['Destination']['Airport']['CityName'];
-			$aCountryCode2 = $flight['segments'][2]['Destination']['Airport']['CountryCode'];
-
-
-			$DepTime2 = $flight['segments'][2]['Origin']['DepTime'];
-			$ArrTime2 = $flight['segments'][2]['Destination']['ArrTime'];
-
-			$AirlineCode2 = $flight['segments'][2]['Airline']['AirlineCode'];
-			$AirlineName2 = $flight['segments'][2]['Airline']['AirlineName'];
-			$FlightNumber2 = $flight['segments'][2]['Airline']['FlightNumber'];
-			$BookingClass2 = $flight['segments'][2]['Airline']['BookingClass'];
-			$CabinClass2 = $flight['segments'][2]['Airline']['CabinClass'];
-			$OperatingCarrier2 = $flight['segments'][2]['Airline']['OperatingCarrier'];
-
-			//$Baggag2 = $flight['segments'][2]['Baggage'];
-			$JourneyDuration2 = $flight['segments'][2]['JourneyDuration'];
-			$Duration2 = floor($JourneyDuration1 / 60)."H ".($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60))."Min";
-
-
-			$segment = array("0" => array("marketingcareer"=> "$OperatingCarrier",
-									"marketingcareerName"=> "$AirlineName",
-									"marketingflight"=> "$FlightNumber",
-									"operatingcareer"=> "$OperatingCarrier",
-									"operatingflight"=> "$FlightNumber",
-									"departure"=> "$dAirportCode",
-									"departureAirport"=> "$dAirportName ",
-									"departureLocation"=> "$dCityName , $dCountryCode",                    
-									"departureTime" => "$DepTime",
-									"arrival"=> "$aAirportCode",                   
-									"arrivalTime" => "$ArrTime",
-									"arrivalAirport"=> "$aAirportName",
-									"arrivalLocation"=> "$aCityName , $aCountryCode",
-									"flightduration"=> "$Duration",
-									"bookingcode"=> "$BookingClass",
-									"seat"=> "$Availabilty"),
-							"1" =>
-								array("marketingcareer"=> "$OperatingCarrier1",
-									"marketingcareerName"=> "$AirlineName1",
-									"marketingflight"=> "$FlightNumber1",
-									"operatingcareer"=> "$OperatingCarrier1",
-									"operatingflight"=> "$FlightNumber1",
-									"departure"=> "$dAirportCode1",
-									"departureAirport"=> "$dAirportName1 ",
-									"departureLocation"=> "$dCityName1 , $dCountryCode1",                    
-									"departureTime" => "$DepTime1",
-									"arrival"=> "$aAirportCode1",                   
-									"arrivalTime" => "$ArrTime1",
-									"arrivalAirport"=> "$aAirportName1",
-									"arrivalLocation"=> "$aCityName1 , $aCountryCode1",
-									"flightduration"=> "$Duration1",
-									"bookingcode"=> "$BookingClass1",
-									"seat"=> "$Availabilty"),                                          
-									
-							"2" =>array("marketingcareer"=> "$OperatingCarrier2",
-										"marketingcareerName"=> "$AirlineName2",
-										"marketingflight"=> "$FlightNumber2",
-										"operatingcareer"=> "$OperatingCarrier2",
-										"operatingflight"=> "$FlightNumber2",
-										"departure"=> "$dAirportCode2",
-										"departureAirport"=> "$dAirportName2",
-										"departureLocation"=> "$dCityName2 , $dCountryCode2",                    
-										"departureTime" => "$DepTime2",
-										"arrival"=> "$aAirportCode2",                   
-										"arrivalTime" => "$ArrTime2",
-										"arrivalAirport"=> "$aAirportName2",
-										"arrivalLocation"=> "$aCityName2 , $aCountryCode2",
-										"flightduration"=> "$Duration2",
-										"bookingcode"=> "$BookingClass2",
-										"seat"=> "$Availabilty"),								
-								);
-
-							$TransitTime = round(abs(strtotime($DepTime1) - strtotime($ArrTime)) / 60,2);
-							$TransitDuration = floor($TransitTime / 60)."H ".($TransitTime - ((floor($TransitTime / 60)) * 60))."Min";
-
-							$TransitTime1 = round(abs(strtotime($DepTime2) - strtotime($ArrTime1)) / 60,2);
-							$TransitDuration1 = floor($TransitTime1 / 60)."H ".($TransitTime1 - ((floor($TransitTime1 / 60)) * 60))."Min";
-
-							$JourneyTime = $JourneyDuration + $JourneyDuration1 + $JourneyDuration2 + $TransitTime + $TransitTime1;
-							$TotalDuration = floor($JourneyTime / 60)."H ".($JourneyTime - ((floor($JourneyTime / 60)) * 60))."Min";
-							
-							$transitDetails = array("transit1"=> $TransitDuration,
-											 		"transit2"=> $TransitDuration1);
-							
-
-							$basic = array("system"=>"FlyHub",
-											"segment"=> "3",
-											"triptype"=>$TripType,
-											"career"=> $Validatingcarrier,
-											"careerName" => "$CarrieerName",
-											"BasePrice" => "$BasePrice",
-											"Taxes" => "$Taxes",
-											"price" => "$TotalFare",
-											"clientPrice"=> "$ClientFare",
-											"comission"=> "$Commission",
-											"pricebreakdown"=> $PriceBreakDown,
-											"departure"=> "$dAirportCode",                   
-											"departureTime" => substr($DepTime,11,5),
-											"departureDate" => date("D d M Y", strtotime($DepTime)),
-											"arrival"=> "$aAirportCode2",                   
-											"arrivalTime" => substr($ArrTime2,11,5),
-											"arrivalDate" => date("D d M Y", strtotime($ArrTime2)),
-											"flightduration"=> "$TotalDuration",
-											"transit" => $transitDetails,
-											"bags" => "$Baggage",
-											"seat" => "$Availabilty",
-											"class" => "$CabinClass",
-											"refundable"=> "$Refundable",
-											"segments" => $segment,
-											"hold"=> "$Hold",											
-											"SearchID"=> $SearchID,
-											"ResultID"=> $ResultID
-											
-												
-										);
-						array_push($FlyHubResponse, $basic);
-
-
-					}
-				}
-				
-
-}
+	}
 
 
 
@@ -5949,7 +6129,6 @@ if($FlyHub == 1){
 		
 	}
 			
-
 }
 
 $conn->close();
