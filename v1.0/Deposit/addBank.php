@@ -60,8 +60,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 $response['message']="Bank Account Added Successful";
 
             }else{
-                $response['status']="success";
-                $response['message']="Bank Account Added Successful";
+                $response['status']="error";
+                $response['message']="Query Failed";
             } 
             echo json_encode($response);                                   
         }

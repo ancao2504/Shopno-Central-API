@@ -18,10 +18,10 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 while($row = $result->fetch_assoc()) {
                     $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
                     $number= (int)$outputString + 1;
-                    $paxId = "FWP$number"; 								
+                    $paxId = "STP$number"; 								
                 }
             } else {
-                    $paxId ="FWP1000";
+                    $paxId ="STP1000";
             }
         
         $agentId = $_POST['agentId'];  
