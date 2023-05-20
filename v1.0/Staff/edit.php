@@ -36,10 +36,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
     if ($conn->query($sql) === TRUE) {
 
         $response['status']="success";
-        $response['message']="Upadated Successfully";
+        $response['message']="Updated Successfully";
     }else{
         $response['status']="error";
-           $response['message']="Upadate Failed";
+        $response['message']="Updated Query Failed";
     }
 
     echo json_encode($response);

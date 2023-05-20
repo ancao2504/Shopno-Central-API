@@ -2,13 +2,13 @@
 
 include_once('../config.php');
 
-$sql = "SELECT * FROM `search_history`";
+$sql = "SELECT * FROM `search_history`"; 
   $result = $conn->query($sql);
   $count = 0;
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()){
             $count++;
-            $searchId = $row['searchId'];
+            $searchId = $row['search Id'];
             $agentId = $row['agentId'];
             $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
             $data = mysqli_fetch_assoc($query);

@@ -18,10 +18,10 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             while($row = $result->fetch_assoc()){
                 $outputString = preg_replace('/[^0-9]/', '', $row["searchId"]);
                 $number = (int) $outputString + 1;
-                $Search_Id = "FWS$number";
+                $Search_Id = "STS$number";
             }
        }else{
-        $Search_Id = "FWS100";
+        $Search_Id = "STS100";
        }
         
 

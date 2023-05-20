@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             $response['message']="Staff Deleted Successfully";                     
         }else{
             $response['status']="error";
-            $response['message']="Deleted Failed Successfully";
+            $response['message']="Deleted Query Failed";
         }
     }else{
         $response['status']="error";
