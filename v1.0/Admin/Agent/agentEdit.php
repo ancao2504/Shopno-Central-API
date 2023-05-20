@@ -7,8 +7,7 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $_POST = json_decode(file_get_contents('php://input'), true);
+
 
     $agentId  = $_POST['agentId'];
     $Name  = $_POST['name'];
@@ -33,7 +32,7 @@ if(empty($fileName)){
 	echo $errorMSG;
 }
 else{
-	$upload_path = "../../asset/Agent/$agentId/Company"; // set upload folder path 
+	$upload_path = "../../asset/Agent/$agentId/CompanyImg/"; // set upload folder path 
 	
 	if (!file_exists($upload_path)) {
     	mkdir($upload_path, 0777, true);
@@ -101,4 +100,3 @@ $fileUrl = isset($renameFile)? $renameFile:"";
     }
 
     echo json_encode($response);
-}
