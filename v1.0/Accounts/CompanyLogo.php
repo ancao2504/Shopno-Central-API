@@ -25,7 +25,7 @@ if(empty($fileName)){
 	echo $errorMSG;
 }
 else{
-	$upload_path = "../../../cdn.flyfarint.com/Agent/$agentId/"; // set upload folder path 
+	$upload_path = "../../asset/Agent/$agentId/"; // set upload folder path 
 	
 	if (!file_exists($upload_path)) {
     	mkdir($upload_path, 0777, true);
@@ -76,7 +76,7 @@ else{
 // if no error caused, continue ....
 if(!isset($errorMSG))
 {
-    $fileUrl = "https://cdn.flyfarint.com/Agent/$agentId/$renameFile";
+    $fileUrl = $renameFile;
     
 	$query = mysqli_query($conn,'UPDATE `agent` SET `companyImage`="'.$fileUrl.'" WHERE agentId="'.$agentId.'"');
 			
