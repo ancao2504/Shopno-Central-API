@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         $response['message']="Updated Successfully";
     }else{
         $response['status']="error";
-        $response['message']="Updated Query Failed";
+            $response['message']="Updated Query Failed";
     }
 
     echo json_encode($response);
