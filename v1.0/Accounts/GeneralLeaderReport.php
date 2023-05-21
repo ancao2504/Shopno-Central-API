@@ -9,8 +9,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 if (array_key_exists("agentId", $_GET) && array_key_exists("all", $_GET)){
     $agentId = $_GET['agentId'];
-    $startDate = $_GET['startDate'];
-    $endDate = $_GET['endDate'];
     
     $sql = "SELECT * FROM `agent_ledger` WHERE agentId='$agentId' ORDER BY id DESC LIMIT 100";
     $result = $conn->query($sql);
