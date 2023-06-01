@@ -28,10 +28,10 @@ if (array_key_exists('add', $_GET)) {
             while ($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["staffId"]);
                 $number = (int) $outputString + 1;
-                $StaffId = "FFAST$number";
+                $StaffId = "STAST$number";
             }
         } else {
-            $StaffId = "FFAST1000";
+            $StaffId = "STAST1000";
         }
 
         $checkUser = "SELECT * FROM admin_stafflist WHERE email='$Email'";
