@@ -40,7 +40,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
       $response['status']="error";
       $response['message']="User does not exist";   						
   }else if(!empty($agentrow)){
- 
     $checkUserquery="SELECT agentId, email, name, company, phone, status FROM agent WHERE email='$email' AND `password`=convert('$password' using utf8mb4) collate utf8mb4_bin";
     $resultant=mysqli_query($conn,$checkUserquery);
 
@@ -58,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','$platform','$currentTime')");                 
           }else if($row['status'] == 'pending'){
               $response['action']="pending";
-              $response['message']="Your agency registration process is pending.";              
+              $response['message']="Your agency registration process is pending. Please contact us at support@flyfarint.com or 01755-572099, 09606912912";              
           }else if($row['status'] == 'deactive'){
               $response['action']="deactive";
               $response['message']="Status Is Deactive";              
