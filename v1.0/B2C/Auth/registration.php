@@ -56,6 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 `email`,
                 `password`,
                 `phone`,
+                `platform`,
                 `status`,
                 `joinAt`
             )
@@ -65,7 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 '$Email',
                 '$Password',
                 '$Phone',
-                'pending',
+                'B2C',
+                'active',
                 '$createdAt'
             )";
 

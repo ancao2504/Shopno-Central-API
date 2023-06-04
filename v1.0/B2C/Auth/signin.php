@@ -1,6 +1,6 @@
 <?php
 
-require '../config.php';
+require '../../config.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
   }
   
 
-  $agentSql = mysqli_query($conn,"SELECT email, status FROM agent WHERE email='$email'");
+  $agentSql = mysqli_query($conn,"SELECT email, status FROM agent WHERE email='$email' AND platform = 'B2C'");
   $agentrow = mysqli_fetch_array($agentSql,MYSQLI_ASSOC);
 
   $staffSql = mysqli_query($conn,"SELECT email, status FROM staffList WHERE email='$email'");
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
       $response['status']="error";
       $response['message']="User does not exist";   						
   }else if(!empty($agentrow)){
-    $checkUserquery="SELECT agentId, email, name, company, phone, status FROM agent WHERE email='$email' AND `password`=convert('$password' using utf8mb4) collate utf8mb4_bin";
+    $checkUserquery="SELECT agentId, email, name, company, phone, status FROM agent WHERE platform='B2C' AND email='$email' AND `password`=convert('$password' using utf8mb4) collate utf8mb4_bin";
     $resultant=mysqli_query($conn,$checkUserquery);
 
     if(mysqli_num_rows($resultant)>0){
