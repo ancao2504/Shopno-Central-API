@@ -130,8 +130,7 @@ if (array_key_exists('add', $_GET)) {
 } else if (array_key_exists('delete', $_GET)) {
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_POST = json_decode(file_get_contents('php://input'), true);
-        $Id = $_POST['id'];
-        $StaffId = $_POST['staffId'];
+         
 
         $checker = mysqli_query($conn, "SELECT * FROM admin_stafflist WHERE id='$Id' AND staffId='$StaffId'")->fetch_all(MYSQLI_ASSOC);
 
