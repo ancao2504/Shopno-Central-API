@@ -72,7 +72,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             ORDER BY id DESC LIMIT 1");
         $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);        
         if(!empty($row2)){
-          $lastAmount = $row2['lastAmount'];							
+          $lastAmount = $row2['lastAmount'];						
         }else{
           $lastAmount = 0;
         }

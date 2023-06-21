@@ -990,3 +990,8 @@ Pay Using Account Number:  <span style="color: #dc143c">' . $sender . '</span>
     echo json_encode($response);
 
 }
+$conn->close();
+?>
+
+
+

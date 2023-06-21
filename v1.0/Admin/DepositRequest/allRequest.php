@@ -157,3 +157,5 @@ if (array_key_exists("page", $_GET)) {
   echo json_encode($return_arr);
   
 }
+$conn->close();
+?>
