@@ -7,23 +7,23 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if(isset($_GET['id'])){
-    
-    $id = $_GET['id'];          
+if($_SERVER['REQUEST_METHOD'] == "POST"){
+    $_POST = json_decode(file_get_contents("php://input"), true);
+    $id = $_POST['id'];          
     $sql = "DELETE FROM `airlines` WHERE id='$id'";
 
     if ($conn->query($sql) === TRUE) {
-        $response['status']="sucess";
+        $response['status']="success";
         $response['message']="Airlines Deleted Successfully";                     
     }else{
         $response['status']="error";
-        $response['message']="Deleted Failed Successfully";
+        $response['message']="Deleted Query Failed";
     }
          
     echo json_encode($response);
     
 }
 
-
+$conn->close();
 
 ?>

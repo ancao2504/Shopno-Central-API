@@ -92,7 +92,7 @@ if(array_key_exists("all", $_GET)){
 
             $checker = $conn->query("SELECT * FROM vendor WHERE vendorId='$VendorId' AND id='$Id'")->fetch_all(MYSQLI_ASSOC);
             if(!empty($checker)){
-                $sql = "UPDATE vendor SET name='$Name', email='$Email', phone='$Phone', pccnumber='$PccNumber', itanumber='$ItaNumber', `system` ='$System', updatedAt='$DateTime' WHERE vendorId='$VendorId' AND id='$Id'";
+                $sql = "UPDATE vendor SET name='$Name', email='$Email', phone='$Phone', pccnumber='$PccNumber', itanumber='$ItaNumber', `system` ='$System',  `address`='$Address', updatedAt='$DateTime' WHERE vendorId='$VendorId' AND id='$Id'";
                 if($conn->query($sql) === true){
                 $response['status'] = "success";
                 $response['message'] = "Vendor updated successfully";
@@ -108,4 +108,4 @@ if(array_key_exists("all", $_GET)){
 
             echo json_encode($response);
         }
-}
+} 

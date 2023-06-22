@@ -32,7 +32,7 @@ if(empty($fileName)){
 	echo $errorMSG;
 }
 else{
-	$upload_path = "../../asset/Agent/$agentId/CompanyImg/"; // set upload folder path 
+	$upload_path = "../../../asset/Agent/$agentId/CompanyImg/"; // set upload folder path 
 	
 	if (!file_exists($upload_path)) {
     	mkdir($upload_path, 0777, true);
@@ -41,9 +41,9 @@ else{
 	$fileExt = strtolower(pathinfo($fileName,PATHINFO_EXTENSION)); // get image extension
 		
 	// valid image extensions
-	$valid_extensions = array('png', 'PNG'); 
+	$valid_extensions = array('png', 'PNG', 'jpg', 'jpeg', 'webp', 'WEBP'); 
 
-    $renameFile ="companylogo.$fileExt";
+    $renameFile ="$fileName.webp";
 	
 					
 	// allow valid image file formats
@@ -73,11 +73,6 @@ else{
 			}
 		}
 	}
-	else
-	{		
-		$errorMSG = json_encode(array("message" => "Sorry, only  PNG files are allowed", "status" => "error"));	
-		echo $errorMSG;		
-	}
 }
 
 $fileUrl = isset($renameFile)? $renameFile:"";
@@ -100,3 +95,6 @@ $fileUrl = isset($renameFile)? $renameFile:"";
     }
 
     echo json_encode($response);
+
+	$conn->close();
+	?>

@@ -20,9 +20,10 @@ if (array_key_exists('all', $_GET)) {
       $agentId = $row['agentId'];
       $staffId = $row['staffId'];
       
-      $agentSql = mysqli_query($conn,"SELECT company FROM agent WHERE agentId='$agentId' ");
+      $agentSql = mysqli_query($conn,"SELECT company,phone FROM agent WHERE agentId='$agentId'");
 			$agentRow = mysqli_fetch_array($agentSql,MYSQLI_ASSOC);
       $companyName = $agentRow['company'];
+      $phone = $agentRow['phone'];
 
       $staffsql = mysqli_query($conn,"SELECT * FROM staffList WHERE staffId='$staffId' ");
 			$staffRow = mysqli_fetch_array($staffsql,MYSQLI_ASSOC);
@@ -36,6 +37,7 @@ if (array_key_exists('all', $_GET)) {
       $response = $row;
       $response['bookedby'] ="$staffName";
       $response['company'] ="$companyName";
+      $response['phone'] ="$phone";
       array_push($Data, $response);
     }
   }
@@ -185,3 +187,5 @@ else if(array_key_exists("agentId", $_GET) && array_key_exists("pages", $_GET) &
   echo json_encode($return_arr);
 
 } 
+$conn->close();
+?>

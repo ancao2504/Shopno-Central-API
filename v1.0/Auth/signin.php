@@ -40,12 +40,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
       $response['status']="error";
       $response['message']="User does not exist";   						
   }else if(!empty($agentrow)){
- 
     $checkUserquery="SELECT agentId, email, name, company, phone, status FROM agent WHERE email='$email' AND `password`=convert('$password' using utf8mb4) collate utf8mb4_bin";
     $resultant=mysqli_query($conn,$checkUserquery);
 
     if(mysqli_num_rows($resultant)>0){
-
       while($row=$resultant->fetch_assoc()){
           if($row['status'] == 'active'){
               $agentId = $row['agentId'];
@@ -62,7 +60,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
           }else if($row['status'] == 'deactive'){
               $response['action']="deactive";
               $response['message']="Status Is Deactive";              
-          }          
+          } else{
+            $response['action']="rejected";
+              $response['message']="Status Is Rejected"; 
+          }         
       }
            
     }else{

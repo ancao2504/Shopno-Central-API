@@ -27,7 +27,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 VALUES('$code','$name','$city','$country')";
 
         if ($conn->query($sql) === TRUE) {
-            $response['status']="sucess";
+            $response['status']="success";
             $response['message']="Airport Added Successfully";          
         } else {
             $response['status']="error";
