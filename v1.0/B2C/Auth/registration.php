@@ -16,17 +16,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Phone = $_POST['phone'];
     $Password = $_POST['password'];
 
-
     $createdAt = date("Y-m-d H:i:s");
 
-    $userId = "";
-    $sql = "SELECT userId FROM agent ORDER BY userId DESC LIMIT 1";
+    $sql = "SELECT MAX(userId) AS maxUserId FROM agent";
     $result = $conn->query($sql);
-    if (!empty($result)) {
-        while ($row = $result->fetch_assoc()) {
-            $outputString = preg_replace('/[^0-9]/', '', $row["userId"]);
-            $number = (int) $outputString + 1;
+
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $maxUserId = $row["maxUserId"];
+
+        if ($maxUserId) {
+            $number = (int) preg_replace('/[^0-9]/', '', $maxUserId) + 1;
             $userId = "STU$number";
+        } else {
+            $userId = "STU1000";
         }
     } else {
         $userId = "STU1000";

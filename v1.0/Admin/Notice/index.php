@@ -47,7 +47,7 @@ echo json_encode($return_arr);
         $id = $_POST["id"];
          $title = $_POST["title"];
          $overview = $_POST["overview"];
-         $date = date("Y-m-d H:i:s");
+         $date = date("Y-m- d H:i:s");
           
          $sql = "UPDATE notice SET title ='$title', overview='$overview', updated_at='$date' where id='$id'";
 
@@ -62,7 +62,7 @@ echo json_encode($return_arr);
     }
 
 }else if(array_key_exists("delete", $_GET)){
-    if($_SERVER['REQUEST_METHOD'] == "  POST"){
+    if($_SERVER['REQUEST_METHOD'] == "POST"){
         $_POST = json_decode(file_get_contents("php://input"), true);
 
         $id = $_POST['id'];

@@ -12,7 +12,7 @@ if (array_key_exists('agentId', $_GET) && array_key_exists('actionBy', $_GET)) {
     $agentId = $_GET['agentId'];
     $actionBy = $_GET['actionBy'];
 
-    $data = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'")->fetch_all(MYSQLI_ASSOC);
+    $data = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId' AND platform='B2B'")->fetch_all(MYSQLI_ASSOC);
     if (!empty($data)) {
         $companyname = $data[0]['company'];
         $agentEmail = $data[0]['email'];
@@ -23,11 +23,11 @@ if (array_key_exists('agentId', $_GET) && array_key_exists('actionBy', $_GET)) {
 
         $createdTime = date("Y-m-d H:i:s");
 
-        $sql = "UPDATE `agent` SET `status`='active',`bonus`='0' WHERE agentId='$agentId'";
+        $sql = "UPDATE `agent` SET `status`='active',`bonus`='0' WHERE agentId='$agentId' AND platform='B2B'";
 
         if ($conn->query($sql) === true) {
-            $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
-                  VALUES ('$agentId','$agentId','Approved',' ','$actionBy','$createdTime')");
+            $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `platform`,`actionAt`)
+                  VALUES ('$agentId','$agentId','Approved',' ','$actionBy','B2B','$createdTime')");
             $response['action'] = "success";
             $response['message'] = "Agent Approved Successfully";
         }

@@ -12,9 +12,9 @@ if (array_key_exists("page", $_GET)) {
   $result_per_page = 20;
   $page_first_result = ($page-1) * $result_per_page;
 
-  $sql = "SELECT * FROM `agent` ORDER BY id DESC LIMIT $page_first_result,$result_per_page";
+  $sql = "SELECT * FROM `agent` WHERE platform='B2B' ORDER BY id DESC LIMIT $page_first_result,$result_per_page";
   //echo $sql;
-  $totaldata = $conn->query("SELECT * FROM `agent` ORDER BY id DESC")->num_rows;
+  $totaldata = $conn->query("SELECT * FROM `agent` WHERE platform='B2B' ORDER BY id DESC")->num_rows;
   $result = $conn->query($sql);
  
   $return_arr = array();
@@ -25,7 +25,7 @@ if (array_key_exists("page", $_GET)) {
       $count++;
       $agentId = $row['agentId'];
     
-      $checkBalanced = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' 
+      $checkBalanced = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' AND platform='B2B'
             ORDER BY id DESC LIMIT 1");
         $row1 = mysqli_fetch_array($checkBalanced,MYSQLI_ASSOC);  
         
@@ -54,7 +54,7 @@ if (array_key_exists("page", $_GET)) {
 }else if(array_key_exists("search",$_GET)){
   $search = $_GET['search'];
   
-  $sql = "SELECT * FROM `agent` where agentId='$search' OR email='$search' OR company LIKE '$search%' OR phone LIKE '$search%'";
+  $sql = "SELECT * FROM `agent` where (agentId='$search' OR email='$search' OR company LIKE '$search%' OR phone LIKE '$search%')AND platform='B2B'";
   $result = $conn->query($sql);
 
   $return_arr = array();
@@ -87,8 +87,8 @@ if (array_key_exists("page", $_GET)) {
 
     $status= $_GET['status'];
    
-    $sql = "SELECT * FROM `agent` where status='$status' ORDER BY id DESC LIMIT $page_first_result,$result_per_page";
-    $totaldata = $conn->query("SELECT * FROM `agent` where status='$status' ORDER BY id DESC")->num_rows;
+    $sql = "SELECT * FROM `agent` where status='$status' AND platform='B2B' ORDER BY id DESC LIMIT $page_first_result,$result_per_page";
+    $totaldata = $conn->query("SELECT * FROM `agent` where status='$status' AND platform='B2B' ORDER BY id DESC")->num_rows;
     $result = $conn->query($sql);
 
     $return_arr = array();
@@ -96,7 +96,7 @@ if (array_key_exists("page", $_GET)) {
     if($result->num_rows > 0) {
       while ($row = $result->fetch_assoc()){
       $agentId = $row['agentId'];          
-      $agentsql = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId'  ORDER BY id DESC LIMIT 1");
+      $agentsql = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' AND platform='B2B'  ORDER BY id DESC LIMIT 1");
 			$agentRow = mysqli_fetch_array($agentsql,MYSQLI_ASSOC);
 			if(!empty($agentRow)){				
 				$Balanced = $agentRow['lastAmount'];
@@ -121,7 +121,7 @@ if (array_key_exists("page", $_GET)) {
 
     $agentId= $_GET['agentId'];
    
-    $sql = "SELECT * FROM `agent` where agentId='$agentId' ORDER BY id DESC";
+    $sql = "SELECT * FROM `agent` where agentId='$agentId' AND platform='B2B' ORDER BY id DESC";
     $result = $conn->query($sql);
 
     $return_arr = array();
@@ -130,7 +130,7 @@ if (array_key_exists("page", $_GET)) {
       while ($row = $result->fetch_assoc()){
         
       $agentId = $row['agentId'];   
-      $agentsql = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId'   ORDER BY id DESC LIMIT 1");
+      $agentsql = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' AND platform='B2B' ORDER BY id DESC LIMIT 1");
 			$agentRow = mysqli_fetch_array($agentsql,MYSQLI_ASSOC);
 
 			if(!empty($agentRow)){				
@@ -157,8 +157,7 @@ if (array_key_exists("page", $_GET)) {
   if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()){
       $agentId = $row['agentId'];   
-      $checkBalanced = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' 
-            ORDER BY id DESC LIMIT 1");
+      $checkBalanced = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' AND platform='B2B' ORDER BY id DESC LIMIT 1");
         $row1 = mysqli_fetch_array($checkBalanced,MYSQLI_ASSOC); 
         
         if(!empty($row1)){

@@ -22,7 +22,7 @@ if(array_key_exists("agentId",$_GET) && array_key_exists("amount",$_GET) && arra
     $DateTime = date("D d M Y h:i A");
     
 
-    $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
+    $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId' AND platform='B2B'");
     $data = mysqli_fetch_array($query,MYSQLI_ASSOC);
 
     $companyname = $data['company'];
@@ -35,7 +35,7 @@ if(array_key_exists("agentId",$_GET) && array_key_exists("amount",$_GET) && arra
        $newAmount = $amount - $creditAm;
     }
 
-    $amountsql = "SELECT lastAmount, deposit FROM `agent_ledger` WHERE agentId='$agentId' ORDER BY id DESC LIMIT 1";
+    $amountsql = "SELECT lastAmount, deposit FROM `agent_ledger` WHERE agentId='$agentId' AND platform='B2B' ORDER BY id DESC LIMIT 1";
     $result1 = mysqli_query($conn, $amountsql);
     $data1 = mysqli_fetch_array($result1);
     if(!empty($data1)){
@@ -45,15 +45,15 @@ if(array_key_exists("agentId",$_GET) && array_key_exists("amount",$_GET) && arra
     }
        
             
-    $sql = "INSERT INTO `agent_ledger`(`agentId`, `loan`, `lastAmount`, `details`,`actionBy`,`createdAt`)
-                  VALUES ('$agentId','$newAmount','$lastAmount','Loan Given $newAmount By $actionBy','$actionBy','$createdTime')";
+    $sql = "INSERT INTO `agent_ledger`(`agentId`, `loan`, `lastAmount`, `details`, `platform`,`actionBy`,`createdAt`)
+                  VALUES ('$agentId','$newAmount','$lastAmount','Loan Given $newAmount By $actionBy','B2B','$actionBy','$createdTime')";
                    
     if ($conn->query($sql) === TRUE) {
       
-      $conn->query("UPDATE `agent` SET credit='$amount' WHERE agentId='$agentId'");
+      $conn->query("UPDATE `agent` SET credit='$amount' WHERE agentId='$agentId' AND platform='B2B'");
       
-      $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
-                VALUES ('$agentId','$agentId','Credited','Loan Given $newAmount','$actionBy','$createdTime')");
+      $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`platform`,`actionBy`, `actionAt`)
+                VALUES ('$agentId','$agentId','Credited','Loan Given $newAmount','B2B','$actionBy','$createdTime')");
 
       $conn->query("INSERT INTO `notification`(`agentId`,`title`,`timedate`,`text`)
       VALUES('$agentId','$amount Taka Credited By $actionBy','$createdTime','$newAmount Credited to your account as loan. This amount will be deducted from your account when you deposit.')");

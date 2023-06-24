@@ -17,17 +17,19 @@ if(array_key_exists("agentId",$_GET) && array_key_exists("actionBy",$_GET)){
 
 
     if ($conn->query($sql) === TRUE){
-        $conn->query("DELETE FROM `staffList` WHERE agentId='$agentId'");
+        $conn->query("DELETE FROM `staffList` WHERE agentId='$agentId' AND platform='B2B'");
         $sqlActivity = "INSERT INTO `activitylog`(
                 `agentId`,
                 `reference`,
                 `name`,
+                `platform`,
                 `activity`,             
                 `created`)
             VALUES(
                 '$agentId',
                 '$agentId',
-                '$actionBy', 
+                '$actionBy',
+                'B2B', 
                 'Agent Id Deleted',              
                 '$Time'
             )";

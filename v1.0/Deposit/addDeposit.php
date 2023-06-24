@@ -161,6 +161,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 `ref`,
                 `chequeIssueDate`,
                 `attachment`,
+                `platform`,
                 `status`,
                 `depositBy`,
                 `createdAt`
@@ -178,6 +179,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 '$ref',
                 '$ckDate',
                 '$attachment',
+                'B2B',
                 'pending',
                 '$staffName',
                 '$time')";

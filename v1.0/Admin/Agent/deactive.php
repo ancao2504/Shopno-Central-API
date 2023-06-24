@@ -20,7 +20,7 @@ if(array_key_exists("agentId",$_GET) && array_key_exists("actionBy",$_GET)){
         $agentId = $_GET['agentId'];
         $actionBy = $_GET['actionBy'];
          
-        $data = $conn->query("SELECT * FROM agent WHERE agentId='$agentId'")->fetch_all(MYSQLI_ASSOC);
+        $data = $conn->query("SELECT * FROM agent WHERE agentId='$agentId' AND platform='B2B'")->fetch_all(MYSQLI_ASSOC);
 if (!empty($data)) {
     $companyname = $data[0]['company'];
     $agentEmail = $data[0]['email'];
@@ -37,11 +37,11 @@ if (!empty($data)) {
       $response['status']="error";                     
       $response['message']=" Agent Already Deactivated";
     }else {
-    $sql="UPDATE `agent` SET `status`='deactive'  WHERE agentId='$agentId'";
+    $sql="UPDATE `agent` SET `status`='deactive'  WHERE agentId='$agentId' AND platform='B2B'";
 
     if ($conn->query($sql) === true) {
-        $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
-            VALUES ('$agentId','$agentId','Deactive','','$actionBy','$createdTime')");
+        $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`platform`,`actionBy`, `actionAt`)
+            VALUES ('$agentId','$agentId','Deactive','','B2B','$actionBy','$createdTime')");
 
         $response['status']="success";
         $response['message']="Agent Deactivated Successfully";

@@ -9,9 +9,9 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 if (array_key_exists('all', $_GET)) {
 
-  $sql = "SELECT * FROM `deposit_request` ORDER BY id DESC";
+  $sql = "SELECT * FROM `deposit_request` WHERE platform='B2B' ORDER BY id DESC";
   $result = $conn->query($sql);
-  $totaldata = $conn->query("SELECT * FROM `deposit_request`")->num_rows;
+  $totaldata = $conn->query("SELECT * FROM `deposit_request` WHERE platform='B2B'")->num_rows;
   $return_arr = array();
   $Data = array();
 
@@ -20,12 +20,12 @@ if (array_key_exists('all', $_GET)) {
       $agentId = $row['agentId'];
       $staffId = $row['staffId'];
       
-      $agentSql = mysqli_query($conn,"SELECT company,phone FROM agent WHERE agentId='$agentId'");
+      $agentSql = mysqli_query($conn,"SELECT company,phone FROM agent WHERE agentId='$agentId' AND platform='B2B'");
 			$agentRow = mysqli_fetch_array($agentSql,MYSQLI_ASSOC);
       $companyName = $agentRow['company'];
       $phone = $agentRow['phone'];
 
-      $staffsql = mysqli_query($conn,"SELECT * FROM staffList WHERE staffId='$staffId' ");
+      $staffsql = mysqli_query($conn,"SELECT * FROM staffList WHERE staffId='$staffId'");
 			$staffRow = mysqli_fetch_array($staffsql,MYSQLI_ASSOC);
 
 			if(!empty($staffRow)){				

@@ -11,8 +11,8 @@ if (array_key_exists("page", $_GET)) {
   $page = $_GET['page'];
   $result_per_page = 20;
   $first_page_result = ($page-1) * $result_per_page;
-  $sql = "SELECT * FROM `deposit_request` ORDER BY id DESC LIMIT $first_page_result, $result_per_page";
-  $totatdata = $conn->query("SELECT * FROM `deposit_request` ORDER BY id DESC")->num_rows;
+  $sql = "SELECT * FROM `deposit_request` WHERE platform='B2B' ORDER BY id DESC LIMIT $first_page_result, $result_per_page";
+  $totatdata = $conn->query("SELECT * FROM `deposit_request` WHERE platform='B2B' ORDER BY id DESC")->num_rows;
   $result = $conn->query($sql);
   
   $return_arr = array();
@@ -25,7 +25,7 @@ if (array_key_exists("page", $_GET)) {
       $agentId = $row['agentId'];
       $staffId = $row['staffId'];
       
-      $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
+      $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId' AND platform='B2B'");
       $data = mysqli_fetch_assoc($query);
 
       if(!empty($data)){
@@ -65,9 +65,9 @@ if (array_key_exists("page", $_GET)) {
     $first_page_result = ($page-1) * $result_per_page;
 
    
-    $sql = "SELECT * FROM `deposit_request` where status='$status' ORDER BY id DESC LIMIT $first_page_result,$result_per_page";
+    $sql = "SELECT * FROM `deposit_request` where status='$status' AND platform='B2B' ORDER BY id DESC LIMIT $first_page_result,$result_per_page";
     $result = $conn->query($sql);
-    $totatdata = $conn->query( "SELECT * FROM `deposit_request` WHERE status= '$status' ORDER BY id DESC")->num_rows;
+    $totatdata = $conn->query( "SELECT * FROM `deposit_request` WHERE status= '$status' AND platform='B2B' ORDER BY id DESC")->num_rows;
 
     $return_arr = array();
     $Data = array();
@@ -76,7 +76,7 @@ if (array_key_exists("page", $_GET)) {
       while ($row = $result->fetch_assoc()){
         $agentId = $row['agentId'];
         $staffId  = $row['staffId'];
-        $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
+        $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId' AND platform='B2B'");
         $data = mysqli_fetch_assoc($query);
         if(!empty($data)){
           $companyname = $data['company'];

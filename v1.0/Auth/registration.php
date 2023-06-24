@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $AgentId = "STA1000";
     }
 
-    $checkUser = "SELECT * FROM agent WHERE email='$userEmail' OR phone ='$phone' OR company='$company_name'";
+    $checkUser = "SELECT * FROM agent WHERE email='$userEmail' OR phone ='$phone' OR company='$company_name' AND platform='B2B'";
     $result = mysqli_query($conn, $checkUser);
 
     $checkStaff = "SELECT * FROM staffList WHERE email = '$userEmail'";
@@ -81,6 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 `city`,
                 `status`,
                 `company`,
+                `platform`,
                 `companyadd`,
                 `joinAt`
             )
@@ -95,6 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 '$city',
                 'pending',
                 '$company_name',
+                'B2B',
                 '$companyaddress',
                 '$createdAt'
             )";
