@@ -1,6 +1,6 @@
 <?php
 
-include "../config.php";
+include "../../config.php";
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -158,8 +158,8 @@ if($Sabre == 1) // Sabre Start
 
 try{
 
-	$client_id= base64_encode("V1:396724:FD3K:AA");
-	$client_secret = base64_encode("FlWy967"); //prod
+	$client_id= base64_encode("V1:593072:14KK:AA");
+	$client_secret = base64_encode("f270395");
 	
 	$token = base64_encode($client_id.":".$client_secret);
 	
