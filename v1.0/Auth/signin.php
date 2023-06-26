@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
               $response['user']=$row;
               $response['action']="complete";
               $response['message']="success";
-              $conn->query("UPDATE `agent` SET `isActive`='yes',`loginIp`='$ip',`browser`='$browser',`platform`='$platform' WHERE email='$email'");
+              $conn->query("UPDATE `agent` SET `isActive`='yes',`loginIp`='$ip',`browser`='$browser' WHERE email='$email'");
               $conn->query("INSERT INTO `lastLogin`(`agentId`, `agencyName`, `StaffName`, `loginIp`, `success`,`browser`,`platform`, `craetedTime`)
                VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','$platform','$currentTime')");                 
           }else if($row['status'] == 'pending'){

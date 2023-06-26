@@ -74,7 +74,7 @@ if (array_key_exists("all", $_GET)) {
     $Total['ReissueRejected'] = $TotalReissueRejectedBooking;
 
     echo json_encode($Total);
-}else if (array_key_exists("TotalBookingData", $_GET)) {
+}else if (array_key_exists("agentBookingData", $_GET)) {
     
 
     $result = $conn->query("SELECT * FROM booking ORDER BY id DESC");

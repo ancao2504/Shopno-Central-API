@@ -8,102 +8,88 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 
-if ($_SERVER["REQUEST_METHOD"] == "POST"){
-            
-    $_POST = json_decode(file_get_contents('php://input'), true);
-        $segment = $_POST['segment'];
-        $career = $_POST['career'];
-        $invoice = $_POST['invoice'];
-        $vendor = $_POST['vendor'];
-        $BasePrice = $_POST['basePrice'];
-        $Taxes = $_POST['taxes'];
-        $price = $_POST['price'];
-        $bags = $_POST['bags'];
-        $seat = $_POST['seat'];
-        $journeyTime = $_POST['journeyTime'];
+    if($_SERVER["REQUEST_METHOD"] == "POST") {
+        $jsonData = json_decode(file_get_contents('php://input'), true);
 
-        $GroupId ="";
-        $sql = "SELECT * FROM groupfare ORDER BY groupId DESC LIMIT 1";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                $outputString = preg_replace('/[^0-9]/', '', $row["groupId"]);
-                $number= (int)$outputString + 1;
-                $GroupId = "FWIG-$number";								
+        $segment=$jsonData["segment"];
+        $adtBaseFare=$jsonData["AdultBaseFare"];
+        $totalSeat=$jsonData["TotalSeat"];
+        $transitTime=$jsonData["TransitTime"];
+
+        if($segment==1) {
+            $deptFrom=$jsonData[0]["DepartureFrom"];
+            $deptTime=$jsonData[0]["DepartureTime"];
+            $arriveTo=$jsonData[0]["ArriveTo"];
+            $arriveTime=$jsonData[0]["ArrivalTime"];
+            $carrierName=$jsonData[0]["CarrierName"];
+            $flightNum=$jsonData[0]["FlightNumber"];
+            $flightCode=$jsonData[0]["FlightCode"];
+            $cabin=$jsonData[0]["Cabin"];
+            $class=$jsonData[0]["Class"];
+            $baggage=$jsonData[0]["Baggage"];
+            $travelTime=$jsonData[0]["TravelTime"];
+
+
+            $sql="INSERT INTO groupfare 
+            (segment, dept1, deptTime1,  arrive1,  arriveTime1,  carrierName1,  
+            flightNum1,  flightCode1,  cabin1,  class1,  baggage1,  travelTime1, 
+             transitTime, totalSeat, adtBaseFare)
+            VALUES 
+            ('$segment','$deptFrom','$deptTime','$arriveTo','$arriveTime','$carrierName','$flightNum','$flightCode', '$cabin',
+            '$class','$baggage','$travelTime','$transitTime', '$totalSeat', '$adtBaseFare')";
+
+
+
+        } elseif($segment==2) {
+            $deptFrom1=$jsonData[0]["DepartureFrom"];
+            $deptTime1=$jsonData[0]["DepartureTime"];
+            $arriveTo1=$jsonData[0]["ArriveTo"];
+            $arriveTime1=$jsonData[0]["ArrivalTime"];
+            $carrierName1=$jsonData[0]["CarrierName"];
+            $flightNum1=$jsonData[0]["FlightNumber"];
+            $flightCode1=$jsonData[0]["FlightCode"];
+            $cabin1=$jsonData[0]["Cabin"];
+            $class1=$jsonData[0]["Class"];
+            $baggage1=$jsonData[0]["Baggage"];
+            $travelTime1=$jsonData[0]["Travel Time"];
+
+
+            $deptFrom2=$jsonData[1]["DepartureFrom"];
+            $deptTime2=$jsonData[1]["DepartureTime"];
+            $arriveTo2=$jsonData[1]["ArriveTo"];
+            $arriveTime2=$jsonData[1]["ArrivalTime"];
+            $carrierName2=$jsonData[1]["CarrierName"];
+            $flightNum2=$jsonData[1]["FlightNumber"];
+            $flightCode2=$jsonData[1]["FlightCode"];
+            $cabin2=$jsonData[1]["Cabin"];
+            $class2=$jsonData[1]["Class"];
+            $baggage2=$jsonData[1]["Baggage"];
+            $travelTime2=$jsonData[1]["TravelTime"];
+
+
+
+
+            $sql="INSERT INTO groupfare 
+            (segment, dept1, dept2, deptTime1, deptTime2, arrive1, arrive2, arriveTime1, arriveTime2, carrierName1, carrierName2, 
+            flightNum1, flightNum2, flightCode1, flightCode2, cabin1, cabin2, class1, class2, baggage1, baggage2, travelTime1, 
+            travelTime2, transitTime, totalSeat, adtBaseFare)
+            VALUES 
+            ('$segment','$deptFrom1','$deptFrom2','$deptTime1','$deptTime2','$arriveTo1','$arriveTo2','$arriveTime1','$arriveTime2',
+            '$carrierName1','$carrierName2','$flightNum1','$flightNum2','$flightCode1','$flightCode2', '$cabin1','$cabin2','$class1','$class2',
+            '$baggage1','$baggage2','$travelTime1','$travelTime2','$transitTime', '$totalSeat', '$adtBaseFare')";
         }
+
+        if ($conn->query($sql)) {
+            $response["action"] = "Success";
+            $response["message"] = "Group Fare Added Successfully!";
         } else {
-            $GroupId ="FWIG-1000";
+            $response["action"] = "Failed";
+            $response["message"] = "Query Failed!";
         }
 
-        if($segment == 1){
-            $depFrom = $_POST["segments"][0]['depFrom'];
-            $arrTo = $_POST["segments"][0]['arrTo'];
-            $depTime = $_POST['segments'][0]['depTime'];
-            $arrTime = $_POST['segments'][0]['arrTime'];
-            $flightNumber = $_POST['segments'][0]['flightNumber'];
-
-            $sql="INSERT INTO `groupfare`(`groupId`,`vendor`,`invoice`,`segment`, `career`, `price`, `departure1`, `depTime1`, `arrival1`,  `arrTime1`, `seat`, `bags`, `flightNum1`, `journeyTime`)
-             VALUES ('$GroupId','$vendor','$invoice','$segment','$career','$price','$depFrom','$depTime','$arrTo','$arrTime','$seat','$bags',' $flightNumber','$journeyTime')";
- 
-
-        }else if($segment == 2){
-            $depFrom = $_POST["segments"][0]['depFrom'];
-            $arrTo = $_POST["segments"][0]['arrTo'];
-            $depTime = $_POST['segments'][0]['depTime'];
-            $arrTime = $_POST['segments'][0]['arrTime'];
-            $flightNumber = $_POST['segments'][0]['flightNumber'];
-
-            //Segment 2
-            $depFrom1 = $_POST["segments"][1]['depFrom'];
-            $arrTo1 = $_POST["segments"][1]['arrTo'];
-            $depTime1 = $_POST['segments'][1]['depTime'];
-            $arrTime1 = $_POST['segments'][1]['arrTime'];
-            $flightNumber1 = $_POST['segments'][1]['flightNumber'];
-
-            $Transit = $_POST['transit'][0]['time'];
-
-            $sql="INSERT INTO `groupfare`(`groupId`,`vendor`,`invoice`,`segment`, `career`,`price`, `departure1`,`departure2`, `depTime1`,`depTime2`, `arrival1`,`arrival2`,  `arrTime1`, `arrTime2`, `seat`, `bags`, `flightNum1`,`flightNum2`, `journeyTime`,`transit1`)
-            VALUES ('$GroupId','$vendor','$invoice','$segment','$career','$price','$depFrom','$depFrom1','$depTime','$depTime1','$arrTo','$arrTo1','$arrTime','$arrTime1','$seat','$bags','$flightNumber','$flightNumber1','$journeyTime','$Transit')";           
-
-        }else if($segment == 3){
-            $depFrom = $_POST["segments"][0]['depFrom'];
-            $arrTo = $_POST["segments"][0]['arrTo'];
-            $depTime = $_POST['segments'][0]['depTime'];
-            $arrTime = $_POST['segments'][0]['arrTime'];
-            $flightNumber = $_POST['segments'][0]['flightNumber'];
-
-            //Segment 2
-            $depFrom1 = $_POST["segments"][1]['depFrom'];
-            $arrTo1 = $_POST["segments"][1]['arrTo'];
-            $depTime1 = $_POST['segments'][1]['depTime'];
-            $arrTime1 = $_POST['segments'][1]['arrTime'];
-            $flightNumber1 = $_POST['segments'][1]['flightNumber'];
-
-            //Segment 3
-
-            $depFrom2 = $_POST["segments"][2]['depFrom'];
-            $arrTo2 = $_POST["segments"][2]['arrTo'];
-            $depTime2 = $_POST['segments'][2]['depTime'];
-            $arrTime2 = $_POST['segments'][2]['arrTime'];
-            $flightNumber2 = $_POST['segments'][2]['flightNumber'];
-
-            $Transit = $_POST['transit'][0]['time'];
-            $Transit1 = $_POST['transit'][1]['time'];
-
-            $sql="INSERT INTO `groupfare`(`groupId`,`vendor`,`invoice`,`segment`, `career`, `BasePrice`, `Taxes`, `price`, `departure1`,`departure2`,`departure3`, `depTime1`,`depTime2`,`depTime3`,`arrival1`,`arrival2`,`arrival3`,`arrTime1`, `arrTime2`,`arrTime3`, `seat`, `bags`, `flightNum1`,`flightNum2`,`flightNum3`,`journeyTime`,`transit1`,`transit2`)
-            VALUES ('$GroupId','$vendor','$invoice','$segment','$career','$BasePrice','$Taxes','$price','$depFrom','$depFrom1','$depFrom2','$depTime','$depTime1','$depTime2','$arrTo','$arrTo1','$arrTo2','$arrTime','$arrTime1','$arrTime2','$seat','$bags','$flightNumber','$flightNumber1','$flightNumber2','$journeyTime','$Transit','$Transit1')";
-
-        }
-        
-    
-        if ($conn->query($sql) === TRUE) {
-            $response["action"] = "success";
-            $response["message"] = "Group Fare Added";
-        }
-    echo json_encode($response);
-                           
-}
+        echo json_encode($response);
 
 
-
+    }
+$conn->close();
 ?>
