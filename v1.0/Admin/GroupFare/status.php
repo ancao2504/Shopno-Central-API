@@ -11,9 +11,9 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
     if($_SERVER["REQUEST_METHOD"] == "POST")
     {
         $id= $_POST["groupfareid"];
-        $show= $_POST["showstatus"];
+        $Status= $_POST["status"];
         
-        $sql="UPDATE groupfare SET showStatus='$show' WHERE groupFareId='$id'";
+        $sql="UPDATE groupfare SET status='$Status' WHERE groupFareId='$id'";
 
 
         if(empty($id))
@@ -22,12 +22,10 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $response["message"] = "groupfareid Is Missing";
             echo json_encode($response);
             exit();
-        }
-
-        if($conn->query($sql))
+        }else if($conn->query($sql))
         {
             $response["status"] = "Success";
-            $response["message"] = "Show Status Updated for id ".$id;
+            $response["message"] = "Status .$Status. for".$id;
             
             echo json_encode($response);
         }

@@ -19,10 +19,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
         echo json_encode($response);
         exit();
     }
-    if($conn->query($sql))
+    else if($conn->query($sql))
     {
         $response["status"] = "Success";
-        $response["message"] = $id."'s All Data Removed";
+        $response["message"] = $id."Deleted";
         
         echo json_encode($response);
     }

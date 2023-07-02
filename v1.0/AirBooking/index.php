@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $PassengerData = $_POST['flightPassengerData'];
     $bookingInfo = $_POST['bookingInfo'];
-    $saveBookingAarray = isset($_POST['saveBooking']) ? $_POST['saveBooking'] : '';
+    $saveBookingAarray = isset($_POST['saveBooking']) ? $_POST['saveBooking'] :'';
     $gdsSystem = isset($_POST['system']) ? $_POST['system'] : '';
     $agentId = $_POST['agentId'];
     $subagentId = isset($_POST['subagentId']) ? $_POST['subagentId'] : "";
@@ -746,7 +746,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     }
 
-    if ($gdsSystem == 'Sabre') {
+if ($gdsSystem == 'Sabre'){
+
         $Name = $PassengerData['adult'][0]['afName'] . ' ' . $PassengerData['adult'][0]['alName'];
         $SeatReq = $adult + $child;
         $tripType = $PassengerData['tripType'];
@@ -1446,12 +1447,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             }]';
 
             }
-        } else if ($tripType == "3" || $tripType == "multicity") {
+        } else if($tripType == "3" || $tripType == "multicity"){
             $flightData = $saveBookingAarray['flightData'];
 
-            $Allsegments = array();
+            $Allsegments = array(); 
 
-            foreach ($flightData['segments'] as $sgflight) {
+            foreach($flightData['segments'] as $sgflight){
 
                 $departure = $sgflight['departure'];
                 $arrival = $sgflight['arrival'];
@@ -1463,29 +1464,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $oCarrier = $sgflight['operatingcareer'];
                 $oCarrierFN = $sgflight['operatingflight'];
 
-                $SingleSegment = array(
-                    "DepartureDateTime" => $dpTime,
-                    "ArrivalDateTime" => $arrTime,
-                    "FlightNumber" => $mCarrierFN,
-                    "NumberInParty" => "$SeatReq",
-                    "ResBookDesigCode" => $bCode,
-                    "Status" => "NN",
-                    "OriginLocation" => array(
-                        "LocationCode" => $departure,
-                    ),
-                    "DestinationLocation" => array(
-                        "LocationCode" => $arrival,
-                    ),
-                    "MarketingAirline" => array(
-                        "Code" => $mCarrier,
-                        "FlightNumber" => $mCarrierFN,
-                    ),
-                );
 
-                array_push($Allsegments, $SingleSegment);
+                $SingleSegment = array(
+                            "DepartureDateTime"=>$dpTime,
+                            "ArrivalDateTime"=> $arrTime,
+                            "FlightNumber"=> $mCarrierFN,
+                            "NumberInParty"=> "$SeatReq",
+                            "ResBookDesigCode"=> $bCode,
+                            "Status"=>"NN",
+                            "OriginLocation"=>array(
+                                "LocationCode"=>$departure
+                            ),
+                            "DestinationLocation"=>array(
+                                "LocationCode"=> $arrival
+                            ),
+                            "MarketingAirline"=> array(
+                                "Code"=> $mCarrier,
+                                "FlightNumber"=> $mCarrierFN
+                            )
+                            ); 
+                            
+                    array_push($Allsegments, $SingleSegment);
             }
 
-            $FlightSegment = json_encode($Allsegments);
+                $FlightSegment = json_encode($Allsegments);
         }
 
         $PersonFinal = json_encode($AllPerson);
@@ -1550,7 +1552,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             }
                             ],
                             "OriginDestinationInformation":{
-                            "FlightSegment": ' . $FlightSegment . '
+                            "FlightSegment": '.$FlightSegment.'
                             },
                             "RedisplayReservation":{
                             "NumAttempts":10,
@@ -1595,11 +1597,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
                 }';
 
-        //print($Request);
 
-        try {
 
-            $client_id = base64_encode("V1:593072:14KK:AA");
+            $client_id= base64_encode("V1:593072:14KK:AA");
             //$client_secret = base64_encode("280ff537"); //cert
             $client_secret = base64_encode("f270395"); //prod
 
@@ -1626,11 +1626,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $access_token = $resf['access_token'];
             //echo $access_token;
 
-        } catch (Exception $e) {
-
-        }
-
-        //Curl start
+       
         $curl = curl_init();
 
         curl_setopt_array(
@@ -1660,16 +1656,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         curl_close($curl);
         $result = json_decode($SabrerResponse, true);
 
+
         if (isset($result['CreatePassengerNameRecordRS']['ItineraryRef']['ID'])) {
             $BookingPNR = $result['CreatePassengerNameRecordRS']['ItineraryRef']['ID'];
             $AirlinesPNR = '';
-            $UniversalPnr = '';
+            $UniversalPnr='';
             saveBooking($conn, $BookingPNR, $saveBookingAarray);
             addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $bookingInfo, $PassengerData, $saveBookingAarray);
 
         } else if (isset($result['CreatePassengerNameRecordRS']['ApplicationResults']['Error'])) {
-            $BookingPNR = '';
-            $bookingId = '';
+            $BookingPNR='';
+            $bookingId='';
             addPax($conn, $BookingPNR, $agentId, $subagentId, $userId, $bookingId, $PassengerData);
             $resResult = $result['CreatePassengerNameRecordRS']['ApplicationResults']['Error'][0]['SystemSpecificResults'];
             $resError = $result['CreatePassengerNameRecordRS']['ApplicationResults']['Warning'][0]['SystemSpecificResults'];
@@ -1680,8 +1677,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             echo json_encode($response1);
             exit();
-        } else {
-            $BookingPNR = '';
+        }else {
+            $BookingPNR='';
             addPax($conn, $BookingPNR, $agentId, $subagentId, $userId, $bookingId, $PassengerData);
             $response1['status'] = "error";
             $response1['message'] = "Booking Failed";
@@ -1689,794 +1686,214 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
 
-    } else if ($gdsSystem == 'FlyHub') {
-
-        $SearchID = $_POST['flightPassengerData']['SearchID'];
-        $ResultID = $_POST['flightPassengerData']['ResultID'];
-
-        $Passenger = array();
-        if ($adult > 0 && $child > 0 && $infants > 0) {
-            for ($x = 0; $x < $adult; $x++) {
-
-                ${'afName' . $x} = $PassengerData['adult'][$x]["afName"];
-                ${'alName' . $x} = $PassengerData['adult'][$x]["alName"];
-                ${'agender' . $x} = $PassengerData['adult'][$x]["agender"];
-                ${'adob' . $x} = $PassengerData['adult'][$x]["adob"];
-                ${'apassNo' . $x} = $PassengerData['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = $PassengerData['adult'][$x]["apassEx"];
-                ${'apassNation' . $x} = $PassengerData['adult'][$x]["apassNation"];
-
-                if ($x == 0) {
-                    $leadPass = true;
-                } else {
-                    $leadPass = false;
-                }
-
-                if (${'agender' . $x} == 'Male') {
-                    ${'aTitle' . $x} = "MR";
-                } else {
-                    ${'aTitle' . $x} = "MS";
-                }
-
-                $Adultbasic = array(
-                    "Title" => ${'aTitle' . $x},
-                    "FirstName" => ${'afName' . $x},
-                    "LastName" => ${'alName' . $x},
-                    "PaxType" => "Adult",
-                    "DateOfBirth" => ${'adob' . $x},
-                    "Gender" => ${'agender' . $x},
-                    "PassportNumber" => ${'apassNo' . $x},
-                    "PassportExpiryDate" => ${'apassEx' . $x},
-                    "PassportNationality" => ${'apassNation' . $x},
-                    "Address1" => null,
-                    "Address2" => null,
-                    "CountryCode" => "BD",
-                    "Nationality" => "BD",
-                    "ContactNumber" => "+8809606912912",
-                    "Email" => "support@flyfarint.com",
-                    "IsLeadPassenger" => $leadPass,
-                    "FFAirline" => null,
-                    "FFNumber" => null,
-                    "Baggage" => [
-                        array(
-                            "BaggageID" => null,
-                        ),
-                    ],
-                    "Meal" => [
-                        array(
-                            "MealID" => null,
-                        ),
-                    ],
-
-                );
-
-                array_push($Passenger, $Adultbasic);
-
-            }
-
-            for ($x = 0; $x < $child; $x++) {
-
-                ${'cfname' . $x} = $PassengerData['child'][$x]["cfName"];
-                ${'clname' . $x} = $PassengerData['child'][$x]["clName"];
-                ${'cgender' . $x} = $PassengerData['child'][$x]["cgender"];
-                ${'cdob' . $x} = $PassengerData['child'][$x]["cdob"];
-                ${'cpassNo' . $x} = $PassengerData['child'][$x]["cpassNo"];
-                ${'cpassNoEx' . $x} = $PassengerData['child'][$x]["cpassEx"];
-                ${'cpassNation' . $x} = $PassengerData['child'][$x]["cpassNation"];
-
-                if (${'cgender' . $x} == 'Male') {
-                    ${'cTitle' . $x} = "MSTR";
-                } else {
-                    ${'cTitle' . $x} = "MISS";
-                }
-
-                $Childbasic = array(
-                    "Title" => ${'cTitle' . $x},
-                    "FirstName" => ${'cfname' . $x},
-                    "LastName" => ${'clname' . $x},
-                    "PaxType" => "Child",
-                    "DateOfBirth" => ${'cdob' . $x},
-                    "Gender" => ${'cgender' . $x},
-                    "PassportNumber" => ${'cpassNo' . $x},
-                    "PassportExpiryDate" => ${'cpassNoEx' . $x},
-                    "PassportNationality" => ${'cpassNation' . $x},
-                    "Address1" => null,
-                    "Address2" => null,
-                    "CountryCode" => "BD",
-                    "Nationality" => "BD",
-                    "ContactNumber" => "+8809606912912",
-                    "Email" => "support@flyfarint.com",
-                    "IsLeadPassenger" => false,
-                    "FFAirline" => null,
-                    "FFNumber" => null,
-                    "Baggage" => [
-                        array(
-                            "BaggageID" => null,
-                        ),
-                    ],
-                    "Meal" => [
-                        array(
-                            "MealID" => null,
-                        ),
-                    ],
-
-                );
-
-                array_push($Passenger, $Childbasic);
-
-            }
-
-            for ($x = 0; $x < $infants; $x++) {
-
-                ${'ifname' . $x} = $PassengerData['infant'][$x]["ifName"];
-                ${'ilname' . $x} = $PassengerData['infant'][$x]["ilName"];
-                ${'igender' . $x} = $PassengerData['infant'][$x]["igender"];
-                ${'idob' . $x} = $PassengerData['infant'][$x]["idob"];
-                ${'ipassNo' . $x} = $PassengerData['infant'][$x]["ipassNo"];
-                ${'ipassNoEx' . $x} = $PassengerData['infant'][$x]["ipassEx"];
-                ${'ipassNation' . $x} = $PassengerData['infant'][$x]["ipassNation"];
-
-                if (${'igender' . $x} == 'Male') {
-                    ${'iTitle' . $x} = "MSTR";
-                } else {
-                    ${'iTitle' . $x} = "MISS";
-                }
-
-                $Infantbasic = array(
-                    "Title" => ${'iTitle' . $x},
-                    "FirstName" => ${'ifname' . $x},
-                    "LastName" => ${'ilname' . $x},
-                    "PaxType" => "Infant",
-                    "DateOfBirth" => ${'idob' . $x},
-                    "Gender" => ${'igender' . $x},
-                    "PassportNumber" => ${'ipassNo' . $x},
-                    "PassportExpiryDate" => ${'ipassNoEx' . $x},
-                    "PassportNationality" => ${'ipassNation' . $x},
-                    "Address1" => null,
-                    "Address2" => null,
-                    "CountryCode" => "BD",
-                    "Nationality" => "BD",
-                    "ContactNumber" => "+8809606912912",
-                    "Email" => "support@flyfarint.com",
-                    "IsLeadPassenger" => false,
-                    "FFAirline" => null,
-                    "FFNumber" => null,
-                    "Baggage" => [
-                        array(
-                            "BaggageID" => null,
-                        ),
-                    ],
-                    "Meal" => [
-                        array(
-                            "MealID" => null,
-                        ),
-                    ],
-
-                );
-
-                array_push($Passenger, $Infantbasic);
-
-            }
-
-            $FinalResponse = array(
-                "SearchID" => $SearchID,
-                "ResultID" => $ResultID,
-                "Passengers" => $Passenger,
-                "PromotionCode" => null,
-            );
-
-            $FlyHubBookingRequst = (json_encode($FinalResponse, JSON_PRETTY_PRINT));
-
-        } else if ($adult > 0 && $child > 0) {
-            for ($x = 0; $x < $adult; $x++) {
-                ${'afName' . $x} = $PassengerData['adult'][$x]["afName"];
-                ${'alName' . $x} = $PassengerData['adult'][$x]["alName"];
-                ${'agender' . $x} = $PassengerData['adult'][$x]["agender"];
-                ${'adob' . $x} = $PassengerData['adult'][$x]["adob"];
-                ${'apassNo' . $x} = $PassengerData['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = $PassengerData['adult'][$x]["apassEx"];
-                ${'apassNation' . $x} = $PassengerData['adult'][$x]["apassNation"];
-
-                if ($x == 0) {
-                    $leadPass = true;
-                } else {
-                    $leadPass = false;
-                }
-
-                if (${'agender' . $x} == 'Male') {
-                    ${'aTitle' . $x} = "MR";
-                } else {
-                    ${'aTitle' . $x} = "MRS";
-                }
-
-                $Adultbasic = array(
-                    "Title" => ${'aTitle' . $x},
-                    "FirstName" => ${'afName' . $x},
-                    "LastName" => ${'alName' . $x},
-                    "PaxType" => "Adult",
-                    "DateOfBirth" => ${'adob' . $x},
-                    "Gender" => ${'agender' . $x},
-                    "PassportNumber" => ${'apassNo' . $x},
-                    "PassportExpiryDate" => ${'apassEx' . $x},
-                    "PassportNationality" => ${'apassNation' . $x},
-                    "Address1" => null,
-                    "Address2" => null,
-                    "CountryCode" => "BD",
-                    "Nationality" => "BD",
-                    "ContactNumber" => "+8809606912912",
-                    "Email" => "support@flyfarint.com",
-                    "IsLeadPassenger" => $leadPass,
-                    "FFAirline" => null,
-                    "FFNumber" => null,
-                    "Baggage" => [
-                        array(
-                            "BaggageID" => null,
-                        ),
-                    ],
-                    "Meal" => [
-                        array(
-                            "MealID" => null,
-                        ),
-                    ],
-
-                );
-
-                array_push($Passenger, $Adultbasic);
-
-            }
-
-            for ($x = 0; $x < $child; $x++) {
-                $paxId = "";
-                $result = $conn->query("SELECT * FROM passengers ORDER BY id DESC LIMIT 1");
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]);
-                        $number = (int) $outputString + 1;
-                        $paxId = "FFP$number";
-                    }
-                } else {
-                    $paxId = "FFP1000";
-                }
-
-                ${'cfname' . $x} = $PassengerData['child'][$x]["cfName"];
-                ${'clname' . $x} = $PassengerData['child'][$x]["clName"];
-                ${'cgender' . $x} = $PassengerData['child'][$x]["cgender"];
-                ${'cdob' . $x} = $PassengerData['child'][$x]["cdob"];
-                ${'cpassNo' . $x} = $PassengerData['child'][$x]["cpassNo"];
-                ${'cpassNoEx' . $x} = $PassengerData['child'][$x]["cpassEx"];
-                ${'cpassNation' . $x} = $PassengerData['child'][$x]["cpassNation"];
-
-                if (${'cgender' . $x} == 'Male') {
-                    ${'cTitle' . $x} = "MSTR";
-                } else {
-                    ${'cTitle' . $x} = "MISS";
-                }
-
-                $Childbasic = array(
-                    "Title" => ${'cTitle' . $x},
-                    "FirstName" => ${'cfname' . $x},
-                    "LastName" => ${'clname' . $x},
-                    "PaxType" => "Child",
-                    "DateOfBirth" => ${'cdob' . $x},
-                    "Gender" => ${'cgender' . $x},
-                    "PassportNumber" => ${'cpassNo' . $x},
-                    "PassportExpiryDate" => ${'cpassNoEx' . $x},
-                    "PassportNationality" => ${'cpassNation' . $x},
-                    "Address1" => null,
-                    "Address2" => null,
-                    "CountryCode" => "BD",
-                    "Nationality" => "BD",
-                    "ContactNumber" => "+8809606912912",
-                    "Email" => "support@flyfarint.com",
-                    "IsLeadPassenger" => false,
-                    "FFAirline" => null,
-                    "FFNumber" => null,
-                    "Baggage" => [
-                        array(
-                            "BaggageID" => null,
-                        ),
-                    ],
-                    "Meal" => [
-                        array(
-                            "MealID" => null,
-                        ),
-                    ],
-
-                );
-
-                array_push($Passenger, $Childbasic);
-
-            }
-
-            $FinalResponse = array(
-                "SearchID" => $SearchID,
-                "ResultID" => $ResultID,
-                "Passengers" => $Passenger,
-                "PromotionCode" => null,
-            );
-
-            $FlyHubBookingRequst = (json_encode($FinalResponse, JSON_PRETTY_PRINT));
-
-        } else if ($adult > 0 && $infants > 0) {
-            for ($x = 0; $x < $adult; $x++) {
-
-                ${'afName' . $x} = $PassengerData['adult'][$x]["afName"];
-                ${'alName' . $x} = $PassengerData['adult'][$x]["alName"];
-                ${'agender' . $x} = $PassengerData['adult'][$x]["agender"];
-                ${'adob' . $x} = $PassengerData['adult'][$x]["adob"];
-                ${'apassNo' . $x} = $PassengerData['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = $PassengerData['adult'][$x]["apassEx"];
-                ${'apassNation' . $x} = $PassengerData['adult'][$x]["apassNation"];
-
-                if ($x == 0) {
-                    $leadPass = true;
-                } else {
-                    $leadPass = false;
-                }
-
-                if (${'agender' . $x} == 'Male') {
-                    ${'aTitle' . $x} = "MR";
-                } else {
-                    ${'aTitle' . $x} = "MRS";
-                }
-
-                $Adultbasic = array(
-                    "Title" => ${'aTitle' . $x},
-                    "FirstName" => ${'afName' . $x},
-                    "LastName" => ${'alName' . $x},
-                    "PaxType" => "Adult",
-                    "DateOfBirth" => ${'adob' . $x},
-                    "Gender" => ${'agender' . $x},
-                    "PassportNumber" => ${'apassNo' . $x},
-                    "PassportExpiryDate" => ${'apassEx' . $x},
-                    "PassportNationality" => ${'apassNation' . $x},
-                    "Address1" => null,
-                    "Address2" => null,
-                    "CountryCode" => "BD",
-                    "Nationality" => "BD",
-                    "ContactNumber" => "+8809606912912",
-                    "Email" => "support@flyfarint.com",
-                    "IsLeadPassenger" => $leadPass,
-                    "FFAirline" => null,
-                    "FFNumber" => null,
-                    "Baggage" => [
-                        array(
-                            "BaggageID" => null,
-                        ),
-                    ],
-                    "Meal" => [
-                        array(
-                            "MealID" => null,
-                        ),
-                    ],
-
-                );
-
-                array_push($Passenger, $Adultbasic);
-
-            }
-
-            for ($x = 0; $x < $infants; $x++) {
-
-                ${'ifname' . $x} = $PassengerData['infant'][$x]["ifName"];
-                ${'ilname' . $x} = $PassengerData['infant'][$x]["ilName"];
-                ${'igender' . $x} = $PassengerData['infant'][$x]["igender"];
-                ${'idob' . $x} = $PassengerData['infant'][$x]["idob"];
-                ${'ipassNo' . $x} = $PassengerData['infant'][$x]["ipassNo"];
-                ${'ipassNoEx' . $x} = $PassengerData['infant'][$x]["ipassEx"];
-                ${'ipassNation' . $x} = $PassengerData['infant'][$x]["ipassNation"];
-
-                if (${'igender' . $x} == 'Male') {
-                    ${'iTitle' . $x} = "MSTR";
-                } else {
-                    ${'iTitle' . $x} = "MISS";
-                }
-
-                $Infantbasic = array(
-                    "Title" => ${'iTitle' . $x},
-                    "FirstName" => ${'ifname' . $x},
-                    "LastName" => ${'ilname' . $x},
-                    "PaxType" => "Infant",
-                    "DateOfBirth" => ${'idob' . $x},
-                    "Gender" => ${'igender' . $x},
-                    "PassportNumber" => ${'ipassNo' . $x},
-                    "PassportExpiryDate" => ${'ipassNoEx' . $x},
-                    "PassportNationality" => ${'ipassNation' . $x},
-                    "Address1" => null,
-                    "Address2" => null,
-                    "CountryCode" => "BD",
-                    "Nationality" => "BD",
-                    "ContactNumber" => "+8809606912912",
-                    "Email" => "support@flyfarint.com",
-                    "IsLeadPassenger" => false,
-                    "FFAirline" => null,
-                    "FFNumber" => null,
-                    "Baggage" => [
-                        array(
-                            "BaggageID" => null,
-                        ),
-                    ],
-                    "Meal" => [
-                        array(
-                            "MealID" => null,
-                        ),
-                    ],
-
-                );
-
-                array_push($Passenger, $Infantbasic);
-
-            }
-
-            $FinalResponse = array(
-                "SearchID" => $SearchID,
-                "ResultID" => $ResultID,
-                "Passengers" => $Passenger,
-                "PromotionCode" => null,
-            );
-
-            $FlyHubBookingRequst = (json_encode($FinalResponse, JSON_PRETTY_PRINT));
-
-        } else if ($adult > 0) {
-
-            for ($x = 0; $x < $adult; $x++) {
-
-                ${'afName' . $x} = $PassengerData['adult'][$x]["afName"];
-                ${'alName' . $x} = $PassengerData['adult'][$x]["alName"];
-                ${'agender' . $x} = $PassengerData['adult'][$x]["agender"];
-                ${'adob' . $x} = $PassengerData['adult'][$x]["adob"];
-                ${'apassNo' . $x} = $PassengerData['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = $PassengerData['adult'][$x]["apassEx"];
-                ${'apassNation' . $x} = $PassengerData['adult'][$x]["apassNation"];
-
-                if ($x == 0) {
-                    $leadPass = true;
-                } else {
-                    $leadPass = false;
-                }
-
-                if (${'agender' . $x} == 'Male') {
-                    ${'aTitle' . $x} = "MR";
-                } else {
-                    ${'aTitle' . $x} = "MRS";
-                }
-
-                $Adultbasic = array(
-                    "Title" => ${'aTitle' . $x},
-                    "FirstName" => ${'afName' . $x},
-                    "LastName" => ${'alName' . $x},
-                    "PaxType" => "Adult",
-                    "DateOfBirth" => ${'adob' . $x},
-                    "Gender" => ${'agender' . $x},
-                    "PassportNumber" => ${'apassNo' . $x},
-                    "PassportExpiryDate" => ${'apassEx' . $x},
-                    "PassportNationality" => ${'apassNation' . $x},
-                    "Address1" => null,
-                    "Address2" => null,
-                    "CountryCode" => "BD",
-                    "Nationality" => "BD",
-                    "ContactNumber" => "+8809606912912",
-                    "Email" => "support@flyfarint.com",
-                    "IsLeadPassenger" => $leadPass,
-                    "FFAirline" => null,
-                    "FFNumber" => null,
-                    "Baggage" => [
-                        array(
-                            "BaggageID" => null,
-                        ),
-                    ],
-                    "Meal" => [
-                        array(
-                            "MealID" => null,
-                        ),
-                    ],
-
-                );
-
-                array_push($Passenger, $Adultbasic);
-
-            }
-
-            $FinalResponse = array(
-                "SearchID" => $SearchID,
-                "ResultID" => $ResultID,
-                "Passengers" => $Passenger,
-                "PromotionCode" => null,
-            );
-
-            $FlyHubBookingRequst = (json_encode($FinalResponse, JSON_PRETTY_PRINT));
-
-        }
-
-        $curlflyhubauth = curl_init();
-
-        curl_setopt_array(
-            $curlflyhubauth,
-            array(
-                CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => '{
-                    "username": "ceo@flyfarint.com",
-                    "apikey": "ENex7c5Ge+0~SGc1t71iccr1xXacDPdK51g=iTm9SlL+de39HF"
-                    }',
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                ),
-            )
-        );
-
-        $response = curl_exec($curlflyhubauth);
-        $TokenJson = json_decode($response, true);
-        $FlyhubToken = $TokenJson['TokenId']; //echo $FlyhubToken;
-
-        //Pre Booking
-        $curlFlyHubPreBooking = curl_init();
-
-        curl_setopt_array($curlFlyHubPreBooking,
-            array(CURLOPT_URL => 'https://api.flyhub.com/api/v1/AirPreBook',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $FlyHubBookingRequst,
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                    "Authorization: Bearer $FlyhubToken"),
-            )
-        );
-
-        $flyhubresponse1 = curl_exec($curlFlyHubPreBooking);
-
-        curl_close($curlFlyHubPreBooking);
-
-        // echo  $flyhubresponse1;
-
-        $resutPreBook = json_decode($flyhubresponse1, true);
-
-        if (isset($resutPreBook['Error']['ErrorMessage'])) {
-            $FlyHubRes['status'] = "error";
-            $FlyHubRes['message'] = $resutPreBook['Error']['ErrorMessage'];
-            echo json_encode($FlyHubRes);
-            exit();
-        } else {
-
-            sleep(5);
-
-            $curlFlyHubBooking = curl_init();
-
-            curl_setopt_array($curlFlyHubBooking,
-                array(
-                    CURLOPT_URL => 'https://api.flyhub.com/api/v1/AirBook',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => $FlyHubBookingRequst,
-                    CURLOPT_HTTPHEADER => array(
-                        'Content-Type: application/json',
-                        "Authorization: Bearer $FlyhubToken"),
-                )
-            );
-
-            $flyhubresponse = curl_exec($curlFlyHubBooking);
-
-            curl_close($curlFlyHubBooking);
-            $flyhubResult = json_decode($flyhubresponse, true);
-
-            if (isset($flyhubResult['Error'])) {
-                $FlyHubRes['status'] = "error";
-                $FlyHubRes['message'] = $flyhubResult['Error']['ErrorMessage'];
-                echo json_encode($FlyHubRes);
-                exit();
-            } else {
-                if (isset($flyhubResult['BookingID'])) {
-                    $BookingPNR = $flyhubResult['BookingID'];
-                    $AirlinesPNR = '';
-                    $UniversalPnr = '';
-                    saveBooking($conn, $BookingPNR, $saveBookingAarray);
-                    addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $bookingInfo, $PassengerData, $saveBookingAarray);
-                }
-
-            }
-        }
-    } else if ($gdsSystem == 'Galileo') {
+    }else if($gdsSystem == 'Galileo'){
         GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo);
     }
 }
 
-function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
-{
+function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo){
     $_POST = $PassengerData;
     $tripType = $_POST['tripType'];
-    $adult = $_POST['adultCount'];
+	$adult = $_POST['adultCount'];
     $child = $_POST['childCount'];
-    $infants = $_POST['infantCount'];
+    $infants =  $_POST['infantCount'];
     $segment = $_POST['segment'];
     $tDate = $_POST['tDate'];
     $eDate = $_POST['eDate'];
-    $FareBasis = isset($_POST['fbcode']) ? $_POST['fbcode'] : '';
-    $goFareBasis = isset($saveBookingAarray['roundData']['goFareBasisCode']) ? $saveBookingAarray['roundData']['goFareBasisCode'] : '';
-    $backFareBasis = isset($saveBookingAarray['roundData']['goFareBasisCode']) ? $saveBookingAarray['roundData']['goFareBasisCode'] : '';
+    $FareBasis = isset($_POST['fbcode']) ? $_POST['fbcode'] :'';
+    $goFareBasis = isset($saveBookingAarray['roundData']['goFareBasisCode']) ? $saveBookingAarray['roundData']['goFareBasisCode'] :'';
+    $backFareBasis = isset($saveBookingAarray['roundData']['goFareBasisCode']) ? $saveBookingAarray['roundData']['goFareBasisCode'] :'';
     $AirPricingSolutionKey = $_POST['airPriceKey'];
+	
+    $AdultPassenger =array();
+    $AdultPassengerType =array();
 
-    $AdultPassenger = array();
-    $AdultPassengerType = array();
+    $ChildPassenger =array();
+    $ChildPassengerType =array();
 
-    $ChildPassenger = array();
-    $ChildPassengerType = array();
-
-    $InfantPassenger = array();
-    $InfantPassengerType = array();
+    $InfantPassenger =array();
+    $InfantPassengerType =array();
 
     $AllPassenger = array();
 
-    if ($tripType == 1 || $tripType == 'onewway') {
+	
+    if($tripType == 1 || $tripType == 'onewway'){
 
-        if ($segment == '1') {
-            $Cr = $_POST['segments'][0]['cr'];
-            $AirSKey = $_POST['segments'][0]['airSegKey'];
-            $BCode = $_POST['segments'][0]['bcode'];
-            $Dep = $_POST['segments'][0]['dep'];
-            $Arr = $_POST['segments'][0]['arr'];
-            $FNo = $_POST['segments'][0]['Fno'];
-            $G = $_POST['segments'][0]['G'];
-            $DepTime = $_POST['segments'][0]['DepTime'];
-            $ArrTime = $_POST['segments'][0]['ArrTime'];
+	if($segment == '1'){
+		$Cr = $_POST['segments'][0]['cr'];
+		$AirSKey = $_POST['segments'][0]['airSegKey'];
+		$BCode = $_POST['segments'][0]['bcode'];
+		$Dep = $_POST['segments'][0]['dep'];
+		$Arr = $_POST['segments'][0]['arr'];
+		$FNo = $_POST['segments'][0]['Fno'];
+		$G = $_POST['segments'][0]['G'];	
+		$DepTime = $_POST['segments'][0]['DepTime'];
+		$ArrTime  = $_POST['segments'][0]['ArrTime'];
 
-            $From = $_POST['segments'][0]['dep'];
-            $To = $_POST['segments'][0]['arr'];
+		$From = $_POST['segments'][0]['dep'];
+		$To = $_POST['segments'][0]['arr'];
 
-            $AirSegments = <<<EOM
+
+		$AirSegments = <<<EOM
 			<AirSegment Key="$AirSKey" Group="$G" Carrier="$Cr" FlightNumber="$FNo" ProviderCode="1G" Origin="$Dep" Destination="$Arr" DepartureTime="$DepTime" ArrivalTime="$ArrTime"></AirSegment>
 		EOM;
 
-        } else if ($segment == '2') {
-            $Cr = $_POST['segments'][0]['cr'];
-            $AirSKey = $_POST['segments'][0]['airSegKey'];
-            $BCode = $_POST['segments'][0]['bcode'];
-            $Dep = $_POST['segments'][0]['dep'];
-            $Arr = $_POST['segments'][0]['arr'];
-            $FNo = $_POST['segments'][0]['Fno'];
-            $G = $_POST['segments'][0]['G'];
-            $DepTime = $_POST['segments'][0]['DepTime'];
-            $ArrTime = $_POST['segments'][0]['ArrTime'];
 
-            //Segment 2
 
-            $Cr1 = $_POST['segments'][1]['cr'];
-            $AirSKey1 = $_POST['segments'][1]['airSegKey'];
-            $BCode1 = $_POST['segments'][1]['bcode'];
-            $Dep1 = $_POST['segments'][1]['dep'];
-            $Arr1 = $_POST['segments'][1]['arr'];
-            $FNo1 = $_POST['segments'][1]['Fno'];
-            $G1 = $_POST['segments'][1]['G'];
-            $DepTime1 = $_POST['segments'][1]['DepTime'];
-            $ArrTime1 = $_POST['segments'][1]['ArrTime'];
+		}else if($segment == '2'){
+		$Cr = $_POST['segments'][0]['cr'];
+		$AirSKey = $_POST['segments'][0]['airSegKey'];
+		$BCode = $_POST['segments'][0]['bcode'];
+		$Dep = $_POST['segments'][0]['dep'];
+		$Arr = $_POST['segments'][0]['arr'];
+		$FNo = $_POST['segments'][0]['Fno'];
+		$G = $_POST['segments'][0]['G'];
+		$DepTime = $_POST['segments'][0]['DepTime'];
+		$ArrTime  = $_POST['segments'][0]['ArrTime'];
 
-            $From = $_POST['segments'][0]['dep'];
-            $To = $_POST['segments'][1]['arr'];
 
-            $AirSegments = <<<EOM
+		//Segment 2
+
+		$Cr1 = $_POST['segments'][1]['cr'];
+		$AirSKey1 = $_POST['segments'][1]['airSegKey'];
+		$BCode1 = $_POST['segments'][1]['bcode'];
+		$Dep1 = $_POST['segments'][1]['dep'];
+		$Arr1 = $_POST['segments'][1]['arr'];
+		$FNo1 = $_POST['segments'][1]['Fno'];
+		$G1 = $_POST['segments'][1]['G'];
+		$DepTime1 = $_POST['segments'][1]['DepTime'];
+		$ArrTime1  = $_POST['segments'][1]['ArrTime'];
+
+		$From = $_POST['segments'][0]['dep'];
+		$To = $_POST['segments'][1]['arr'];
+
+
+			
+		$AirSegments = <<<EOM
 			<AirSegment Key="$AirSKey" Group="$G" Carrier="$Cr" FlightNumber="$FNo" ProviderCode="1G" Origin="$Dep" Destination="$Arr" DepartureTime="$DepTime" ArrivalTime="$ArrTime"></AirSegment>
 			<AirSegment Key="$AirSKey1" Group="$G1" Carrier="$Cr1" FlightNumber="$FNo1" ProviderCode="1G" Origin="$Dep1" Destination="$Arr1" DepartureTime="$DepTime1" ArrivalTime="$ArrTime1"></AirSegment>
 		EOM;
 
-        }
+		}
 
-        if ($adult > 0 && $child > 0 && $infants > 0) {
 
-            $FareInfoKey = $_POST['adult'][0]['fareInfoKey'];
-            $AirPriceInfoKey = $_POST['adult'][0]['airPriceInfoKey'];
+		if($adult > 0 && $child> 0 && $infants> 0){
 
-            for ($x = 0; $x < $adult; $x++) {
+		$FareInfoKey = $_POST['adult'][0]['fareInfoKey'];
+		$AirPriceInfoKey = $_POST['adult'][0]['airPriceInfoKey'];
 
-                ${'afName' . $x} = $_POST['adult'][$x]["afName"];
-                ${'alName' . $x} = $_POST['adult'][$x]["alName"];
-                ${'agender' . $x} = $_POST['adult'][$x]["agender"];
-                ${'adob' . $x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
-                ${'apassNo' . $x} = $_POST['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
-                ${'apassNation' . $x} = $_POST['adult'][$x]["apassNation"];
-                if (${'agender' . $x} = 'M') {
-                    ${'atitle' . $x} = 'MR';
-                } else {
-                    ${'atitle' . $x} = 'MRS';
-                }
 
-                //Flight Info
+		for($x = 0 ; $x < $adult; $x++){
 
-                $AdultPassengerItem = <<<EOM
+			${'afName'.$x} = $_POST['adult'][$x]["afName"];
+			${'alName'.$x} = $_POST['adult'][$x]["alName"];
+			${'agender'.$x} = $_POST['adult'][$x]["agender"];
+			${'adob'.$x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
+			${'apassNo'.$x} = $_POST['adult'][$x]["apassNo"];
+			${'apassEx'.$x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
+			${'apassNation'.$x} = $_POST['adult'][$x]["apassNation"];
+			if(${'agender'.$x} = 'M'){
+				${'atitle'.$x} = 'MR';
+			}else{
+				${'atitle'.$x} = 'MRS';
+			}
+
+
+			//Flight Info
+			
+
+			$AdultPassengerItem=<<<EOM
 							<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="ADT$x" TravelerType="ADT" Gender="${'agender'.$x}" Nationality="${'apassNation'.$x}">
 								<BookingTravelerName Prefix="${'atitle'.$x}" First="${'afName'.$x} " Last="${'alName'.$x}" />
 								<SSR Type="DOCS" Status="HK" FreeText="P/${'apassNation'.$x}/${'apassNo'.$x}/${'apassNation'.$x}/${'adob'.$x}/${'agender'.$x}/${'apassEx'.$x}/${'alName'.$x}/${'afName'.$x} " Carrier="$Cr" />
 							</BookingTraveler>
 						EOM;
+			
+			array_push($AllPassenger, $AdultPassengerItem);
 
-                array_push($AllPassenger, $AdultPassengerItem);
 
-                $AdultPassengerTypeItem = <<<EOM
+			$AdultPassengerTypeItem =<<<EOM
 						<PassengerType Code="ADT"  BookingTravelerRef="ADT$x" />
 			EOM;
 
-                array_push($AdultPassengerType, $AdultPassengerTypeItem);
+			array_push($AdultPassengerType, $AdultPassengerTypeItem);
+					
+		}
 
-            }
 
-            $FareInfoKey1 = $_POST['child'][0]['fareInfoKey'];
-            $AirPriceInfoKey1 = $_POST['child'][0]['airPriceInfoKey'];
 
-            for ($x = 0; $x < $child; $x++) {
+		$FareInfoKey1 = $_POST['child'][0]['fareInfoKey'];
+		$AirPriceInfoKey1 = $_POST['child'][0]['airPriceInfoKey'];
 
-                ${'cfName' . $x} = $_POST['child'][$x]["cfName"];
-                ${'clName' . $x} = $_POST['child'][$x]["clName"];
-                ${'cgender' . $x} = $_POST['child'][$x]["cgender"];
-                ${'cdob' . $x} = date("dMy", strtotime($_POST['child'][$x]["cdob"]));
-                ${'cpassNo' . $x} = $_POST['child'][$x]["cpassNo"];
-                ${'cpassEx' . $x} = date("dMy", strtotime($_POST['child'][$x]["cpassEx"]));
-                ${'cpassNation' . $x} = $_POST['child'][$x]["cpassNation"];
 
-                if (${'cgender' . $x} = 'M') {
-                    ${'ctitle' . $x} = 'MR';
-                } else {
-                    ${'ctitle' . $x} = 'MISS';
-                }
+		for($x = 0 ; $x < $child; $x++){
 
-                //Flight Info
+			${'cfName'.$x} = $_POST['child'][$x]["cfName"];
+			${'clName'.$x} = $_POST['child'][$x]["clName"];
+			${'cgender'.$x} = $_POST['child'][$x]["cgender"];
+			${'cdob'.$x} = date("dMy", strtotime($_POST['child'][$x]["cdob"]));
+			${'cpassNo'.$x} = $_POST['child'][$x]["cpassNo"];
+			${'cpassEx'.$x} = date("dMy", strtotime($_POST['child'][$x]["cpassEx"]));
+			${'cpassNation'.$x} = $_POST['child'][$x]["cpassNation"];
 
-                $ChildPassengerItem =
-                    <<<EOM
+			if(${'cgender'.$x} = 'M'){
+				${'ctitle'.$x} = 'MR';
+			}else{
+				${'ctitle'.$x} = 'MISS';
+			}
+
+
+			//Flight Info
+			
+
+			$ChildPassengerItem=
+            <<<EOM
             <BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="CNN$x" TravelerType="CNN" Gender="${'cgender'.$x}" Nationality="${'cpassNation'.$x}">
                     <BookingTravelerName Prefix="${'ctitle'.$x}" First="${'cfName'.$x} " Last="${'clName'.$x}" />
                     <SSR Type="DOCS" Status="HK" FreeText="P/${'cpassNation'.$x}/${'cpassNo'.$x}/${'cpassNation'.$x}/${'cdob'.$x}/${'cgender'.$x}/${'cpassEx'.$x}/${'clName'.$x}/${'cfName'.$x} " Carrier="$Cr" />
                 </BookingTraveler>
             EOM;
 
-                array_push($AllPassenger, $ChildPassengerItem);
+            array_push($AllPassenger, $ChildPassengerItem);
 
-                $ChildPassengerTypeItem =
-                    <<<EOM
+
+			$ChildPassengerTypeItem =
+            <<<EOM
 						<PassengerType Code="CNN" BookingTravelerRef="CNN$x" />
 			EOM;
 
-                array_push($ChildPassengerType, $ChildPassengerTypeItem);
+			array_push($ChildPassengerType, $ChildPassengerTypeItem);
+				
+		}
 
-            }
 
-            $FareInfoKey2 = $_POST['infant'][0]['fareInfoKey'];
-            $AirPriceInfoKey2 = $_POST['infant'][0]['airPriceInfoKey'];
 
-            for ($x = 0; $x < $infants; $x++) {
+		$FareInfoKey2 = $_POST['infant'][0]['fareInfoKey'];
+		$AirPriceInfoKey2 = $_POST['infant'][0]['airPriceInfoKey'];
 
-                ${'ifName' . $x} = $_POST['infant'][$x]["ifName"];
-                ${'ilName' . $x} = $_POST['infant'][$x]["ilName"];
-                ${'igender' . $x} = $_POST['infant'][$x]["igender"];
-                ${'idob' . $x} = date("dMy", strtotime($_POST['infant'][$x]["idob"]));
-                ${'ipassNo' . $x} = $_POST['infant'][$x]["ipassNo"];
-                ${'ipassEx' . $x} = date("dMy", strtotime($_POST['infant'][$x]["ipassEx"]));
-                ${'ipassNation' . $x} = $_POST['infant'][$x]["ipassNation"];
 
-                if (${'igender' . $x} = 'M') {
+		for($x = 0 ; $x < $infants; $x++){
 
-                    ${'ititle' . $x} = 'MSTR';
-                } else {
-                    ${'ititle' . $x} = 'MISS';
-                }
+			${'ifName'.$x} = $_POST['infant'][$x]["ifName"];
+			${'ilName'.$x} = $_POST['infant'][$x]["ilName"];
+			${'igender'.$x} = $_POST['infant'][$x]["igender"];
+			${'idob'.$x} = date("dMy", strtotime($_POST['infant'][$x]["idob"]));
+			${'ipassNo'.$x} = $_POST['infant'][$x]["ipassNo"];
+			${'ipassEx'.$x} = date("dMy", strtotime($_POST['infant'][$x]["ipassEx"]));
+			${'ipassNation'.$x} = $_POST['infant'][$x]["ipassNation"];
 
-                //Flight Info
+			if(${'igender'.$x} = 'M'){
+                
+				${'ititle'.$x} = 'MSTR';
+			}else{
+				${'ititle'.$x} = 'MISS';
+			}
 
-                $InfantPassengerItem = <<<EOM
+
+			//Flight Info
+			
+
+			$InfantPassengerItem=<<<EOM
 							<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="INF$x" TravelerType="INF" Gender="${'igender'.$x}" Nationality="${'ipassNation'.$x}">
 								<BookingTravelerName Prefix="${'ititle'.$x}" First="${'ifName'.$x} " Last="${'ilName'.$x}" />
 								<SSR Type="DOCS" Status="HK" FreeText="P/${'ipassNation'.$x}/${'ipassNo'.$x}/${'ipassNation'.$x}/${'idob'.$x}/${'igender'.$x}/${'ipassEx'.$x}/${'ilName'.$x}/${'ifName'.$x} " Carrier="$Cr" />
@@ -2485,51 +1902,56 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 								</NameRemark>
 							</BookingTraveler>
 						EOM;
+			
+						array_push($AllPassenger, $InfantPassengerItem);
 
-                array_push($AllPassenger, $InfantPassengerItem);
 
-                $InfantPassengerTypeItem = <<<EOM
+			$InfantPassengerTypeItem =<<<EOM
 						<PassengerType Code="INF"  BookingTravelerRef="INF$x" />
 			EOM;
 
-                array_push($InfantPassengerType, $InfantPassengerTypeItem);
+			array_push($InfantPassengerType, $InfantPassengerTypeItem);
+					
+		}
 
-            }
 
-            $AdultPassengerTypeAll = implode(" ", $AdultPassengerType);
-            $ChildPassengerTypeAll = implode(" ", $ChildPassengerType);
-            $InfantPassengerTypeAll = implode(" ", $InfantPassengerType);
 
-            if ($segment == 1) {
-                $AdultBookingCode = <<<EOM
+			$AdultPassengerTypeAll = implode(" ",$AdultPassengerType); 
+			$ChildPassengerTypeAll = implode(" ",$ChildPassengerType); 
+			$InfantPassengerTypeAll = implode(" ",$InfantPassengerType);
+
+			if($segment == 1){
+				$AdultBookingCode=<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey" SegmentRef="$AirSKey" />
 					EOM;
-                $ChildBookingCode = <<<EOM
+				$ChildBookingCode=<<<EOM
 					<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey1" SegmentRef="$AirSKey" />
 				EOM;
-                $InfantBookingCode = <<<EOM
+				$InfantBookingCode=<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey2" SegmentRef="$AirSKey" />
 					EOM;
 
-            } else if ($segment == 2) {
+				
+			}else if($segment == 2){	
 
-                $AdultBookingCode = <<<EOM
+				$AdultBookingCode =<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey" SegmentRef="$AirSKey" />
 						<BookingInfo BookingCode="$BCode1" FareInfoRef="$FareInfoKey" SegmentRef="$AirSKey1" />
 					EOM;
-
-                $ChildBookingCode = <<<EOM
+				
+				$ChildBookingCode =<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey1" SegmentRef="$AirSKey" />
 						<BookingInfo BookingCode="$BCode1" FareInfoRef="$FareInfoKey1" SegmentRef="$AirSKey1" />
 					EOM;
-
-                $InfantBookingCode = <<<EOM
+					
+				$InfantBookingCode =<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey2" SegmentRef="$AirSKey" />
 						<BookingInfo BookingCode="$BCode1" FareInfoRef="$FareInfoKey2" SegmentRef="$AirSKey1" />
 					EOM;
-            }
+			}
 
-            $AirPricingSolution = <<<EOM
+
+			$AirPricingSolution = <<<EOM
 			<AirPricingSolution Key="$AirPricingSolutionKey" xmlns="http://www.travelport.com/schema/air_v51_0">
 					$AirSegments
 				<AirPricingInfo Key="$AirPriceInfoKey" PricingMethod="Guaranteed" PlatingCarrier="$Cr" ProviderCode="1G">
@@ -2547,10 +1969,10 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 						$InfantBookingCode
 						$InfantPassengerTypeAll
 				</AirPricingInfo>
-			</AirPricingSolution>
+			</AirPricingSolution>	
 		EOM;
 
-            $AirPricingTicketingModifiers = <<<EOM
+		$AirPricingTicketingModifiers=<<<EOM
 			<AirPricingTicketingModifiers xmlns="http://www.travelport.com/schema/air_v51_0">
 				<AirPricingInfoRef Key="$AirPriceInfoKey" />
 				<TicketingModifiers>
@@ -2570,111 +1992,126 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 				</TicketingModifiers>
 			</AirPricingTicketingModifiers>
 		EOM;
+			
+		}else if($adult > 0 && $child > 0){
 
-        } else if ($adult > 0 && $child > 0) {
+		$FareInfoKey = $_POST['adult'][0]['fareInfoKey'];
+		$AirPriceInfoKey = $_POST['adult'][0]['airPriceInfoKey'];
 
-            $FareInfoKey = $_POST['adult'][0]['fareInfoKey'];
-            $AirPriceInfoKey = $_POST['adult'][0]['airPriceInfoKey'];
 
-            for ($x = 0; $x < $adult; $x++) {
+		for($x = 0 ; $x < $adult; $x++){
 
-                ${'afName' . $x} = $_POST['adult'][$x]["afName"];
-                ${'alName' . $x} = $_POST['adult'][$x]["alName"];
-                ${'agender' . $x} = $_POST['adult'][$x]["agender"];
-                ${'adob' . $x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
-                ${'apassNo' . $x} = $_POST['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
-                ${'apassNation' . $x} = $_POST['adult'][$x]["apassNation"];
+			${'afName'.$x} = $_POST['adult'][$x]["afName"];
+			${'alName'.$x} = $_POST['adult'][$x]["alName"];
+			${'agender'.$x} = $_POST['adult'][$x]["agender"];
+			${'adob'.$x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
+			${'apassNo'.$x} = $_POST['adult'][$x]["apassNo"];
+			${'apassEx'.$x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
+			${'apassNation'.$x} = $_POST['adult'][$x]["apassNation"];
 
-                if (${'agender' . $x} = 'M') {
-                    ${'atitle' . $x} = 'MR';
-                } else {
-                    ${'atitle' . $x} = 'MRS';
-                }
+			if(${'agender'.$x} = 'M'){
+				${'atitle'.$x} = 'MR';
+			}else{
+				${'atitle'.$x} = 'MRS';
+			}
 
-                //Flight Info
 
-                $AdultPassengerItem = <<<EOM
+			//Flight Info
+			
+
+			$AdultPassengerItem=<<<EOM
 							<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="ADT$x" TravelerType="ADT" Gender="${'agender'.$x}" Nationality="${'apassNation'.$x}">
 								<BookingTravelerName Prefix="${'atitle'.$x}" First="${'afName'.$x} " Last="${'alName'.$x}" />
 								<SSR Type="DOCS" Status="HK" FreeText="P/${'apassNation'.$x}/${'apassNo'.$x}/${'apassNation'.$x}/${'adob'.$x}/${'agender'.$x}/${'apassEx'.$x}/${'alName'.$x}/${'afName'.$x} " Carrier="$Cr" />
 							</BookingTraveler>
 						EOM;
+			
+						array_push($AllPassenger, $AdultPassengerItem);
 
-                array_push($AllPassenger, $AdultPassengerItem);
 
-                $AdultPassengerTypeItem = <<<EOM
+			$AdultPassengerTypeItem =<<<EOM
 						<PassengerType Code="ADT"  BookingTravelerRef="ADT$x" />
 			EOM;
 
-                array_push($AdultPassengerType, $AdultPassengerTypeItem);
+			array_push($AdultPassengerType, $AdultPassengerTypeItem);
+					
+		}
 
-            }
 
-            $FareInfoKey1 = $_POST['child'][0]['fareInfoKey'];
-            $AirPriceInfoKey1 = $_POST['child'][0]['airPriceInfoKey'];
 
-            for ($x = 0; $x < $child; $x++) {
 
-                ${'cfName' . $x} = $_POST['child'][$x]["cfName"];
-                ${'clName' . $x} = $_POST['child'][$x]["clName"];
-                ${'cgender' . $x} = $_POST['child'][$x]["cgender"];
-                ${'cdob' . $x} = date("dMy", strtotime($_POST['child'][$x]["cdob"]));
-                ${'cpassNo' . $x} = $_POST['child'][$x]["cpassNo"];
-                ${'cpassEx' . $x} = date("dMy", strtotime($_POST['child'][$x]["cpassEx"]));
-                ${'cpassNation' . $x} = $_POST['child'][$x]["cpassNation"];
+		$FareInfoKey1 = $_POST['child'][0]['fareInfoKey'];
+		$AirPriceInfoKey1 = $_POST['child'][0]['airPriceInfoKey'];
 
-                if (${'cgender' . $x} = 'M') {
-                    ${'ctitle' . $x} = 'MSTR';
-                } else {
-                    ${'ctitle' . $x} = 'MISS';
-                }
 
-                //Flight Info
+		for($x = 0 ; $x < $child; $x++){
 
-                $ChildPassengerItem = <<<EOM
+			${'cfName'.$x} = $_POST['child'][$x]["cfName"];
+			${'clName'.$x} = $_POST['child'][$x]["clName"];
+			${'cgender'.$x} = $_POST['child'][$x]["cgender"];
+			${'cdob'.$x} = date("dMy", strtotime($_POST['child'][$x]["cdob"]));
+			${'cpassNo'.$x} = $_POST['child'][$x]["cpassNo"];
+			${'cpassEx'.$x} = date("dMy", strtotime($_POST['child'][$x]["cpassEx"]));
+			${'cpassNation'.$x} = $_POST['child'][$x]["cpassNation"];
+
+			if(${'cgender'.$x} = 'M'){
+				${'ctitle'.$x} = 'MSTR';
+			}else{
+				${'ctitle'.$x} = 'MISS';
+			}
+
+
+			//Flight Info
+			
+
+			$ChildPassengerItem=<<<EOM
 							<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="CNN$x" TravelerType="CNN" Gender="${'cgender'.$x}" Nationality="${'cpassNation'.$x}">
 								<BookingTravelerName Prefix="${'ctitle'.$x}" First="${'cfName'.$x} " Last="${'clName'.$x}" />
 								<SSR Type="DOCS" Status="HK" FreeText="P/${'cpassNation'.$x}/${'cpassNo'.$x}/${'cpassNation'.$x}/${'cdob'.$x}/${'cgender'.$x}/${'cpassEx'.$x}/${'clName'.$x}/${'cfName'.$x}" Carrier="$Cr" />
 							</BookingTraveler>
 						EOM;
+			
+						array_push($AllPassenger, $ChildPassengerItem);
 
-                array_push($AllPassenger, $ChildPassengerItem);
 
-                $ChildPassengerTypeItem = <<<EOM
+			$ChildPassengerTypeItem =<<<EOM
 						<PassengerType Code="CNN"  BookingTravelerRef="CNN$x" />
 			EOM;
 
-                array_push($ChildPassengerType, $ChildPassengerTypeItem);
+			array_push($ChildPassengerType, $ChildPassengerTypeItem);
+					
+		}
 
-            }
 
-            $AdultPassengerTypeAll = implode(" ", $AdultPassengerType);
-            $ChildPassengerTypeAll = implode(" ", $ChildPassengerType);
 
-            if ($segment == 1) {
-                $AdultBookingCode = <<<EOM
+			$AdultPassengerTypeAll = implode(" ",$AdultPassengerType);
+			$ChildPassengerTypeAll = implode(" ",$ChildPassengerType);
+
+			if($segment == 1){
+				$AdultBookingCode=<<<EOM
 						<BookingInfo BookingCode="$BCode"  FareInfoRef="$FareInfoKey"  SegmentRef="$AirSKey" />
 					EOM;
-                $ChildBookingCode = <<<EOM
+				$ChildBookingCode=<<<EOM
 					<BookingInfo BookingCode="$BCode"  FareInfoRef="$FareInfoKey1"  SegmentRef="$AirSKey" />
 				EOM;
 
-            } else if ($segment == 2) {
+				
+			}else if($segment == 2){	
 
-                $AdultBookingCode = <<<EOM
+				$AdultBookingCode =<<<EOM
 						<BookingInfo BookingCode="$BCode"  FareInfoRef="$FareInfoKey"  SegmentRef="$AirSKey" />
 						<BookingInfo BookingCode="$BCode1"  FareInfoRef="$FareInfoKey"  SegmentRef="$AirSKey1" />
 					EOM;
-
-                $ChildBookingCode = <<<EOM
+				
+				$ChildBookingCode =<<<EOM
 						<BookingInfo  BookingCode="$BCode"  FareInfoRef="$FareInfoKey1"  SegmentRef="$AirSKey" />
 						<BookingInfo  BookingCode="$BCode1"  FareInfoRef="$FareInfoKey1"  SegmentRef="$AirSKey1" />
 					EOM;
+					
+			}
 
-            }
 
-            $AirPricingSolution = <<<EOM
+			$AirPricingSolution = <<<EOM
 			<AirPricingSolution Key="$AirPricingSolutionKey" xmlns="http://www.travelport.com/schema/air_v51_0">
 					$AirSegments
 				<AirPricingInfo Key="$AirPriceInfoKey" PricingMethod="Guaranteed" PlatingCarrier="$Cr" ProviderCode="1G">
@@ -2687,10 +2124,10 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 						$ChildBookingCode
 						$ChildPassengerTypeAll
 				</AirPricingInfo>
-			</AirPricingSolution>
+			</AirPricingSolution>	
 		EOM;
 
-            $AirPricingTicketingModifiers = <<<EOM
+		$AirPricingTicketingModifiers=<<<EOM
 			<AirPricingTicketingModifiers xmlns="http://www.travelport.com/schema/air_v51_0">
 				<AirPricingInfoRef Key="$AirPriceInfoKey" />
 				<TicketingModifiers>
@@ -2705,70 +2142,84 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 			</AirPricingTicketingModifiers>
 		EOM;
 
-        } else if ($adult > 0 && $infants > 0) {
 
-            $FareInfoKey = $_POST['child'][0]['fareInfoKey'];
-            $AirPriceInfoKey = $_POST['child'][0]['airPriceInfoKey'];
 
-            for ($x = 0; $x < $adult; $x++) {
+		}else if($adult > 0 && $infants > 0){
 
-                ${'afName' . $x} = $_POST['adult'][$x]["afName"];
-                ${'alName' . $x} = $_POST['adult'][$x]["alName"];
-                ${'agender' . $x} = $_POST['adult'][$x]["agender"];
-                ${'adob' . $x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
-                ${'apassNo' . $x} = $_POST['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
-                ${'apassNation' . $x} = $_POST['adult'][$x]["apassNation"];
+		$FareInfoKey = $_POST['child'][0]['fareInfoKey'];
+		$AirPriceInfoKey = $_POST['child'][0]['airPriceInfoKey'];
 
-                if (${'agender' . $x} = 'M') {
-                    ${'atitle' . $x} = 'MR';
-                } else {
-                    $atitle = 'Mrs';
-                }
 
-                //Flight Info
+		for($x = 0 ; $x < $adult; $x++){
 
-                $AdultPassengerItem = <<<EOM
+			${'afName'.$x} = $_POST['adult'][$x]["afName"];
+			${'alName'.$x} = $_POST['adult'][$x]["alName"];
+			${'agender'.$x} = $_POST['adult'][$x]["agender"];
+			${'adob'.$x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
+			${'apassNo'.$x} = $_POST['adult'][$x]["apassNo"];
+			${'apassEx'.$x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
+			${'apassNation'.$x} = $_POST['adult'][$x]["apassNation"];
+
+			if(${'agender'.$x} = 'M'){
+				${'atitle'.$x} = 'MR';
+			}else{
+				$atitle = 'Mrs';
+			}
+
+
+			//Flight Info
+			
+
+			$AdultPassengerItem=<<<EOM
 							<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="ADT$x" TravelerType="ADT" Gender="${'agender'.$x}" Nationality="${'apassNation'.$x}">
 								<BookingTravelerName Prefix="$atitle" First="${'afName'.$x}  "  Last="${'alName'.$x}" />
 								<SSR Type="DOCS" Status="HK" FreeText="P/${'apassNation'.$x}/${'apassNo'.$x}/${'apassNation'.$x}/${'adob'.$x}/${'agender'.$x}/${'apassEx'.$x}/${'alName'.$x}/${'afName'.$x} " Carrier="$Cr" />
 							</BookingTraveler>
 						EOM;
+			
+			array_push($AllPassenger, $AdultPassengerItem);
 
-                array_push($AllPassenger, $AdultPassengerItem);
 
-                $AdultPassengerTypeItem = <<<EOM
+			$AdultPassengerTypeItem =<<<EOM
 						<PassengerType Code="ADT"  BookingTravelerRef="ADT$x" />
 			EOM;
 
-                array_push($AdultPassengerType, $AdultPassengerTypeItem);
+			array_push($AdultPassengerType, $AdultPassengerTypeItem);
+					
+		}
 
-            }
 
-            //INFANTS
 
-            $FareInfoKey1 = $_POST['infant'][0]['fareInfoKey'];
-            $AirPriceInfoKey1 = $_POST['infant'][0]['airPriceInfoKey'];
 
-            for ($x = 0; $x < $infants; $x++) {
 
-                ${'ifName' . $x} = $_POST['infant'][$x]["ifName"];
-                ${'ilName' . $x} = $_POST['infant'][$x]["ilName"];
-                ${'igender' . $x} = $_POST['infant'][$x]["igender"];
-                ${'idob' . $x} = date("dMy", strtotime($_POST['infant'][$x]["idob"]));
-                ${'ipassNo' . $x} = $_POST['infant'][$x]["ipassNo"];
-                ${'ipassEx' . $x} = date("dMy", strtotime($_POST['infant'][$x]["ipassEx"]));
-                ${'ipassNation' . $x} = $_POST['infant'][$x]["ipassNation"];
+		//INFANTS
 
-                if (${'igender' . $x} = 'M') {
-                    $ititle = 'Master';
-                } else {
-                    $ititle = 'Miss';
-                }
+		$FareInfoKey1 = $_POST['infant'][0]['fareInfoKey'];
+		$AirPriceInfoKey1 = $_POST['infant'][0]['airPriceInfoKey'];
 
-                //Flight Info
 
-                $InfantPassengerItem = <<<EOM
+		for($x = 0 ; $x < $infants; $x++){
+
+			${'ifName'.$x} = $_POST['infant'][$x]["ifName"];
+			${'ilName'.$x} = $_POST['infant'][$x]["ilName"];
+			${'igender'.$x} = $_POST['infant'][$x]["igender"];
+			${'idob'.$x} = date("dMy", strtotime($_POST['infant'][$x]["idob"]));
+			${'ipassNo'.$x} = $_POST['infant'][$x]["ipassNo"];
+			${'ipassEx'.$x} = date("dMy", strtotime($_POST['infant'][$x]["ipassEx"]));
+			${'ipassNation'.$x} = $_POST['infant'][$x]["ipassNation"];
+
+			if(${'igender'.$x} = 'M'){
+				$ititle = 'Master';
+			}else{
+				$ititle = 'Miss';
+			}
+
+
+
+			//Flight Info
+			
+
+			$InfantPassengerItem=<<<EOM
 							<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="INF$x" TravelerType="INF" Gender="${'igender'.$x}" Nationality="${'ipassNation'.$x}">
 								<BookingTravelerName Prefix="$ititle" First="${'ifName'.$x} " Last="${'ilName'.$x}" />
 								<SSR Type="DOCS" Status="HK" FreeText="P/${'ipassNation'.$x}/${'ipassNo'.$x}/${'ipassNation'.$x}/${'idob'.$x}/${'igender'.$x}/${'ipassEx'.$x}/${'ilName'.$x}/${'ifName'.$x} " Carrier="$Cr" />
@@ -2777,43 +2228,51 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 								</NameRemark>
 							</BookingTraveler>
 						EOM;
+			
+			array_push($AllPassenger, $InfantPassengerItem);
 
-                array_push($AllPassenger, $InfantPassengerItem);
 
-                $InfantPassengerTypeItem = <<<EOM
+			$InfantPassengerTypeItem =<<<EOM
 						<PassengerType Code="INF"  BookingTravelerRef="INF$x" />
 			EOM;
 
-                array_push($InfantPassengerType, $InfantPassengerTypeItem);
+			array_push($InfantPassengerType, $InfantPassengerTypeItem);
+					
+		}
 
-            }
+			
 
-            if ($segment == 1) {
-                $AdultBookingCode = <<<EOM
+			if($segment == 1){
+				$AdultBookingCode=<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey" SegmentRef="$AirSKey" />
 					EOM;
 
-                $InfantBookingCode = <<<EOM
+
+				$InfantBookingCode=<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey1" SegmentRef="$AirSKey" />
 					EOM;
 
-            } else if ($segment == 2) {
+				
+			}else if($segment == 2){	
 
-                $AdultBookingCode = <<<EOM
+				$AdultBookingCode =<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey" SegmentRef="$AirSKey" />
 						<BookingInfo BookingCode="$BCode1" FareInfoRef="$FareInfoKey" SegmentRef="$AirSKey1" />
 					EOM;
-
-                $InfantBookingCode = <<<EOM
+				
+					
+				$InfantBookingCode =<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey1" SegmentRef="$AirSKey" />
 						<BookingInfo BookingCode="$BCode1" FareInfoRef="$FareInfoKey1" SegmentRef="$AirSKey1" />
 					EOM;
-            }
+			}
 
-            $AdultPassengerTypeAll = implode(" ", $AdultPassengerType);
-            $InfantPassengerTypeAll = implode(" ", $InfantPassengerType);
 
-            $AirPricingSolution = <<<EOM
+			$AdultPassengerTypeAll = implode(" ",$AdultPassengerType);
+			$InfantPassengerTypeAll = implode(" ",$InfantPassengerType);
+
+
+			$AirPricingSolution = <<<EOM
 			<AirPricingSolution Key="$AirPricingSolutionKey" xmlns="http://www.travelport.com/schema/air_v51_0">
 					$AirSegments
 				<AirPricingInfo Key="$AirPriceInfoKey" PricingMethod="Guaranteed" PlatingCarrier="$Cr" ProviderCode="1G">
@@ -2826,10 +2285,10 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 						$InfantBookingCode
 						$InfantPassengerTypeAll
 				</AirPricingInfo>
-			</AirPricingSolution>
+			</AirPricingSolution>	
 		EOM;
 
-            $AirPricingTicketingModifiers = <<<EOM
+		$AirPricingTicketingModifiers=<<<EOM
 			<AirPricingTicketingModifiers xmlns="http://www.travelport.com/schema/air_v51_0">
 				<AirPricingInfoRef Key="$AirPriceInfoKey" />
 				<TicketingModifiers>
@@ -2844,61 +2303,71 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 			</AirPricingTicketingModifiers>
 		EOM;
 
-        } else if ($adult > 0) {
 
-            $FareInfoKey = $_POST['adult'][0]['FareInfoRef'];
-            $AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
 
-            for ($x = 0; $x < $adult; $x++) {
 
-                ${'afName' . $x} = $_POST['adult'][$x]["afName"];
-                ${'alName' . $x} = $_POST['adult'][$x]["alName"];
-                ${'agender' . $x} = $_POST['adult'][$x]["agender"];
-                ${'adob' . $x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
-                ${'apassNo' . $x} = $_POST['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
-                ${'apassNation' . $x} = $_POST['adult'][$x]["apassNation"];
+		}else if($adult > 0){
 
-                if (${'agender' . $x} = 'M') {
-                    $atitle = 'Mr';
-                } else {
-                    $atitle = 'Mrs';
-                }
+		$FareInfoKey = $_POST['adult'][0]['FareInfoRef'];
+		$AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
 
-                //Flight Info
 
-                $AdultPassengerItem = <<<EOM
+		for($x = 0 ; $x < $adult; $x++){
+
+			${'afName'.$x} = $_POST['adult'][$x]["afName"];
+			${'alName'.$x} = $_POST['adult'][$x]["alName"];
+			${'agender'.$x} = $_POST['adult'][$x]["agender"];
+			${'adob'.$x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
+			${'apassNo'.$x} = $_POST['adult'][$x]["apassNo"];
+			${'apassEx'.$x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
+			${'apassNation'.$x} = $_POST['adult'][$x]["apassNation"];
+
+			if(${'agender'.$x} = 'M'){
+				$atitle = 'Mr';
+			}else{
+				$atitle = 'Mrs';
+			}
+
+
+			//Flight Info
+			
+			$AdultPassengerItem=<<<EOM
 							<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="ADT$x" TravelerType="ADT" Gender="${'agender'.$x}" Nationality="${'apassNation'.$x}">
 								<BookingTravelerName Prefix="$atitle" First="${'afName'.$x} " Last="${'alName'.$x}" />
 								<SSR Type="DOCS" Status="HK" FreeText="P/${'apassNation'.$x}/${'apassNo'.$x}/${'apassNation'.$x}/${'adob'.$x}/${'agender'.$x}/${'apassEx'.$x}/${'alName'.$x}/${'afName'.$x} " Carrier="$Cr" />
 							</BookingTraveler>
 						EOM;
+			
+			array_push($AllPassenger, $AdultPassengerItem);
 
-                array_push($AllPassenger, $AdultPassengerItem);
 
-                $AdultPassengerTypeItem = <<<EOM
+			$AdultPassengerTypeItem =<<<EOM
 						<PassengerType Code="ADT"  BookingTravelerRef="ADT$x" />
 			EOM;
 
-                array_push($AdultPassengerType, $AdultPassengerTypeItem);
+			array_push($AdultPassengerType, $AdultPassengerTypeItem);
+					
+		}
 
-            }
 
-            $AdultPassengerTypeAll = implode(" ", $AdultPassengerType);
 
-            if ($segment == 1) {
-                $BookingCode = <<<EOM
+			$AdultPassengerTypeAll = implode(" ",$AdultPassengerType);
+
+			if($segment == 1){
+				$BookingCode=<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey" SegmentRef="$AirSKey" />
 					EOM;
 
-            } else if ($segment == 2) {
-                $BookingCode = <<<EOM
+				
+			}else if($segment == 2){			
+					$BookingCode =<<<EOM
 						<BookingInfo BookingCode="$BCode" FareInfoRef="$FareInfoKey" SegmentRef="$AirSKey" />
 						<BookingInfo BookingCode="$BCode1" FareInfoRef="$FareInfoKey" SegmentRef="$AirSKey1" />
 					EOM;
-            }
+			}
 
-            $AirPricingSolution = <<<EOM
+
+			$AirPricingSolution = <<<EOM
 			<AirPricingSolution Key="$AirPricingSolutionKey" xmlns="http://www.travelport.com/schema/air_v51_0">
 					$AirSegments
 				<AirPricingInfo Key="$AirPriceInfoKey" PricingMethod="Guaranteed" PlatingCarrier="$Cr" ProviderCode="1G">
@@ -2906,10 +2375,10 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 					$BookingCode
 					$AdultPassengerTypeAll
 				</AirPricingInfo>
-			</AirPricingSolution>
+			</AirPricingSolution>	
 		EOM;
 
-            $AirPricingTicketingModifiers = <<<EOM
+		$AirPricingTicketingModifiers=<<<EOM
 			<AirPricingTicketingModifiers xmlns="http://www.travelport.com/schema/air_v51_0">
 				<AirPricingInfoRef Key="$AirPriceInfoKey" />
 				<TicketingModifiers>
@@ -2918,11 +2387,12 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 			</AirPricingTicketingModifiers>
 		EOM;
 
-        }
 
-        $PassengerNumAll = implode(" ", $AllPassenger);
+		}
 
-        $message = <<<EOM
+		$PassengerNumAll = implode(" ",$AllPassenger);
+
+		$message = <<<EOM
 						<soapenv:Envelope
 						xmlns:univ="http://www.travelport.com/schema/universal_v51_0"
 						xmlns:com="http://www.travelport.com/schema/common_v51_0"
@@ -2945,281 +2415,313 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 					</soapenv:Envelope>
 					EOM;
 
-    } else if ($tripType == 2 || $tripType == 'return') {
-        if ($segment == '1') {
-            $goCr = $_POST['segments']['go'][0]['cr'];
-            $goAirSKey = $_POST['segments']['go'][0]['airSegKey'];
-            $goBCode = $_POST['segments']['go'][0]['bcode'];
-            $goDep = $_POST['segments']['go'][0]['dep'];
-            $goArr = $_POST['segments']['go'][0]['arr'];
-            $goFNo = $_POST['segments']['go'][0]['Fno'];
-            $goG = $_POST['segments']['go'][0]['G'];
-            $goDepTime = $_POST['segments']['go'][0]['DepTime'];
-            $goArrTime = $_POST['segments']['go'][0]['ArrTime'];
 
-            $backCr = $_POST['segments']['back'][0]['cr'];
-            $backAirSKey = $_POST['segments']['back'][0]['airSegKey'];
-            $backBCode = $_POST['segments']['back'][0]['bcode'];
-            $backDep = $_POST['segments']['back'][0]['dep'];
-            $backArr = $_POST['segments']['back'][0]['arr'];
-            $backFNo = $_POST['segments']['back'][0]['Fno'];
-            $backG = $_POST['segments']['back'][0]['G'];
-            $backDepTime = $_POST['segments']['back'][0]['DepTime'];
-            $backArrTime = $_POST['segments']['back'][0]['ArrTime'];
+    }else if($tripType == 2 || $tripType == 'return'){
+		if($segment == '1'){
+			$goCr = $_POST['segments']['go'][0]['cr'];
+			$goAirSKey = $_POST['segments']['go'][0]['airSegKey'];
+			$goBCode = $_POST['segments']['go'][0]['bcode'];
+			$goDep = $_POST['segments']['go'][0]['dep'];
+			$goArr = $_POST['segments']['go'][0]['arr'];
+			$goFNo = $_POST['segments']['go'][0]['Fno'];
+			$goG = $_POST['segments']['go'][0]['G'];	
+			$goDepTime = $_POST['segments']['go'][0]['DepTime'];
+			$goArrTime  = $_POST['segments']['go'][0]['ArrTime'];
 
-            $From = $_POST['segments']['go'][0]['dep'];
-            $To = $_POST['segments']['go'][0]['arr'];
+			$backCr = $_POST['segments']['back'][0]['cr'];
+			$backAirSKey = $_POST['segments']['back'][0]['airSegKey'];
+			$backBCode = $_POST['segments']['back'][0]['bcode'];
+			$backDep = $_POST['segments']['back'][0]['dep'];
+			$backArr = $_POST['segments']['back'][0]['arr'];
+			$backFNo = $_POST['segments']['back'][0]['Fno'];
+			$backG = $_POST['segments']['back'][0]['G'];	
+			$backDepTime = $_POST['segments']['back'][0]['DepTime'];
+			$backArrTime  = $_POST['segments']['back'][0]['ArrTime'];
 
-            $AirSegments = <<<EOM
+			$From = $_POST['segments']['go'][0]['dep'];
+			$To = $_POST['segments']['go'][0]['arr'];
+
+			
+			$AirSegments = <<<EOM
 				<AirSegment Key="$goAirSKey" Group="$goG" Carrier="$goCr" FlightNumber="$goFNo" ProviderCode="1G" Origin="$goDep" Destination="$goArr" DepartureTime="$goDepTime" ArrivalTime="$goArrTime"></AirSegment>
 				<AirSegment Key="$backAirSKey" Group="$backG" Carrier="$backCr" FlightNumber="$backFNo" ProviderCode="1G" Origin="$backDep" Destination="$backArr" DepartureTime="$backDepTime" ArrivalTime="$backArrTime"></AirSegment>
 			EOM;
 
-        } else if ($segment == '2') {
+			
+			
+		}else if($segment == '2'){
 
-            //Go 1
-            $goCr = $_POST['segments']['go'][0]['cr'];
-            $goAirSKey = $_POST['segments']['go'][0]['airSegKey'];
-            $goBCode = $_POST['segments']['go'][0]['bcode'];
-            $goDep = $_POST['segments']['go'][0]['dep'];
-            $goArr = $_POST['segments']['go'][0]['arr'];
-            $goFNo = $_POST['segments']['go'][0]['Fno'];
-            $goG = $_POST['segments']['go'][0]['G'];
-            $goDepTime = $_POST['segments']['go'][0]['DepTime'];
-            $goArrTime = $_POST['segments']['go'][0]['ArrTime'];
+			//Go 1
+			$goCr = $_POST['segments']['go'][0]['cr'];
+			$goAirSKey = $_POST['segments']['go'][0]['airSegKey'];
+			$goBCode = $_POST['segments']['go'][0]['bcode'];
+			$goDep = $_POST['segments']['go'][0]['dep'];
+			$goArr = $_POST['segments']['go'][0]['arr'];
+			$goFNo = $_POST['segments']['go'][0]['Fno'];
+			$goG = $_POST['segments']['go'][0]['G'];	
+			$goDepTime = $_POST['segments']['go'][0]['DepTime'];
+			$goArrTime  = $_POST['segments']['go'][0]['ArrTime'];
 
-            //Go 2
-            $goCr1 = $_POST['segments']['go'][1]['cr'];
-            $goAirSKey1 = $_POST['segments']['go'][1]['airSegKey'];
-            $goBCode1 = $_POST['segments']['go'][1]['bcode'];
-            $goDep1 = $_POST['segments']['go'][1]['dep'];
-            $goArr1 = $_POST['segments']['go'][1]['arr'];
-            $goFNo1 = $_POST['segments']['go'][1]['Fno'];
-            $goG1 = $_POST['segments']['go'][1]['G'];
-            $goDepTime1 = $_POST['segments']['go'][1]['DepTime'];
-            $goArrTime1 = $_POST['segments']['go'][1]['ArrTime'];
 
-            //Back 1
-            $backCr = $_POST['segments']['back'][0]['cr'];
-            $backAirSKey = $_POST['segments']['back'][0]['airSegKey'];
-            $backBCode = $_POST['segments']['back'][0]['bcode'];
-            $backDep = $_POST['segments']['back'][0]['dep'];
-            $backArr = $_POST['segments']['back'][0]['arr'];
-            $backFNo = $_POST['segments']['back'][0]['Fno'];
-            $backG = $_POST['segments']['back'][0]['G'];
-            $backDepTime = $_POST['segments']['back'][0]['DepTime'];
-            $backArrTime = $_POST['segments']['back'][0]['ArrTime'];
+			//Go 2
+			$goCr1 = $_POST['segments']['go'][1]['cr'];
+			$goAirSKey1 = $_POST['segments']['go'][1]['airSegKey'];
+			$goBCode1 = $_POST['segments']['go'][1]['bcode'];
+			$goDep1 = $_POST['segments']['go'][1]['dep'];
+			$goArr1 = $_POST['segments']['go'][1]['arr'];
+			$goFNo1 = $_POST['segments']['go'][1]['Fno'];
+			$goG1 = $_POST['segments']['go'][1]['G'];	
+			$goDepTime1 = $_POST['segments']['go'][1]['DepTime'];
+			$goArrTime1  = $_POST['segments']['go'][1]['ArrTime'];
 
-            //Back 2
-            $backCr1 = $_POST['segments']['back'][1]['cr'];
-            $backAirSKey1 = $_POST['segments']['back'][1]['airSegKey'];
-            $backBCode1 = $_POST['segments']['back'][1]['bcode'];
-            $backDep1 = $_POST['segments']['back'][1]['dep'];
-            $backArr1 = $_POST['segments']['back'][1]['arr'];
-            $backFNo1 = $_POST['segments']['back'][1]['Fno'];
-            $backG1 = $_POST['segments']['back'][1]['G'];
-            $backDepTime1 = $_POST['segments']['back'][1]['DepTime'];
-            $backArrTime1 = $_POST['segments']['back'][1]['ArrTime'];
 
-            $From = $_POST['segments']['go'][0]['dep'];
-            $To = $_POST['segments']['go'][1]['arr'];
 
-            $AirSegments = <<<EOM
+			//Back 1
+			$backCr = $_POST['segments']['back'][0]['cr'];
+			$backAirSKey = $_POST['segments']['back'][0]['airSegKey'];
+			$backBCode = $_POST['segments']['back'][0]['bcode'];
+			$backDep = $_POST['segments']['back'][0]['dep'];
+			$backArr = $_POST['segments']['back'][0]['arr'];
+			$backFNo = $_POST['segments']['back'][0]['Fno'];
+			$backG = $_POST['segments']['back'][0]['G'];	
+			$backDepTime = $_POST['segments']['back'][0]['DepTime'];
+			$backArrTime  = $_POST['segments']['back'][0]['ArrTime'];
+
+
+			//Back 2
+			$backCr1 = $_POST['segments']['back'][1]['cr'];
+			$backAirSKey1 = $_POST['segments']['back'][1]['airSegKey'];
+			$backBCode1 = $_POST['segments']['back'][1]['bcode'];
+			$backDep1 = $_POST['segments']['back'][1]['dep'];
+			$backArr1 = $_POST['segments']['back'][1]['arr'];
+			$backFNo1 = $_POST['segments']['back'][1]['Fno'];
+			$backG1 = $_POST['segments']['back'][1]['G'];	
+			$backDepTime1 = $_POST['segments']['back'][1]['DepTime'];
+			$backArrTime1  = $_POST['segments']['back'][1]['ArrTime'];
+
+			$From = $_POST['segments']['go'][0]['dep'];
+			$To = $_POST['segments']['go'][1]['arr'];
+			
+				
+			$AirSegments = <<<EOM
 				<AirSegment Key="$goAirSKey" Group="$goG" Carrier="$goCr" FlightNumber="$goFNo" ProviderCode="1G" Origin="$goDep" Destination="$goArr" DepartureTime="$goDepTime" ArrivalTime="$goArrTime"></AirSegment>
 				<AirSegment Key="$goAirSKey1" Group="$goG1" Carrier="$goCr1" FlightNumber="$goFNo1" ProviderCode="1G" Origin="$goDep1" Destination="$goArr1" DepartureTime="$goDepTime1" ArrivalTime="$goArrTime1"></AirSegment>
 				<AirSegment Key="$backAirSKey" Group="$backG" Carrier="$backCr" FlightNumber="$backFNo" ProviderCode="1G" Origin="$backDep" Destination="$backArr" DepartureTime="$backDepTime" ArrivalTime="$backArrTime"></AirSegment>
 				<AirSegment Key="$backAirSKey1" Group="$backG1" Carrier="$backCr1" FlightNumber="$backFNo1" ProviderCode="1G" Origin="$backDep1" Destination="$backArr1" DepartureTime="$backDepTime1" ArrivalTime="$backArrTime1"></AirSegment>
 		EOM;
 
-        } else if ($segments == '12') {
-            //Go 1
-            $goCr = $_POST['segments']['go'][0]['cr'];
-            $goAirSKey = $_POST['segments']['go'][0]['airSegKey'];
-            $goBCode = $_POST['segments']['go'][0]['bcode'];
-            $goDep = $_POST['segments']['go'][0]['dep'];
-            $goArr = $_POST['segments']['go'][0]['arr'];
-            $goFNo = $_POST['segments']['go'][0]['Fno'];
-            $goG = $_POST['segments']['go'][0]['G'];
-            $goDepTime = $_POST['segments']['go'][0]['DepTime'];
-            $goArrTime = $_POST['segments']['go'][0]['ArrTime'];
+		}else if($segments == '12'){
+			//Go 1
+			$goCr = $_POST['segments']['go'][0]['cr'];
+			$goAirSKey = $_POST['segments']['go'][0]['airSegKey'];
+			$goBCode = $_POST['segments']['go'][0]['bcode'];
+			$goDep = $_POST['segments']['go'][0]['dep'];
+			$goArr = $_POST['segments']['go'][0]['arr'];
+			$goFNo = $_POST['segments']['go'][0]['Fno'];
+			$goG = $_POST['segments']['go'][0]['G'];	
+			$goDepTime = $_POST['segments']['go'][0]['DepTime'];
+			$goArrTime  = $_POST['segments']['go'][0]['ArrTime'];
 
-            //Back 1
-            $backCr = $_POST['segments']['back'][0]['cr'];
-            $backAirSKey = $_POST['segments']['back'][0]['airSegKey'];
-            $backBCode = $_POST['segments']['back'][0]['bcode'];
-            $backDep = $_POST['segments']['back'][0]['dep'];
-            $backArr = $_POST['segments']['back'][0]['arr'];
-            $backFNo = $_POST['segments']['back'][0]['Fno'];
-            $backG = $_POST['segments']['back'][0]['G'];
-            $backDepTime = $_POST['segments']['back'][0]['DepTime'];
-            $backArrTime = $_POST['segments']['back'][0]['ArrTime'];
 
-            //Back 2
-            $backCr1 = $_POST['segments']['back'][1]['cr'];
-            $backAirSKey1 = $_POST['segments']['back'][1]['airSegKey'];
-            $backBCode1 = $_POST['segments']['back'][1]['bcode'];
-            $backDep1 = $_POST['segments']['back'][1]['dep'];
-            $backArr1 = $_POST['segments']['back'][1]['arr'];
-            $backFNo1 = $_POST['segments']['back'][1]['Fno'];
-            $backG1 = $_POST['segments']['back'][1]['G'];
-            $backDepTime1 = $_POST['segments']['back'][1]['DepTime'];
-            $backArrTime1 = $_POST['segments']['back'][1]['ArrTime'];
+			//Back 1
+			$backCr = $_POST['segments']['back'][0]['cr'];
+			$backAirSKey = $_POST['segments']['back'][0]['airSegKey'];
+			$backBCode = $_POST['segments']['back'][0]['bcode'];
+			$backDep = $_POST['segments']['back'][0]['dep'];
+			$backArr = $_POST['segments']['back'][0]['arr'];
+			$backFNo = $_POST['segments']['back'][0]['Fno'];
+			$backG = $_POST['segments']['back'][0]['G'];	
+			$backDepTime = $_POST['segments']['back'][0]['DepTime'];
+			$backArrTime  = $_POST['segments']['back'][0]['ArrTime'];
 
-            $From = $_POST['segments']['go'][0]['dep'];
-            $To = $_POST['segments']['go'][0]['arr'];
 
-            $AirSegments = <<<EOM
+			//Back 2
+			$backCr1 = $_POST['segments']['back'][1]['cr'];
+			$backAirSKey1 = $_POST['segments']['back'][1]['airSegKey'];
+			$backBCode1 = $_POST['segments']['back'][1]['bcode'];
+			$backDep1 = $_POST['segments']['back'][1]['dep'];
+			$backArr1 = $_POST['segments']['back'][1]['arr'];
+			$backFNo1 = $_POST['segments']['back'][1]['Fno'];
+			$backG1 = $_POST['segments']['back'][1]['G'];	
+			$backDepTime1 = $_POST['segments']['back'][1]['DepTime'];
+			$backArrTime1  = $_POST['segments']['back'][1]['ArrTime'];
+
+			$From = $_POST['segments']['go'][0]['dep'];
+			$To = $_POST['segments']['go'][0]['arr'];
+			
+				
+			$AirSegments = <<<EOM
 				<AirSegment Key="$goAirSKey" Group="$goG" Carrier="$goCr" FlightNumber="$goFNo" ProviderCode="1G" Origin="$goDep" Destination="$goArr" DepartureTime="$goDepTime" ArrivalTime="$goArrTime"></AirSegment>
 				<AirSegment Key="$backAirSKey" Group="$backG" Carrier="$backCr" FlightNumber="$backFNo" ProviderCode="1G" Origin="$backDep" Destination="$backArr" DepartureTime="$backDepTime" ArrivalTime="$backArrTime"></AirSegment>
 				<AirSegment Key="$backAirSKey1" Group="$backG1" Carrier="$backCr1" FlightNumber="$backFNo1" ProviderCode="1G" Origin="$backDep1" Destination="$backArr1" DepartureTime="$backDepTime1" ArrivalTime="$backArrTime1"></AirSegment>
 		EOM;
-        } else if ($segments == '21') {
-            //Go 1
-            $goCr = $_POST['segments']['go'][0]['cr'];
-            $goAirSKey = $_POST['segments']['go'][0]['airSegKey'];
-            $goBCode = $_POST['segments']['go'][0]['bcode'];
-            $goDep = $_POST['segments']['go'][0]['dep'];
-            $goArr = $_POST['segments']['go'][0]['arr'];
-            $goFNo = $_POST['segments']['go'][0]['Fno'];
-            $goG = $_POST['segments']['go'][0]['G'];
-            $goDepTime = $_POST['segments']['go'][0]['DepTime'];
-            $goArrTime = $_POST['segments']['go'][0]['ArrTime'];
+		}else if($segments == '21'){
+			//Go 1
+			$goCr = $_POST['segments']['go'][0]['cr'];
+			$goAirSKey = $_POST['segments']['go'][0]['airSegKey'];
+			$goBCode = $_POST['segments']['go'][0]['bcode'];
+			$goDep = $_POST['segments']['go'][0]['dep'];
+			$goArr = $_POST['segments']['go'][0]['arr'];
+			$goFNo = $_POST['segments']['go'][0]['Fno'];
+			$goG = $_POST['segments']['go'][0]['G'];	
+			$goDepTime = $_POST['segments']['go'][0]['DepTime'];
+			$goArrTime  = $_POST['segments']['go'][0]['ArrTime'];
 
-            //Go 2
-            $goCr1 = $_POST['segments']['go'][1]['cr'];
-            $goAirSKey1 = $_POST['segments']['go'][1]['airSegKey'];
-            $goBCode1 = $_POST['segments']['go'][1]['bcode'];
-            $goDep1 = $_POST['segments']['go'][1]['dep'];
-            $goArr1 = $_POST['segments']['go'][1]['arr'];
-            $goFNo1 = $_POST['segments']['go'][1]['Fno'];
-            $goG1 = $_POST['segments']['go'][1]['G'];
-            $goDepTime1 = $_POST['segments']['go'][1]['DepTime'];
-            $goArrTime1 = $_POST['segments']['go'][1]['ArrTime'];
 
-            //Back 1
-            $backCr = $_POST['segments']['back'][0]['cr'];
-            $backAirSKey = $_POST['segments']['back'][0]['airSegKey'];
-            $backBCode = $_POST['segments']['back'][0]['bcode'];
-            $backDep = $_POST['segments']['back'][0]['dep'];
-            $backArr = $_POST['segments']['back'][0]['arr'];
-            $backFNo = $_POST['segments']['back'][0]['Fno'];
-            $backG = $_POST['segments']['back'][0]['G'];
-            $backDepTime = $_POST['segments']['back'][0]['DepTime'];
-            $backArrTime = $_POST['segments']['back'][0]['ArrTime'];
+			//Go 2
+			$goCr1 = $_POST['segments']['go'][1]['cr'];
+			$goAirSKey1 = $_POST['segments']['go'][1]['airSegKey'];
+			$goBCode1 = $_POST['segments']['go'][1]['bcode'];
+			$goDep1 = $_POST['segments']['go'][1]['dep'];
+			$goArr1 = $_POST['segments']['go'][1]['arr'];
+			$goFNo1 = $_POST['segments']['go'][1]['Fno'];
+			$goG1 = $_POST['segments']['go'][1]['G'];	
+			$goDepTime1 = $_POST['segments']['go'][1]['DepTime'];
+			$goArrTime1  = $_POST['segments']['go'][1]['ArrTime'];
 
-            $From = $_POST['segments']['go'][0]['dep'];
-            $To = $_POST['segments']['go'][1]['arr'];
 
-            $AirSegments = <<<EOM
+
+			//Back 1
+			$backCr = $_POST['segments']['back'][0]['cr'];
+			$backAirSKey = $_POST['segments']['back'][0]['airSegKey'];
+			$backBCode = $_POST['segments']['back'][0]['bcode'];
+			$backDep = $_POST['segments']['back'][0]['dep'];
+			$backArr = $_POST['segments']['back'][0]['arr'];
+			$backFNo = $_POST['segments']['back'][0]['Fno'];
+			$backG = $_POST['segments']['back'][0]['G'];	
+			$backDepTime = $_POST['segments']['back'][0]['DepTime'];
+			$backArrTime  = $_POST['segments']['back'][0]['ArrTime'];
+
+
+			$From = $_POST['segments']['go'][0]['dep'];
+			$To = $_POST['segments']['go'][1]['arr'];
+			
+				
+			$AirSegments = <<<EOM
 				<AirSegment Key="$goAirSKey" Group="$goG" Carrier="$goCr" FlightNumber="$goFNo" ProviderCode="1G" Origin="$goDep" Destination="$goArr" DepartureTime="$goDepTime" ArrivalTime="$goArrTime"></AirSegment>
 				<AirSegment Key="$goAirSKey1" Group="$goG1" Carrier="$goCr1" FlightNumber="$goFNo1" ProviderCode="1G" Origin="$goDep1" Destination="$goArr1" DepartureTime="$goDepTime1" ArrivalTime="$goArrTime1"></AirSegment>
 				<AirSegment Key="$backAirSKey" Group="$backG" Carrier="$backCr" FlightNumber="$backFNo" ProviderCode="1G" Origin="$backDep" Destination="$backArr" DepartureTime="$backDepTime" ArrivalTime="$backArrTime"></AirSegment>
-
+				
 		EOM;
-        }
+		}
 
-        if ($adult > 0 && $child > 0 && $infants > 0) {
 
-            $AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
-            $AdultgoFareInfoKey = $_POST['adult'][0]['goFareInfoRef'];
-            $AdultbackFareInfoKey = $_POST['adult'][0]['backFareInfoRef'];
+		if($adult > 0 && $child> 0 && $infants> 0){
+			
+			$AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
+			$AdultgoFareInfoKey = $_POST['adult'][0]['goFareInfoRef'];
+			$AdultbackFareInfoKey = $_POST['adult'][0]['backFareInfoRef'];
 
-            for ($x = 0; $x < $adult; $x++) {
+			
+			for($x = 0 ; $x < $adult; $x++){
 
-                ${'afName' . $x} = $_POST['adult'][$x]["afName"];
-                ${'alName' . $x} = $_POST['adult'][$x]["alName"];
-                ${'agender' . $x} = $_POST['adult'][$x]["agender"];
-                ${'adob' . $x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
-                ${'apassNo' . $x} = $_POST['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
-                ${'apassNation' . $x} = $_POST['adult'][$x]["apassNation"];
-                if (${'agender' . $x} = 'M') {
-                    $atitle = 'Mr';
-                } else {
-                    $atitle = 'Mrs';
-                }
+				${'afName'.$x} = $_POST['adult'][$x]["afName"];
+				${'alName'.$x} = $_POST['adult'][$x]["alName"];
+				${'agender'.$x} = $_POST['adult'][$x]["agender"];
+				${'adob'.$x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
+				${'apassNo'.$x} = $_POST['adult'][$x]["apassNo"];
+				${'apassEx'.$x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
+				${'apassNation'.$x} = $_POST['adult'][$x]["apassNation"];
+				if(${'agender'.$x} = 'M'){
+					$atitle = 'Mr';
+				}else{
+					$atitle = 'Mrs';
+				}
 
-                //Flight Info
 
-                $AdultPassengerItem = <<<EOM
+				//Flight Info
+				
+
+				$AdultPassengerItem=<<<EOM
 								<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="ADT$x" TravelerType="ADT" Gender="${'agender'.$x}" Nationality="${'apassNation'.$x}">
 									<BookingTravelerName Prefix="$atitle" First="${'afName'.$x} " Last="${'alName'.$x}" />
 									<SSR Type="DOCS" Status="HK" FreeText="P/${'apassNation'.$x}/${'apassNo'.$x}/${'apassNation'.$x}/${'adob'.$x}/${'agender'.$x}/${'apassEx'.$x}/${'alName'.$x}/${'afName'.$x} " Carrier="$goCr" />
 								</BookingTraveler>
 							EOM;
+				
+				array_push($AllPassenger, $AdultPassengerItem);
 
-                array_push($AllPassenger, $AdultPassengerItem);
 
-                $AdultPassengerTypeItem = <<<EOM
+				$AdultPassengerTypeItem =<<<EOM
 							<PassengerType Code="ADT"  BookingTravelerRef="ADT$x" />
 				EOM;
 
-                array_push($AdultPassengerType, $AdultPassengerTypeItem);
+				array_push($AdultPassengerType, $AdultPassengerTypeItem);
+						
+			}
 
-            }
+			
 
-            $AirPriceInfoKey1 = $_POST['child'][0]['AirFareInfo'];
-            $ChildgoFareInfoKey = $_POST['child'][0]['goFareInfoRef'];
-            $ChildbackFareInfoKey = $_POST['child'][0]['backFareInfoRef'];
+			$AirPriceInfoKey1 = $_POST['child'][0]['AirFareInfo'];
+			$ChildgoFareInfoKey = $_POST['child'][0]['goFareInfoRef'];
+			$ChildbackFareInfoKey = $_POST['child'][0]['backFareInfoRef'];
 
-            for ($x = 0; $x < $child; $x++) {
+			
+			for($x = 0 ; $x < $child; $x++){
 
-                ${'cfName' . $x} = $_POST['child'][$x]["cfName"];
-                ${'clName' . $x} = $_POST['child'][$x]["clName"];
-                ${'cgender' . $x} = $_POST['child'][$x]["cgender"];
-                ${'cdob' . $x} = $_POST['child'][$x]["cdob"];
-                ${'cpassNo' . $x} = $_POST['child'][$x]["cpassNo"];
-                ${'cpassEx' . $x} = $_POST['child'][$x]["cpassEx"];
-                ${'cpassNation' . $x} = $_POST['child'][$x]["cpassNation"];
+				${'cfName'.$x} = $_POST['child'][$x]["cfName"];
+				${'clName'.$x} = $_POST['child'][$x]["clName"];
+				${'cgender'.$x} = $_POST['child'][$x]["cgender"];
+				${'cdob'.$x} = $_POST['child'][$x]["cdob"];
+				${'cpassNo'.$x} = $_POST['child'][$x]["cpassNo"];
+				${'cpassEx'.$x} = $_POST['child'][$x]["cpassEx"];
+				${'cpassNation'.$x} = $_POST['child'][$x]["cpassNation"];
 
-                if (${'cgender' . $x} = 'M') {
-                    $ctitle = 'Mr';
-                } else {
-                    $ctitle = 'Miss';
-                }
+				if(${'cgender'.$x} = 'M'){
+					$ctitle = 'Mr';
+				}else{
+					$ctitle = 'Miss';
+				}
 
-                //Flight Info
 
-                $ChildPassengerItem = <<<EOM
+				//Flight Info
+				
+
+				$ChildPassengerItem=<<<EOM
 								<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="CNN$x" TravelerType="CNN" Gender="${'cgender'.$x}" Nationality="${'cpassNation'.$x}">
 									<BookingTravelerName Prefix="$ctitle" First="${'cfName'.$x} " Last="${'clName'.$x}" />
 									<SSR Type="DOCS" Status="HK" FreeText="P/${'cpassNation'.$x}/${'cpassNo'.$x}/${'cpassNation'.$x}/${'cdob'.$x}/${'cgender'.$x}/${'cpassEx'.$x}/${'clName'.$x}/${'cfName'.$x} " Carrier="$goCr" />
 								</BookingTraveler>
 							EOM;
+				
+							array_push($AllPassenger, $ChildPassengerItem);
 
-                array_push($AllPassenger, $ChildPassengerItem);
 
-                $ChildPassengerTypeItem = <<<EOM
+				$ChildPassengerTypeItem =<<<EOM
 							<PassengerType Code="CNN"  BookingTravelerRef="CNN$x" />
 				EOM;
 
-                array_push($ChildPassengerType, $ChildPassengerTypeItem);
+				array_push($ChildPassengerType, $ChildPassengerTypeItem);
+					
+			}
 
-            }
 
-            $AirPriceInfoKey2 = $_POST['infant'][0]['AirFareInfo'];
-            $InfantgoFareInfoKey = $_POST['infant'][0]['goFareInfoRef'];
-            $InfantbackFareInfoKey = $_POST['infant'][0]['backFareInfoRef'];
+			$AirPriceInfoKey2 = $_POST['infant'][0]['AirFareInfo'];
+			$InfantgoFareInfoKey = $_POST['infant'][0]['goFareInfoRef'];
+			$InfantbackFareInfoKey = $_POST['infant'][0]['backFareInfoRef'];
 
-            for ($x = 0; $x < $infants; $x++) {
+			
+			for($x = 0 ; $x < $infants; $x++){
 
-                ${'ifName' . $x} = $_POST['infant'][$x]["ifName"];
-                ${'ilName' . $x} = $_POST['infant'][$x]["ilName"];
-                ${'igender' . $x} = $_POST['infant'][$x]["igender"];
-                ${'idob' . $x} = date("dMy", strtotime($_POST['infant'][$x]["idob"]));
-                ${'ipassNo' . $x} = $_POST['infant'][$x]["ipassNo"];
-                ${'ipassEx' . $x} = date("dMy", strtotime($_POST['infant'][$x]["ipassEx"]));
-                ${'ipassNation' . $x} = $_POST['infant'][$x]["ipassNation"];
+				${'ifName'.$x} = $_POST['infant'][$x]["ifName"];
+				${'ilName'.$x} = $_POST['infant'][$x]["ilName"];
+				${'igender'.$x} = $_POST['infant'][$x]["igender"];
+				${'idob'.$x} = date("dMy", strtotime($_POST['infant'][$x]["idob"]));
+				${'ipassNo'.$x} = $_POST['infant'][$x]["ipassNo"];
+				${'ipassEx'.$x} = date("dMy", strtotime($_POST['infant'][$x]["ipassEx"]));
+				${'ipassNation'.$x} = $_POST['infant'][$x]["ipassNation"];
 
-                if (${'igender' . $x} = 'M') {
-                    $ititle = 'Master';
-                } else {
-                    $ititle = 'Miss';
-                }
+				if(${'igender'.$x} = 'M'){
+					$ititle = 'Master';
+				}else{
+					$ititle = 'Miss';
+				}
 
-                //Flight Info
 
-                $InfantPassengerItem = <<<EOM
+				//Flight Info
+				
+
+				$InfantPassengerItem=<<<EOM
 								<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="INF$x" TravelerType="INF" Gender="${'igender'.$x}" Nationality="${'ipassNation'.$x}">
 									<BookingTravelerName Prefix="$ctitle" First="${'ifName'.$x} " Last="${'ilName'.$x}" />
 									<SSR Type="DOCS" Status="HK" FreeText="P/${'ipassNation'.$x}/${'ipassNo'.$x}/${'ipassNation'.$x}/${'idob'.$x}/${'igender'.$x}/${'ipassEx'.$x}/${'ilName'.$x}/${'ifName'.$x} " Carrier="$goCr" />
@@ -3228,60 +2730,66 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 									</NameRemark>
 								</BookingTraveler>
 							EOM;
+				
+							array_push($AllPassenger, $InfantPassengerItem);
 
-                array_push($AllPassenger, $InfantPassengerItem);
 
-                $InfantPassengerTypeItem = <<<EOM
+				$InfantPassengerTypeItem =<<<EOM
 							<PassengerType Code="INF"  BookingTravelerRef="INF$x" />
 				EOM;
 
-                array_push($InfantPassengerType, $InfantPassengerTypeItem);
+				array_push($InfantPassengerType, $InfantPassengerTypeItem);
+						
+			}
 
-            }
+			
 
-            $AdultPassengerTypeAll = implode(" ", $AdultPassengerType);
-            $ChildPassengerTypeAll = implode(" ", $ChildPassengerType);
-            $InfantPassengerTypeAll = implode(" ", $InfantPassengerType);
+				$AdultPassengerTypeAll = implode(" ",$AdultPassengerType); 
+				$ChildPassengerTypeAll = implode(" ",$ChildPassengerType); 
+				$InfantPassengerTypeAll = implode(" ",$InfantPassengerType);
 
-            if ($segment == 1) {
-                $AdultBookingCode = <<<EOM
+
+				if($segment == 1){
+					$AdultBookingCode=<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$AdultgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$AdultbackFareInfoKey" SegmentRef="$backAirSKey" />
 						EOM;
-                $ChildBookingCode = <<<EOM
+					$ChildBookingCode=<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$ChildgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$ChildbackFareInfoKey" SegmentRef="$backAirSKey" />
 					EOM;
-                $InfantBookingCode = <<<EOM
+					$InfantBookingCode=<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$InfantgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$InfantbackFareInfoKey" SegmentRef="$backAirSKey" />
 						EOM;
 
-            } else if ($segment == 2) {
+					
+				}else if($segment == 2){	
 
-                $AdultBookingCode = <<<EOM
+					$AdultBookingCode =<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$AdultgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$goBCode1" FareInfoRef="$AdultgoFareInfoKey" SegmentRef="$goAirSKey1" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$AdultbackFareInfoKey" SegmentRef="$backAirSKey" />
 							<BookingInfo BookingCode="$backBCode1" FareInfoRef="$AdultbackFareInfoKey" SegmentRef="$backAirSKey1" />
 						EOM;
-
-                $ChildBookingCode = <<<EOM
+					
+					$ChildBookingCode =<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$ChildgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$goBCode1" FareInfoRef="$ChildgoFareInfoKey" SegmentRef="$goAirSKey1" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$ChildbackFareInfoKey" SegmentRef="$backAirSKey" />
 							<BookingInfo BookingCode="$backBCode1" FareInfoRef="$ChildbackFareInfoKey" SegmentRef="$backAirSKey1" />
 						EOM;
-
-                $InfantBookingCode = <<<EOM
+						
+					$InfantBookingCode =<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$InfantgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$goBCode1" FareInfoRef="$InfantgoFareInfoKey" SegmentRef="$goAirSKey1" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$InfantbackFareInfoKey" SegmentRef="$backAirSKey" />
 							<BookingInfo BookingCode="$backBCode1" FareInfoRef="$InfantbackFareInfoKey" SegmentRef="$backAirSKey1" />
 						EOM;
-            }
+				}
+			
 
-            $AirPricingSolution = <<<EOM
+				$AirPricingSolution = <<<EOM
 				<AirPricingSolution Key="$AirPricingSolutionKey" xmlns="http://www.travelport.com/schema/air_v51_0">
 						$AirSegments
 						<AirPricingInfo Key="$AirPriceInfoKey" PricingMethod="Guaranteed" PlatingCarrier="$goCr" ProviderCode="1G">
@@ -3302,10 +2810,10 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 							$InfantBookingCode
 							$InfantPassengerTypeAll
 					</AirPricingInfo>
-				</AirPricingSolution>
+				</AirPricingSolution>	
 		EOM;
 
-            $AirPricingTicketingModifiers = <<<EOM
+			$AirPricingTicketingModifiers=<<<EOM
 				<AirPricingTicketingModifiers xmlns="http://www.travelport.com/schema/air_v51_0">
 					<AirPricingInfoRef Key="$AirPriceInfoKey" />
 					<TicketingModifiers>
@@ -3325,119 +2833,132 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 					</TicketingModifiers>
 				</AirPricingTicketingModifiers>
 			EOM;
+				
+		}else if($adult > 0 && $child > 0){
+			
+			$AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
+			$AdultgoFareInfoKey = $_POST['adult'][0]['goFareInfoRef'];
+			$AdultbackFareInfoKey = $_POST['adult'][0]['backFareInfoRef'];
 
-        } else if ($adult > 0 && $child > 0) {
+			
+			for($x = 0 ; $x < $adult; $x++){
 
-            $AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
-            $AdultgoFareInfoKey = $_POST['adult'][0]['goFareInfoRef'];
-            $AdultbackFareInfoKey = $_POST['adult'][0]['backFareInfoRef'];
+				${'afName'.$x} = $_POST['adult'][$x]["afName"];
+				${'alName'.$x} = $_POST['adult'][$x]["alName"];
+				${'agender'.$x} = $_POST['adult'][$x]["agender"];
+				${'adob'.$x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
+				${'apassNo'.$x} = $_POST['adult'][$x]["apassNo"];
+				${'apassEx'.$x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
+				${'apassNation'.$x} = $_POST['adult'][$x]["apassNation"];
 
-            for ($x = 0; $x < $adult; $x++) {
+				if(${'agender'.$x} = 'M'){
+					$atitle = 'Mr';
+				}else{
+					$atitle = 'Mrs';
+				}
 
-                ${'afName' . $x} = $_POST['adult'][$x]["afName"];
-                ${'alName' . $x} = $_POST['adult'][$x]["alName"];
-                ${'agender' . $x} = $_POST['adult'][$x]["agender"];
-                ${'adob' . $x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
-                ${'apassNo' . $x} = $_POST['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
-                ${'apassNation' . $x} = $_POST['adult'][$x]["apassNation"];
 
-                if (${'agender' . $x} = 'M') {
-                    $atitle = 'Mr';
-                } else {
-                    $atitle = 'Mrs';
-                }
+				//Flight Info
+				
 
-                //Flight Info
-
-                $AdultPassengerItem = <<<EOM
+				$AdultPassengerItem=<<<EOM
 								<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="ADT$x" TravelerType="ADT" Gender="${'agender'.$x}" Nationality="${'apassNation'.$x}">
 									<BookingTravelerName Prefix="$atitle" First="${'afName'.$x} " Last="${'alName'.$x}" />
 									<SSR Type="DOCS" Status="HK" FreeText="P/${'apassNation'.$x}/${'apassNo'.$x}/${'apassNation'.$x}/${'adob'.$x}/${'agender'.$x}/${'apassEx'.$x}/${'alName'.$x}/${'afName'.$x} " Carrier="$goCr" />
 								</BookingTraveler>
 							EOM;
+				
+							array_push($AllPassenger, $AdultPassengerItem);
 
-                array_push($AllPassenger, $AdultPassengerItem);
 
-                $AdultPassengerTypeItem = <<<EOM
+				$AdultPassengerTypeItem =<<<EOM
 							<PassengerType Code="ADT"  BookingTravelerRef="ADT$x" />
 				EOM;
 
-                array_push($AdultPassengerType, $AdultPassengerTypeItem);
+				array_push($AdultPassengerType, $AdultPassengerTypeItem);
+						
+			}
 
-            }
+			
+			$AirPriceInfoKey1 = $_POST['child'][0]['AirFareInfo'];
+			$ChildgoFareInfoKey = $_POST['child'][0]['goFareInfoRef'];
+			$ChildbackFareInfoKey = $_POST['child'][0]['backFareInfoRef'];
 
-            $AirPriceInfoKey1 = $_POST['child'][0]['AirFareInfo'];
-            $ChildgoFareInfoKey = $_POST['child'][0]['goFareInfoRef'];
-            $ChildbackFareInfoKey = $_POST['child'][0]['backFareInfoRef'];
+			
+			for($x = 0 ; $x < $child; $x++){
 
-            for ($x = 0; $x < $child; $x++) {
+				${'cfName'.$x} = $_POST['child'][$x]["cfName"];
+				${'clName'.$x} = $_POST['child'][$x]["clName"];
+				${'cgender'.$x} = $_POST['child'][$x]["cgender"];
+				${'cdob'.$x} = date("dMy", strtotime($_POST['child'][$x]["cdob"]));
+				${'cpassNo'.$x} = $_POST['child'][$x]["cpassNo"];
+				${'cpassEx'.$x} = date("dMy", strtotime($_POST['child'][$x]["cpassEx"]));
+				${'cpassNation'.$x} = $_POST['child'][$x]["cpassNation"];
 
-                ${'cfName' . $x} = $_POST['child'][$x]["cfName"];
-                ${'clName' . $x} = $_POST['child'][$x]["clName"];
-                ${'cgender' . $x} = $_POST['child'][$x]["cgender"];
-                ${'cdob' . $x} = date("dMy", strtotime($_POST['child'][$x]["cdob"]));
-                ${'cpassNo' . $x} = $_POST['child'][$x]["cpassNo"];
-                ${'cpassEx' . $x} = date("dMy", strtotime($_POST['child'][$x]["cpassEx"]));
-                ${'cpassNation' . $x} = $_POST['child'][$x]["cpassNation"];
+				if(${'cgender'.$x} = 'M'){
+					$ctitle = 'MASTER';
+				}else{
+					$ctitle = 'Miss';
+				}
 
-                if (${'cgender' . $x} = 'M') {
-                    $ctitle = 'MASTER';
-                } else {
-                    $ctitle = 'Miss';
-                }
 
-                //Flight Info
+				//Flight Info
+				
 
-                $ChildPassengerItem = <<<EOM
+				$ChildPassengerItem=<<<EOM
 								<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="CNN$x" TravelerType="CNN" Gender="${'cgender'.$x}" Nationality="${'cpassNation'.$x}">
 									<BookingTravelerName Prefix="$ctitle" First="${'cfName'.$x} " Last="${'clName'.$x}" />
 									<SSR Type="DOCS" Status="HK" FreeText="P/${'cpassNation'.$x}/${'cpassNo'.$x}/${'cpassNation'.$x}/${'cdob'.$x}/${'cgender'.$x}/${'cpassEx'.$x}/${'clName'.$x}/${'cfName'.$x}" Carrier="$goCr" />
 								</BookingTraveler>
 							EOM;
+				
+							array_push($AllPassenger, $ChildPassengerItem);
 
-                array_push($AllPassenger, $ChildPassengerItem);
 
-                $ChildPassengerTypeItem = <<<EOM
+				$ChildPassengerTypeItem =<<<EOM
 							<PassengerType Code="CNN"  BookingTravelerRef="CNN$x" />
 				EOM;
 
-                array_push($ChildPassengerType, $ChildPassengerTypeItem);
+				array_push($ChildPassengerType, $ChildPassengerTypeItem);
+						
+			}
 
-            }
 
-            $AdultPassengerTypeAll = implode(" ", $AdultPassengerType);
-            $ChildPassengerTypeAll = implode(" ", $ChildPassengerType);
 
-            if ($segment == 1) {
-                $AdultBookingCode = <<<EOM
+				$AdultPassengerTypeAll = implode(" ",$AdultPassengerType);
+				$ChildPassengerTypeAll = implode(" ",$ChildPassengerType);
+
+				if($segment == 1){
+					$AdultBookingCode=<<<EOM
 							<BookingInfo BookingCode="$goBCode"  FareInfoRef="$AdultgoFareInfoKey"  SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$backBCode"  FareInfoRef="$AdultbackFareInfoKey"  SegmentRef="$backAirSKey" />
 						EOM;
-                $ChildBookingCode = <<<EOM
+					$ChildBookingCode=<<<EOM
 						<BookingInfo BookingCode="$goBCode"  FareInfoRef="$ChildgoFareInfoKey"  SegmentRef="$goAirSKey" />
 						<BookingInfo BookingCode="$backBCode"  FareInfoRef="$ChildbackFareInfoKey"  SegmentRef="$backAirSKey" />
 					EOM;
 
-            } else if ($segment == 2) {
+					
+				}else if($segment == 2){	
 
-                $AdultBookingCode = <<<EOM
+					$AdultBookingCode =<<<EOM
 							<BookingInfo BookingCode="$goBCode"  FareInfoRef="$AdultgoFareInfoKey"  SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$goBCode"  FareInfoRef="$AdultgoFareInfoKey"  SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$backBCode"  FareInfoRef="$AdultbackFareInfoKey"  SegmentRef="$backAirSKey" />
 							<BookingInfo BookingCode="$backBCode"  FareInfoRef="$AdultbackFareInfoKey"  SegmentRef="$backAirSKey" />
 						EOM;
-
-                $ChildBookingCode = <<<EOM
-							<BookingInfo BookingCode="$goBCode"  FareInfoRef="$ChildgoFareInfoKey"  SegmentRef="$goAirSKey" />
+					
+					$ChildBookingCode =<<<EOM
+							<BookingInfo BookingCode="$goBCode"  FareInfoRef="$ChildgoFareInfoKey"  SegmentRef="$goAirSKey" />				
 							<BookingInfo BookingCode="$goBCode"  FareInfoRef="$ChildgoFareInfoKey"  SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$backBCode"  FareInfoRef="$ChildbackFareInfoKey"  SegmentRef="$backAirSKey" />
 							<BookingInfo BookingCode="$backBCode"  FareInfoRef="$ChildbackFareInfoKey"  SegmentRef="$backAirSKey" />
 						EOM;
+						
+				}
+			
 
-            }
-
-            $AirPricingSolution = <<<EOM
+				$AirPricingSolution = <<<EOM
 				<AirPricingSolution Key="$AirPricingSolutionKey" xmlns="http://www.travelport.com/schema/air_v51_0">
 						$AirSegments
 					<AirPricingInfo Key="$AirPriceInfoKey" PricingMethod="Guaranteed" PlatingCarrier="$goCr" ProviderCode="1G">
@@ -3452,10 +2973,10 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 							$ChildBookingCode
 							$ChildPassengerTypeAll
 					</AirPricingInfo>
-				</AirPricingSolution>
+				</AirPricingSolution>	
 		EOM;
 
-            $AirPricingTicketingModifiers = <<<EOM
+			$AirPricingTicketingModifiers=<<<EOM
 				<AirPricingTicketingModifiers xmlns="http://www.travelport.com/schema/air_v51_0">
 					<AirPricingInfoRef Key="$AirPriceInfoKey" />
 					<TicketingModifiers>
@@ -3470,72 +2991,86 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 				</AirPricingTicketingModifiers>
 			EOM;
 
-        } else if ($adult > 0 && $infants > 0) {
+			
+			
+		}else if($adult > 0 && $infants > 0){
 
-            $AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
-            $AdultgoFareInfoKey = $_POST['adult'][0]['goFareInfoRef'];
-            $AdultbackFareInfoKey = $_POST['adult'][0]['backFareInfoRef'];
+			$AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
+			$AdultgoFareInfoKey = $_POST['adult'][0]['goFareInfoRef'];
+			$AdultbackFareInfoKey = $_POST['adult'][0]['backFareInfoRef'];
 
-            for ($x = 0; $x < $adult; $x++) {
+			
+			for($x = 0 ; $x < $adult; $x++){
 
-                ${'afName' . $x} = $_POST['adult'][$x]["afName"];
-                ${'alName' . $x} = $_POST['adult'][$x]["alName"];
-                ${'agender' . $x} = $_POST['adult'][$x]["agender"];
-                ${'adob' . $x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
-                ${'apassNo' . $x} = $_POST['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
-                ${'apassNation' . $x} = $_POST['adult'][$x]["apassNation"];
+				${'afName'.$x} = $_POST['adult'][$x]["afName"];
+				${'alName'.$x} = $_POST['adult'][$x]["alName"];
+				${'agender'.$x} = $_POST['adult'][$x]["agender"];
+				${'adob'.$x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
+				${'apassNo'.$x} = $_POST['adult'][$x]["apassNo"];
+				${'apassEx'.$x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
+				${'apassNation'.$x} = $_POST['adult'][$x]["apassNation"];
 
-                if (${'agender' . $x} = 'M') {
-                    $atitle = 'Mr';
-                } else {
-                    $atitle = 'Mrs';
-                }
+				if(${'agender'.$x} = 'M'){
+					$atitle = 'Mr';
+				}else{
+					$atitle = 'Mrs';
+				}
 
-                //Flight Info
 
-                $AdultPassengerItem = <<<EOM
+				//Flight Info
+				
+
+				$AdultPassengerItem=<<<EOM
 								<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="ADT$x" TravelerType="ADT" Gender="${'agender'.$x}" Nationality="${'apassNation'.$x}">
 									<BookingTravelerName Prefix="$atitle" First="${'afName'.$x}  "  Last="${'alName'.$x}" />
 									<SSR Type="DOCS" Status="HK" FreeText="P/${'apassNation'.$x}/${'apassNo'.$x}/${'apassNation'.$x}/${'adob'.$x}/${'agender'.$x}/${'apassEx'.$x}/${'alName'.$x}/${'afName'.$x} " Carrier="$goCr" />
 								</BookingTraveler>
 							EOM;
+				
+				array_push($AllPassenger, $AdultPassengerItem);
 
-                array_push($AllPassenger, $AdultPassengerItem);
 
-                $AdultPassengerTypeItem = <<<EOM
+				$AdultPassengerTypeItem =<<<EOM
 							<PassengerType Code="ADT"  BookingTravelerRef="ADT$x" />
 				EOM;
 
-                array_push($AdultPassengerType, $AdultPassengerTypeItem);
+				array_push($AdultPassengerType, $AdultPassengerTypeItem);
+						
+			}
 
-            }
 
-            //INFANTS
+			
 
-            $AirPriceInfoKey1 = $_POST['child'][0]['airPriceInfoKey'];
-            $InfantgoFareInfoKey = $_POST['child'][0]['gocfInfoKeygo'];
-            $InfantbackFareInfoKey = $_POST['child'][0]['backcfInfoKeyback'];
+			
+			//INFANTS
 
-            for ($x = 0; $x < $infants; $x++) {
+			$AirPriceInfoKey1 = $_POST['child'][0]['airPriceInfoKey'];
+			$InfantgoFareInfoKey = $_POST['child'][0]['gocfInfoKeygo'];
+			$InfantbackFareInfoKey = $_POST['child'][0]['backcfInfoKeyback'];
 
-                ${'ifName' . $x} = $_POST['infant'][$x]["ifName"];
-                ${'ilName' . $x} = $_POST['infant'][$x]["ilName"];
-                ${'igender' . $x} = $_POST['infant'][$x]["igender"];
-                ${'idob' . $x} = date("dMy", strtotime($_POST['infant'][$x]["idob"]));
-                ${'ipassNo' . $x} = $_POST['infant'][$x]["ipassNo"];
-                ${'ipassEx' . $x} = date("dMy", strtotime($_POST['infant'][$x]["ipassEx"]));
-                ${'ipassNation' . $x} = $_POST['infant'][$x]["ipassNation"];
+			
+			for($x = 0 ; $x < $infants; $x++){
 
-                if (${'igender' . $x} = 'M') {
-                    $ititle = 'Master';
-                } else {
-                    $ititle = 'Miss';
-                }
+				${'ifName'.$x} = $_POST['infant'][$x]["ifName"];
+				${'ilName'.$x} = $_POST['infant'][$x]["ilName"];
+				${'igender'.$x} = $_POST['infant'][$x]["igender"];
+				${'idob'.$x} = date("dMy", strtotime($_POST['infant'][$x]["idob"]));
+				${'ipassNo'.$x} = $_POST['infant'][$x]["ipassNo"];
+				${'ipassEx'.$x} = date("dMy", strtotime($_POST['infant'][$x]["ipassEx"]));
+				${'ipassNation'.$x} = $_POST['infant'][$x]["ipassNation"];
 
-                //Flight Info
+				if(${'igender'.$x} = 'M'){
+					$ititle = 'Master';
+				}else{
+					$ititle = 'Miss';
+				}
 
-                $InfantPassengerItem = <<<EOM
+
+
+				//Flight Info
+				
+
+				$InfantPassengerItem=<<<EOM
 								<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="INF$x" TravelerType="INF" Gender="${'igender'.$x}" Nationality="${'ipassNation'.$x}">
 									<BookingTravelerName Prefix="$ititle" First="${'ifName'.$x} " Last="${'ilName'.$x}" />
 									<SSR Type="DOCS" Status="HK" FreeText="P/${'ipassNation'.$x}/${'ipassNo'.$x}/${'ipassNation'.$x}/${'idob'.$x}/${'igender'.$x}/${'ipassEx'.$x}/${'ilName'.$x}/${'ifName'.$x} " Carrier="$goCr" />
@@ -3544,49 +3079,57 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 									</NameRemark>
 								</BookingTraveler>
 							EOM;
+				
+				array_push($AllPassenger, $InfantPassengerItem);
 
-                array_push($AllPassenger, $InfantPassengerItem);
 
-                $InfantPassengerTypeItem = <<<EOM
+				$InfantPassengerTypeItem =<<<EOM
 							<PassengerType Code="INF"  BookingTravelerRef="INF$x" />
 				EOM;
 
-                array_push($InfantPassengerType, $InfantPassengerTypeItem);
+				array_push($InfantPassengerType, $InfantPassengerTypeItem);
+						
+			}
 
-            }
+			
 
-            if ($segment == 1) {
-                $AdultBookingCode = <<<EOM
+				if($segment == 1){
+					$AdultBookingCode=<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$AdultgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$AdultbackFareInfoKey" SegmentRef="$backAirSKey" />
 						EOM;
 
-                $InfantBookingCode = <<<EOM
+
+					$InfantBookingCode=<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$InfantgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$InfantbackFareInfoKey" SegmentRef="$backAirSKey" />
 						EOM;
 
-            } else if ($segment == 2) {
+					
+				}else if($segment == 2){	
 
-                $AdultBookingCode = <<<EOM
+					$AdultBookingCode =<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$AdultgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$goBCode1" FareInfoRef="$AdultgoFareInfoKey" SegmentRef="$goAirSKey1" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$AdultbackFareInfoKey" SegmentRef="$backAirSKey" />
 							<BookingInfo BookingCode="$backBCode1" FareInfoRef="$AdultbackFareInfoKey" SegmentRef="$backAirSKey1" />
 						EOM;
-
-                $InfantBookingCode = <<<EOM
+					
+						
+					$InfantBookingCode =<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$InfantgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$goBCode1" FareInfoRef="$InfantgoFareInfoKey" SegmentRef="$goAirSKey1" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$InfantbackFareInfoKey" SegmentRef="$backAirSKey" />
 							<BookingInfo BookingCode="$backBCode1" FareInfoRef="$InfantbackFareInfoKey" SegmentRef="$backAirSKey1" />
 						EOM;
-            }
+				}
 
-            $AdultPassengerTypeAll = implode(" ", $AdultPassengerType);
-            $InfantPassengerTypeAll = implode(" ", $InfantPassengerType);
 
-            $AirPricingSolution = <<<EOM
+				$AdultPassengerTypeAll = implode(" ",$AdultPassengerType);
+				$InfantPassengerTypeAll = implode(" ",$InfantPassengerType);
+			
+
+				$AirPricingSolution = <<<EOM
 				<AirPricingSolution Key="$AirPricingSolutionKey" xmlns="http://www.travelport.com/schema/air_v51_0">
 						$AirSegments
 					<AirPricingInfo Key="$AirPriceInfoKey" PricingMethod="Guaranteed" PlatingCarrier="$goCr" ProviderCode="1G">
@@ -3601,10 +3144,10 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 							$InfantBookingCode
 							$InfantPassengerTypeAll
 					</AirPricingInfo>
-				</AirPricingSolution>
+				</AirPricingSolution>	
 		EOM;
 
-            $AirPricingTicketingModifiers = <<<EOM
+			$AirPricingTicketingModifiers=<<<EOM
 				<AirPricingTicketingModifiers xmlns="http://www.travelport.com/schema/air_v51_0">
 					<AirPricingInfoRef Key="$AirPriceInfoKey" />
 					<TicketingModifiers>
@@ -3618,66 +3161,76 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 					</TicketingModifiers>
 				</AirPricingTicketingModifiers>
 			EOM;
+			
+			
+			
+			
+		}else if($adult > 0){
 
-        } else if ($adult > 0) {
+			$AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
+			$AdultgoFareInfoKey = $_POST['adult'][0]['goFareInfoRef'];
+			$AdultbackFareInfoKey = $_POST['adult'][0]['backFareInfoRef'];
 
-            $AirPriceInfoKey = $_POST['adult'][0]['AirFareInfo'];
-            $AdultgoFareInfoKey = $_POST['adult'][0]['goFareInfoRef'];
-            $AdultbackFareInfoKey = $_POST['adult'][0]['backFareInfoRef'];
+			
+			for($x = 0 ; $x < $adult; $x++){
 
-            for ($x = 0; $x < $adult; $x++) {
+				${'afName'.$x} = $_POST['adult'][$x]["afName"];
+				${'alName'.$x} = $_POST['adult'][$x]["alName"];
+				${'agender'.$x} = $_POST['adult'][$x]["agender"];
+				${'adob'.$x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
+				${'apassNo'.$x} = $_POST['adult'][$x]["apassNo"];
+				${'apassEx'.$x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
+				${'apassNation'.$x} = $_POST['adult'][$x]["apassNation"];
 
-                ${'afName' . $x} = $_POST['adult'][$x]["afName"];
-                ${'alName' . $x} = $_POST['adult'][$x]["alName"];
-                ${'agender' . $x} = $_POST['adult'][$x]["agender"];
-                ${'adob' . $x} = date("dMy", strtotime($_POST['adult'][$x]["adob"]));
-                ${'apassNo' . $x} = $_POST['adult'][$x]["apassNo"];
-                ${'apassEx' . $x} = date("dMy", strtotime($_POST['adult'][$x]["apassEx"]));
-                ${'apassNation' . $x} = $_POST['adult'][$x]["apassNation"];
+				if(${'agender'.$x} = 'M'){
+					$atitle = 'Mr';
+				}else{
+					$atitle = 'Mrs';
+				}
 
-                if (${'agender' . $x} = 'M') {
-                    $atitle = 'Mr';
-                } else {
-                    $atitle = 'Mrs';
-                }
 
-                //Flight Info
-
-                $AdultPassengerItem = <<<EOM
+				//Flight Info
+				
+				$AdultPassengerItem=<<<EOM
 								<BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="ADT$x" TravelerType="ADT" Gender="${'agender'.$x}" Nationality="${'apassNation'.$x}">
 									<BookingTravelerName Prefix="$atitle" First="${'afName'.$x} " Last="${'alName'.$x}" />
 									<SSR Type="DOCS" Status="HK" FreeText="P/${'apassNation'.$x}/${'apassNo'.$x}/${'apassNation'.$x}/${'adob'.$x}/${'agender'.$x}/${'apassEx'.$x}/${'alName'.$x}/${'afName'.$x} " Carrier="$goCr" />
 								</BookingTraveler>
 							EOM;
+				
+				array_push($AllPassenger, $AdultPassengerItem);
 
-                array_push($AllPassenger, $AdultPassengerItem);
 
-                $AdultPassengerTypeItem = <<<EOM
+				$AdultPassengerTypeItem =<<<EOM
 							<PassengerType Code="ADT"  BookingTravelerRef="ADT$x" />
 				EOM;
 
-                array_push($AdultPassengerType, $AdultPassengerTypeItem);
+				array_push($AdultPassengerType, $AdultPassengerTypeItem);
+						
+			}
 
-            }
+			
 
-            $AdultPassengerTypeAll = implode(" ", $AdultPassengerType);
+				$AdultPassengerTypeAll = implode(" ",$AdultPassengerType);
 
-            if ($segment == 1) {
-                $BookingCode = <<<EOM
+				if($segment == 1){
+					$BookingCode=<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$AdultgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$AdultbackFareInfoKey" SegmentRef="$backAirSKey" />
 						EOM;
 
-            } else if ($segment == 2) {
-                $BookingCode = <<<EOM
+					
+				}else if($segment == 2){			
+						$BookingCode =<<<EOM
 							<BookingInfo BookingCode="$goBCode" FareInfoRef="$AdultgoFareInfoKey" SegmentRef="$goAirSKey" />
 							<BookingInfo BookingCode="$goBCode1" FareInfoRef="$AdultgoFareInfoKey" SegmentRef="$goAirSKey1" />
 							<BookingInfo BookingCode="$backBCode" FareInfoRef="$AdultbackFareInfoKey" SegmentRef="$backAirSKey" />
 							<BookingInfo BookingCode="$backBCode1" FareInfoRef="$AdultbackFareInfoKey" SegmentRef="$backAirSKey1" />
 						EOM;
-            }
+				}
+			
 
-            $AirPricingSolution = <<<EOM
+				$AirPricingSolution = <<<EOM
 				<AirPricingSolution Key="$AirPricingSolutionKey" xmlns="http://www.travelport.com/schema/air_v51_0">
 						$AirSegments
 					<AirPricingInfo Key="$AirPriceInfoKey" PricingMethod="Guaranteed" PlatingCarrier="$goCr" ProviderCode="1G">
@@ -3686,10 +3239,10 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 						$BookingCode
 						$AdultPassengerTypeAll
 					</AirPricingInfo>
-				</AirPricingSolution>
+				</AirPricingSolution>	
 		EOM;
 
-            $AirPricingTicketingModifiers = <<<EOM
+			$AirPricingTicketingModifiers=<<<EOM
 				<AirPricingTicketingModifiers xmlns="http://www.travelport.com/schema/air_v51_0">
 					<AirPricingInfoRef Key="$AirPriceInfoKey" />
 					<TicketingModifiers>
@@ -3698,11 +3251,14 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 				</AirPricingTicketingModifiers>
 			EOM;
 
-        }
+			
+		}
 
-        $PassengerNumAll = implode(" ", $AllPassenger);
 
-        $message = <<<EOM
+
+		$PassengerNumAll = implode(" ",$AllPassenger);
+		
+		$message = <<<EOM
 						<soapenv:Envelope
 						xmlns:univ="http://www.travelport.com/schema/universal_v51_0"
 						xmlns:com="http://www.travelport.com/schema/common_v51_0"
@@ -3724,70 +3280,73 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 						</soapenv:Body>
 					</soapenv:Envelope>
 					EOM;
+			
+	}
 
-    }
+   // echo $message;
 
-    echo $message;
 
-    //Prod
-    $TARGETBRANCH = 'P4218912';
-    $CREDENTIALS = 'Universal API/uAPI4444837655-83fe5101:K/s3-5Sy4c';
+	//Prod
+	$TARGETBRANCH = 'P4218912';
+	$CREDENTIALS = 'Universal API/uAPI4444837655-83fe5101:K/s3-5Sy4c';
+	
 
-    $auth = base64_encode("$CREDENTIALS");
-    $soap_do = curl_init("https://apac.universal-api.travelport.com/B2BGateway/connect/uAPI/AirService");
-    $header = array(
-        "Content-Type: text/xml;charset=UTF-8",
-        "Accept: gzip,deflate",
-        "Cache-Control: no-cache",
-        "Pragma: no-cache",
-        "SOAPAction: \"\"",
-        "Authorization: Basic $auth",
-        "Content-length: " . strlen($message),
-    );
+	$auth = base64_encode("$CREDENTIALS"); 
+	$soap_do = curl_init("https://apac.universal-api.travelport.com/B2BGateway/connect/uAPI/AirService");
+	$header = array(
+	"Content-Type: text/xml;charset=UTF-8", 
+	"Accept: gzip,deflate", 
+	"Cache-Control: no-cache", 
+	"Pragma: no-cache", 
+	"SOAPAction: \"\"",
+	"Authorization: Basic $auth", 
+	"Content-length: ".strlen($message),
+	); 
 
-    curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($soap_do, CURLOPT_POST, true);
-    curl_setopt($soap_do, CURLOPT_POSTFIELDS, $message);
-    curl_setopt($soap_do, CURLOPT_HTTPHEADER, $header);
-    curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
-    $return = curl_exec($soap_do);
-    curl_close($soap_do);
 
-    //print_r($return);
+	curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false); 
+	curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false); 
+	curl_setopt($soap_do, CURLOPT_POST, true ); 
+	curl_setopt($soap_do, CURLOPT_POSTFIELDS, $message); 
+	curl_setopt($soap_do, CURLOPT_HTTPHEADER, $header); 
+	curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+	$return = curl_exec($soap_do);
+	curl_close($soap_do);
 
-    //$return = file_get_contents("res.xml") ;
-    $response = preg_replace("/(<\/?)(\w+):([^>]*>)/", "$1$2$3", $return);
-    $xml = new SimpleXMLElement($response);
-    //print_r($xml);
-    if (isset($xml->xpath('//universalAirCreateReservationRsp')[0])) {
-        $body = $xml->xpath('//universalAirCreateReservationRsp')[0];
+	//print_r($return);
 
-        $result = json_decode(json_encode((array) $body), true);
-        if (isset($result['universalUniversalRecord']['@attributes']['LocatorCode'])) {
+	//$return = file_get_contents("res.xml") ;
+	$response = preg_replace("/(<\/?)(\w+):([^>]*>)/", "$1$2$3", $return);
+	$xml = new SimpleXMLElement($response);
+	//print_r($xml);
+	if(isset($xml->xpath('//universalAirCreateReservationRsp')[0])){
+		$body = $xml->xpath('//universalAirCreateReservationRsp')[0];
+		
+		$result = json_decode(json_encode((array)$body), TRUE); 
+		
+        if(isset($result['universalUniversalRecord']['@attributes']['LocatorCode'])){
             $BookingPNR = $result['universalUniversalRecord']['universalProviderReservationInfo']['@attributes']['LocatorCode'];
             $UniversalPnr = $result['universalUniversalRecord']['@attributes']['LocatorCode'];
             saveBooking($conn, $BookingPNR, $saveBookingAarray);
-            addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $bookingInfo, $PassengerData);
-        } else {
-            $BookingPNR = '';
+            addBookingQueue($conn, $BookingPNR, $UniversalPnr, $bookingInfo, $PassengerData, $saveBookingAarray);
+        }else{
+            $BookingPNR='';
             addPax($conn, $BookingPNR, $agentId, $subagentId, $userId, $bookingId, $PassengerData);
             $response1['status'] = "error";
             $response1['message'] = "Booking Failed";
             echo json_encode($response1);
             exit();
-
+            
         }
-
-    }
-
+	
+	}
+    
 }
 
-function saveBooking($conn, $BookingPNR, $saveBookingAarray)
-{
+function saveBooking($conn, $BookingPNR, $saveBookingAarray){
 
     $Data = $saveBookingAarray;
-    $type = $Data['triptype'];
+    $type = $Data['tripType'];
     $pnr = $BookingPNR;
     $createdAt = date('Y-m-d H:i:s');
     $uId = sha1(md5(time()));
@@ -3811,7 +3370,7 @@ function saveBooking($conn, $BookingPNR, $saveBookingAarray)
             $departureTime1 = $_POST['segments'][0]["departureTime"];
             $arrivalTime1 = $_POST['segments'][0]["arrivalTime"];
             $flightDuration1 = $_POST['segments'][0]["flightduration"];
-            $transit1 = '';
+            $transit1 = $_POST['transit']["transit1"];
             $marketingCareer1 = $_POST['segments'][0]["marketingcareer"];
             $marketingCareerName1 = $_POST['segments'][0]["marketingcareerName"];
             $marketingFlight1 = $_POST['segments'][0]["marketingflight"];
@@ -4534,7 +4093,6 @@ function saveBooking($conn, $BookingPNR, $saveBookingAarray)
                 )";
 
         } else if ($segment == 2) {
-
             // segment 1
             $goTransit1 = $_POST['transit']['go']['transit1'];
             $backTransit1 = $_POST['transit']['back']['transit1'];
@@ -5489,7 +5047,7 @@ function saveBooking($conn, $BookingPNR, $saveBookingAarray)
                         '$createdAt',
                         '$uId'
 
-                        )";
+    )";
 
         }
         $conn->query($sql);
@@ -5497,8 +5055,7 @@ function saveBooking($conn, $BookingPNR, $saveBookingAarray)
 
 }
 
-function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $bookingInfo, $PassengerData, $saveBookingAarray)
-{
+function addBookingQueue($conn, $BookingPNR, $UniversalPnr, $bookingInfo, $PassengerData, $saveBookingAarray){
     $SaveBookingData = $bookingInfo;
 
     if (!empty($BookingPNR)) {
@@ -5508,23 +5065,23 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
         if ($result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $number = (int) filter_var($row["bookingId"], FILTER_SANITIZE_NUMBER_INT);
-                $newnumber = $number + 1;
-                $BookingId = "STB$newnumber";
+                $newnumber =  $number + 1;
+                $BookingId = "FFBB$newnumber";
             }
         } else {
-            $BookingId = "STB1000";
+            $BookingId = "FFBB1000";
         }
 
         $AgentId = $SaveBookingData["agentId"];
         $staffId = isset($SaveBookingData["staffId"]) ? $SaveBookingData["staffId"] : "";
         $subagentId = isset($SaveBookingData['subagentId']) ? $SaveBookingData['subagentId'] : "";
-        $userId = isset($SaveBookingData['userId']) ? $SaveBookingData['userId'] : "";
+        $userId = isset($SaveBookingData['userId']) ? $SaveBookingData['userId']:"";
         $System = $SaveBookingData["system"];
         $From = $SaveBookingData["from"];
         $To = $SaveBookingData["to"];
         $Airlines = $SaveBookingData["airlines"];
         $Type = $SaveBookingData["tripType"];
-        $journeyType = isset($SaveBookingData["journeyType"]) ? $SaveBookingData["journeyType"] : $SaveBookingData["tripType"];
+        $journeyType = isset($SaveBookingData["journeyType"]) ? $SaveBookingData["journeyType"] : $SaveBookingData["tripType"] ;
         $Name = strtoupper($SaveBookingData["name"]);
         $Phone = $SaveBookingData["phone"];
         $Email = $SaveBookingData["email"];
@@ -5538,7 +5095,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
         $childBag = $SaveBookingData["childbag"];
         $infantBag = $SaveBookingData["infantbag"];
         $netCost = $SaveBookingData["netcost"];
-        $subagentprice = isset($SaveBookingData["subagentprice"]) ? $SaveBookingData["subagentprice"] : '';
+        $subagentprice = isset($SaveBookingData["subagentprice"]) ? $SaveBookingData["subagentprice"] :'';
         $adultCostBase = $SaveBookingData["adultcostbase"];
         $childCostBase = $SaveBookingData["childcostbase"];
         $infantCostBase = $SaveBookingData["infantcostbase"];
@@ -5548,15 +5105,16 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
         $grossCost = $SaveBookingData["grosscost"];
         $BaseFare = $SaveBookingData["basefare"];
         $taxFare = $SaveBookingData["tax"];
-        $Coupon = isset($SaveBookingData["coupon"]) ? $SaveBookingData["coupon"] : '';
-        $Platform = isset($SaveBookingData["platform"]) ? $SaveBookingData["platform"] : "";
-        $airlinesCode = isset($saveBookingAarray['flightData']['career']) ? $saveBookingAarray['flightData']['career'] : $saveBookingAarray['roundData']['career'];
+        $Coupon = isset($SaveBookingData["coupon"]) ? $SaveBookingData["coupon"] :'';
+        $Platform = isset($SaveBookingData["platform"]) ? $SaveBookingData["platform"] :"";
+        $airlinesCode =  isset($saveBookingAarray['flightData']['career']) ? $saveBookingAarray['flightData']['career']  : $saveBookingAarray['roundData']['career'];
 
         //Com
-        $currency = isset($saveBookingAarray['flightData']['farecurrency']) ? $saveBookingAarray['flightData']['farecurrency'] : $saveBookingAarray['roundData']['farecurrency'];
-        $airlinescomref = isset($saveBookingAarray['flightData']['airlinescomref']) ? $saveBookingAarray['flightData']['airlinescomref'] : $saveBookingAarray['roundData']['airlinescomref'];
-        $comissiontype = isset($saveBookingAarray['flightData']['comissiontype']) ? $saveBookingAarray['flightData']['comissiontype'] : $saveBookingAarray['roundData']['comissiontype'];
-        $comissionvalue = isset($saveBookingAarray['flightData']['comissionvalue']) ? $saveBookingAarray['flightData']['comissionvalue'] : $saveBookingAarray['roundData']['comissionvalue'];
+        $currency = isset($saveBookingAarray['flightData']['farecurrency']) ? $saveBookingAarray['flightData']['farecurrency']  : $saveBookingAarray['roundData']['farecurrency'];
+        $airlinescomref = isset($saveBookingAarray['flightData']['airlinescomref']) ? $saveBookingAarray['flightData']['airlinescomref']  : $saveBookingAarray['roundData']['airlinescomref'];
+        $comissiontype = isset($saveBookingAarray['flightData']['comissiontype']) ?  $saveBookingAarray['flightData']['comissiontype']  : $saveBookingAarray['roundData']['comissiontype'];
+        $comissionvalue = isset($saveBookingAarray['flightData']['comissionvalue']) ? $saveBookingAarray['flightData']['comissionvalue']  : $saveBookingAarray['roundData']['comissionvalue'];
+        
 
         if (isset($SaveBookingData["uId"])) {
             $uId = $SaveBookingData["uId"];
@@ -5602,7 +5160,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                 $newTimeLimit = date("Y-m-d H:i", strtotime("+5 minutes"));
             }
 
-            $LastTicketTime = isset($newTimeLimit) ? $newTimeLimit : '';
+            $LastTicketTime = isset($newTimeLimit) ? $newTimeLimit: '';
 
         } else {
             $LastTicketTime = $SaveBookingData["timeLimit"];
@@ -5619,6 +5177,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
             $resultId = '';
         }
 
+
         $couponRow = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM coupon WHERE coupon='$Coupon'"), MYSQLI_ASSOC);
 
         if (isset($AgentId)) {
@@ -5628,18 +5187,18 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                 $agentName = $row1['name'];
                 $companyname = $row1['company'];
                 $Bonus = $row1['bonus'];
-            } else {
+            }else{
                 $companyname = '';
             }
         }
-
-        //sub agent mail data
+        
+         //sub agent mail data
         $result = $conn->query("SELECT * FROM subagent where subagentId='$subagentId' AND agentId= '$AgentId' ORDER BY id DESC LIMIT 1")->fetch_all(MYSQLI_ASSOC);
-
-        if (!empty($result)) {
+        
+        if(!empty($result)){
             $subcompanyName = $result[0]['company'];
             $Email = $result[0]['email'];
-        } else {
+        }else{
             $subcompanyName = '';
         }
 
@@ -5665,12 +5224,28 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
 
             $Booked = "Booked By: $staffName,  $companyname";
         }
-        if (!empty($subagentId)) {
+        if(!empty($subagentId)){
             $Message = "Dear $companyname,  your subagent $subcompanyName requested for $From to $To $Type air ticket on $DateTime, career Name: <b>$Airlines</b>. Your booking request has been accepted. Your booking time limit  $LastTicketTime. Please issue your ticket before giving time limit. Thank you for booking with Fly Far International ";
             $Booked = "Booked By: $companyname";
         }
 
+
         $createdTime = date("Y-m-d H:i:s");
+
+        
+
+        $result1 = $conn->query("SELECT * FROM wl_content where agentId='$AgentId' ORDER BY id DESC LIMIT 1")->fetch_all(MYSQLI_ASSOC);
+        if(!empty($result1)){
+            $agentCompanyName = $result1[0]['company_name'];
+            $agentCompanyLogo = $result1[0]['companyImage'];
+            $agentCompanyEmail = $result1[0]['email'];
+            $agentCompanyPhone = $result1[0]['phone'];
+            $agentCompanyAddress = $result1[0]['address'];
+            $agentCompanyWebsiteLink = $result1[0]['websitelink'];
+            $agentCompanyFbLink = $result1[0]['fb_link'];
+            $agentCompanyLinkedinLink = $result1[0]['linkedin_link'];
+            $agentCompanyWhatsappNum = $result1[0]['whatsapp_num'];
+         }
 
         $sql = "INSERT INTO `booking` (
                           `uid`,
@@ -5731,7 +5306,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
 
         if ($conn->query($sql) === true) {
             addPax($conn, $BookingPNR, $AgentId, $subagentId, $userId, $BookingId, $PassengerData);
-            $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
+            $conn->query("INSERT INTO `activityLog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
                     VALUES ('$BookingId','$AgentId','Hold','$subcompanyName','$BookedBy','$dateTime')");
 
             $AgentMail = '
@@ -6195,9 +5770,9 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                 $response['message'] = "Mail Doesn't Send";
             }
 
-            if ($subagentId != "") {
-                //subagent mail
-                $subagentMail = '
+          if($subagentId != "") {
+            //subagent mail
+            $subagentMail = '
             <!DOCTYPE html>
             <html lang="en">
                 <head>
@@ -6563,55 +6138,56 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
 
             ';
 
-                $mail = new PHPMailer();
+            $mail = new PHPMailer();
 
-                try {
-                    $mail->isSMTP();
-                    $mail->Host = 'b2b.flyfarint.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'bookingwl@mailservice.center';
-                    $mail->Password = '123Next2$';
-                    $mail->SMTPSecure = 'ssl';
-                    $mail->Port = 465;
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'b2b.flyfarint.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'bookingwl@mailservice.center';
+                $mail->Password = '123Next2$';
+                $mail->SMTPSecure = 'ssl';
+                $mail->Port = 465;
 
-                    //Recipients
-                    $mail->setFrom('bookingwl@mailservice.center', $agentCompanyName);
-                    $mail->addAddress("$Email", "SubAgentId : $subagentId");
-                    $mail->addCC('otaoperation@flyfarint.com');
-                    $mail->addCC('habib@flyfarint.com');
-                    $mail->addCC('afridi@flyfarint.com');
+                //Recipients
+                $mail->setFrom('bookingwl@mailservice.center', $agentCompanyName);
+                $mail->addAddress("$Email", "SubAgentId : $subagentId");
+                $mail->addCC('otaoperation@flyfarint.com');
+                $mail->addCC('habib@flyfarint.com');
+                $mail->addCC('afridi@flyfarint.com');
 
-                    $mail->isHTML(true);
-                    $mail->Subject = "Booking Confirmation by $agentCompanyName";
-                    $mail->Body = $subagentMail;
-                    if (!$mail->Send()) {
-                        echo "Mailer Error: " . $mail->ErrorInfo;
-                    } else {
-                    }
-                } catch (Exception $e) {
-                    $response['status'] = "error";
-                    $response['message'] = "Mail Doesn't Send";
+                $mail->isHTML(true);
+                $mail->Subject = "Booking Confirmation by $agentCompanyName";
+                $mail->Body = $subagentMail;
+                if (!$mail->Send()) {
+                    echo "Mailer Error: " . $mail->ErrorInfo;
+                } else {
                 }
+            } catch (Exception $e) {
+                $response['status'] = "error";
+                $response['message'] = "Mail Doesn't Send";
             }
+}
 
-            if ($userId != "") {
 
-                //Information for Email Template
-                $data = $conn->query("SELECT `email`, `company_name`,`websitelink`, `address`,`phone`,`fb_link`,`linkedin_link`, `whatsapp_num` FROM `B2C_wl_content` WHERE agentId='$AgentId'")->fetch_all(MYSQLI_ASSOC);
-                $agentEmail = $data[0]['email'];
-                $agentPhone = $data[0]['phone'];
-                $agentAddress = $data[0]['address'];
-                $agentCompany_name = $data[0]['company_name'];
-                $agentWebsiteLink = $data[0]['websitelink'];
-                $agentFbLink = $data[0]['fb_link'];
-                $agentLinkedInLink = $data[0]['linkedin_link'];
-                $agentWhatsappNum = $data[0]['whatsapp_num'];
+        if($userId != ""){
 
-                $userData = $conn->query("SELECT `name`,`email` FROM `subagent` WHERE agentId = '$AgentId' AND userId = '$userId'")->fetch_all(MYSQLI_ASSOC);
+            //Information for Email Template
+        $data = $conn->query("SELECT `email`, `company_name`,`websitelink`, `address`,`phone`,`fb_link`,`linkedin_link`, `whatsapp_num` FROM `B2C_wl_content` WHERE agentId='$AgentId'")->fetch_all(MYSQLI_ASSOC);
+        $agentEmail = $data[0]['email'];
+        $agentPhone = $data[0]['phone'];
+        $agentAddress = $data[0]['address'];
+        $agentCompany_name = $data[0]['company_name'];
+        $agentWebsiteLink = $data[0]['websitelink'];
+        $agentFbLink = $data[0]['fb_link'];
+        $agentLinkedInLink = $data[0]['linkedin_link'];
+        $agentWhatsappNum = $data[0]['whatsapp_num'];
+
+            $userData = $conn->query("SELECT `name`,`email` FROM `subagent` WHERE agentId = '$AgentId' AND userId = '$userId'")->fetch_all(MYSQLI_ASSOC);
                 $userName = $userData[0]['name'];
                 $userEmail = $userData[0]['email'];
-
-                $AgentEmail = '
+            
+            $AgentEmail ='
                     <!DOCTYPE html>
                     <html lang="en">
                       <head>
@@ -6660,14 +6236,14 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                       font-size: 25px;
                                       padding-top: 20px;
                                     "
-                                    href="https://www.' . $agentWebsiteLink . '/"
+                                    href="https://www.'.$agentWebsiteLink.'/"
                                   >
-                                    ' . $agentCompany_name . '</a
+                                    '.$agentCompany_name.'</a
                                   >
                                 </td>
                               </tr>
                             </table>
-
+                    
                             <table
                               border="0"
                               cellpadding="0"
@@ -6721,10 +6297,10 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                     background-color: white;
                                   "
                                 >
-                                Dear ' . $userName . ', Your New Booking Request has been placed, please issue your ticket before time limit, otherwise your ticket will be cancel autometically.
+                                Dear '.$userName.', Your New Booking Request has been placed, please issue your ticket before time limit, otherwise your ticket will be cancel autometically.
                                 </td>
                               </tr>
-
+                    
                               <tr>
                                 <td
                                   align="center"
@@ -6744,7 +6320,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                     background-color: white;
                                   "
                                 >
-                                  Booking ID: <span>' . $BookingId . '</span>
+                                  Booking ID: <span>'.$BookingId.'</span>
                                 </td>
                               </tr>
                               <tr>
@@ -6772,7 +6348,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                   help you out.
                                 </td>
                               </tr>
-
+                    
                               <tr>
                                 <td
                                   align="center"
@@ -6797,7 +6373,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                   Sincerely,
                                 </td>
                               </tr>
-
+                    
                               <tr>
                                 <td
                                   align="center"
@@ -6818,10 +6394,10 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                     padding-bottom: 20px;
                                   "
                                 >
-                                 ' . $agentCompany_name . '
+                                 '.$agentCompany_name.'
                                 </td>
                               </tr>
-
+                    
                               <tr>
                                 <td
                                   align="center"
@@ -6842,7 +6418,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                   Need more help?
                                 </td>
                               </tr>
-
+                    
                               <tr>
                                 <td
                                   align="center"
@@ -6867,12 +6443,12 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                     style="color: white; font-size: 13px; text-decoration: none"
                                     href="http://"
                                     target="_blank"
-                                    >' . $agentEmail . '
+                                    >'.$agentEmail.'
                                   </a>
-                                  agency or Call us at ' . $agentPhone . '
+                                  agency or Call us at '.$agentPhone.'
                                 </td>
                               </tr>
-
+                    
                               <tr>
                                 <td
                                   valign="top"
@@ -6897,7 +6473,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                         line-height: 15px;
                                         color: #222222;
                                       "
-                                      href="https://www.' . $agentWebsiteLink . '/termsandcondition"
+                                      href="https://www.'.$agentWebsiteLink.'/termsandcondition"
                                       >Tearms & Conditions</a
                                     >
                                     <a
@@ -6908,7 +6484,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                         color: #222222;
                                         padding-left: 10px;
                                       "
-                                      href="https://www.' . $agentWebsiteLink . '/privacypolicy"
+                                      href="https://www.'.$agentWebsiteLink.'/privacypolicy"
                                       >Privacy Policy</a
                                     >
                                   </p>
@@ -6931,19 +6507,19 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                     padding-right: 20px;
                                   "
                                 >
-                                  <a href="' . $agentFbLink . ' "
+                                  <a href="'.$agentFbLink.' "
                                     ><img
                                       src="https://cdn.flyfarint.com/fb.png"
                                       width="25px"
                                       style="margin: 10px"
                                   /></a>
-                                  <a href="' . $agentLinkedInLink . ' "
+                                  <a href="'.$agentLinkedInLink.' "
                                     ><img
                                       src="https://cdn.flyfarint.com/lin.png"
                                       width="25px"
                                       style="margin: 10px"
                                   /></a>
-                                  <a href="' . $agentWhatsappNum . ' "
+                                  <a href="'.$agentWhatsappNum.' "
                                     ><img
                                       src="https://cdn.flyfarint.com/wapp.png "
                                       width="25px"
@@ -6951,7 +6527,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                   /></a>
                                 </td>
                               </tr>
-
+                    
                               <tr>
                                 <td
                                   align="center"
@@ -6970,46 +6546,47 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                                     padding-right: 10px;
                                   "
                                 >
-                                  ' . $agentAddress . '
+                                  '.$agentAddress.'
                                 </td>
                               </tr>
                             </table>
                           </div>
                         </div>
                       </body>
-                    </html>
+                    </html>        
                     ';
-
-                $mail1 = new PHPMailer();
-
-                try {
-                    $mail1->isSMTP();
-                    $mail1->Host = 'b2b.flyfarint.com';
-                    $mail1->SMTPAuth = true;
-                    $mail1->Username = 'bookingwl@mailservice.center';
-                    $mail1->Password = '123Next2$';
-                    $mail1->SMTPSecure = 'ssl';
-                    $mail1->Port = 465;
-
-                    //Recipients
-                    $mail1->setFrom("bookingwl@mailservice.center", $agentCompany_name);
-                    $mail1->addAddress("$userEmail", "AgentId : $AgentId");
-                    $mail1->addCC('habib@flyfarint.com');
-                    $mail1->addCC('afridi@flyfarint.com');
-
-                    $mail1->isHTML(true);
-                    $mail1->Subject = "New Booking Request Confirmation by $userName";
-                    $mail1->Body = $AgentEmail;
-
-                    //print_r($mail);
-                    if (!$mail1->Send()) {
-                        echo "Mailer Error: " . $mail1->ErrorInfo;
-                    }
-
-                } catch (Exception $e) {
-
+      
+                    $mail1 = new PHPMailer();
+      
+            try {
+                $mail1->isSMTP();
+                $mail1->Host = 'b2b.flyfarint.com';
+                $mail1->SMTPAuth = true;
+                $mail1->Username = 'bookingwl@mailservice.center';
+                $mail1->Password = '123Next2$';
+                $mail1->SMTPSecure = 'ssl';
+                $mail1->Port = 465;
+      
+                //Recipients
+                $mail1->setFrom("bookingwl@mailservice.center", $agentCompany_name);
+                $mail1->addAddress("$userEmail", "AgentId : $AgentId");
+                $mail1->addCC('habib@flyfarint.com');
+                $mail1->addCC('afridi@flyfarint.com');
+                
+      
+                $mail1->isHTML(true);
+                $mail1->Subject = "New Booking Request Confirmation by $userName";
+                $mail1->Body = $AgentEmail;
+                
+                //print_r($mail);
+                if (!$mail1->Send()) {
+                    echo "Mailer Error: " . $mail1->ErrorInfo;
                 }
-            }
+      
+            } catch (Exception $e) {
+      
+            } 
+        }
             //Agent maill
 
             $OwnerMail = '
@@ -7439,19 +7016,17 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                 $response['message'] = "Mail Doesn't Send";
                 echo json_encode($response);
             }
-
         }
     }
 
 }
 
-function addPax($conn, $BookingPNR, $agentId, $subagentId, $userId, $bookingId, $PassengerData)
-{
+function addPax($conn, $BookingPNR, $agentId, $subagentId,$userId, $bookingId, $PassengerData){
     $_POST = $PassengerData;
 
     $adult = $_POST['adultCount'];
     $child = $_POST['childCount'];
-    $infants = $_POST['infantCount'];
+    $infants = $_POST['infantCount']; 
     $BookingId = $bookingId;
     $createdTimer = date('Y-m-d H:i:s');
 
@@ -7798,4 +7373,3 @@ function addPax($conn, $BookingPNR, $agentId, $subagentId, $userId, $bookingId, 
     }
 
 }
-$conn->close();

@@ -76,6 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($conn->query($sql) === true) {
             $response['userId'] = $userId;
+            $response['name'] = $Name;
             $response['status'] = "success";
             $response['message'] = "Registration Successful";
 

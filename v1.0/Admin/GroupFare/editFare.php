@@ -16,7 +16,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     $adtBaseFare=$jsonData["AdultBaseFare"];
     $totalSeat=$jsonData["TotalSeat"];
     $transitTime=$jsonData["TransitTime"];
-    $show=$jsonData["show"];
 
     if(empty($id))
     {
@@ -47,7 +46,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
         cabin1='$cabin',  
         class1='$class',  baggage1='$baggage',  travelTime1='$travelTime', 
         transitTime='$transitTime', totalSeat='$totalSeat',
-        adtBaseFare='$adtBaseFare'/*, showStatus='$show'*/
+        adtBaseFare='$adtBaseFare'
         WHERE groupFareId='$id'";
 
 
@@ -90,14 +89,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
         flightNum1='$flightNum1', flightNum2='$flightNum2', flightCode1='$flightCode1', flightCode2='$flightCode2', 
         cabin1='$cabin1', cabin2='$cabin2', class1='$class1', class2='$class2', baggage1='$baggage1', 
         baggage2='$baggage2', travelTime1='$travelTime1', travelTime2='$travelTime2', transitTime='$transitTime', totalSeat='$totalSeat',
-        adtBaseFare='$adtBaseFare'/*, showStatus='$show'*/
+        adtBaseFare='$adtBaseFare'
         WHERE groupFareId='$id'";
     }
 
     if ($conn->query($sql)) {
         
         $response["status"] = "Success";
-        $response["message"] = $id."'s Data Updated Successfully";
+        $response["message"] = $id." Data Updated Successfully";
     }
     else
     {
