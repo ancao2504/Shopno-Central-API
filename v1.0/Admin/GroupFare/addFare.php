@@ -33,10 +33,10 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $sql="INSERT INTO groupfare 
             (segment, dept1, deptTime1,  arrive1,  arriveTime1,  carrierName1,  
             flightNum1,  flightCode1,  cabin1,  class1,  baggage1,  travelTime1, 
-             transitTime, totalSeat, adtBaseFare)
+             transitTime, totalSeat, adtBaseFare, availableSeat)
             VALUES 
             ('$segment','$deptFrom','$deptTime','$arriveTo','$arriveTime','$carrierName','$flightNum','$flightCode', '$cabin',
-            '$class','$baggage','$travelTime','$transitTime', '$totalSeat', '$adtBaseFare')";
+            '$class','$baggage','$travelTime','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat')";
 
 
 
@@ -51,7 +51,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $cabin1=$jsonData[0]["Cabin"];
             $class1=$jsonData[0]["Class"];
             $baggage1=$jsonData[0]["Baggage"];
-            $travelTime1=$jsonData[0]["Travel Time"];
+            $travelTime1=$jsonData[0]["TravelTime"];
 
 
             $deptFrom2=$jsonData[1]["DepartureFrom"];
@@ -72,24 +72,30 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $sql="INSERT INTO groupfare 
             (segment, dept1, dept2, deptTime1, deptTime2, arrive1, arrive2, arriveTime1, arriveTime2, carrierName1, carrierName2, 
             flightNum1, flightNum2, flightCode1, flightCode2, cabin1, cabin2, class1, class2, baggage1, baggage2, travelTime1, 
-            travelTime2, transitTime, totalSeat, adtBaseFare)
+            travelTime2, transitTime, totalSeat, adtBaseFare, availableSeat)
             VALUES 
             ('$segment','$deptFrom1','$deptFrom2','$deptTime1','$deptTime2','$arriveTo1','$arriveTo2','$arriveTime1','$arriveTime2',
             '$carrierName1','$carrierName2','$flightNum1','$flightNum2','$flightCode1','$flightCode2', '$cabin1','$cabin2','$class1','$class2',
-            '$baggage1','$baggage2','$travelTime1','$travelTime2','$transitTime', '$totalSeat', '$adtBaseFare')";
+            '$baggage1','$baggage2','$travelTime1','$travelTime2','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat')";
         }
 
         if ($conn->query($sql)) {
-            $response["action"] = "Success";
+            $response["status"] = "Success";
             $response["message"] = "Group Fare Added Successfully!";
         } else {
-            $response["action"] = "Failed";
+            $response["status"] = "Failed";
             $response["message"] = "Query Failed!";
         }
 
         echo json_encode($response);
 
 
+    }else
+    {
+        $response["status"] = "Failed";
+        $response["message"] = "Wrong Request Method";
+        
+        echo json_encode($response);
     }
 $conn->close();
 ?>
