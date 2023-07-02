@@ -11,19 +11,20 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 if(array_key_exists("id", $_GET)){
 
     $id = $_GET["id"];
-    $sql = "UPDATE  `groupfare` SET seat ='0' WHERE id='$id'";
-             
-    if ($conn->query($sql) === TRUE) {
-        $response["action"] = "success";
-        $response["message"] = "Group Edited Successfully";
+    $sql = "SELECT availableSeat FROM groupfare WHERE id='$id'";
+    $result=$conn->query($sql)->fetch_assoc();     
+    
+    if (!empty($result)) {
+        echo json_encode($result);
     }else{
-        $response["action"] = "error";
-        $response["message"] = "Group Edited Failed";
+        $response["status"] = "Failed";
+        $response["message"] = "Data Not Found";
+        echo json_encode($response);
     }
-    echo json_encode($response);
+    
                            
 }
 
-
+$conn->close();
 
 ?>

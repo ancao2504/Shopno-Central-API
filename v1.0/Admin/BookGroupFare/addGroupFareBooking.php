@@ -1,37 +1,27 @@
 <?php
+include("../../config.php");
 
-require '../../config.php';
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if($_SERVER["REQUEST_METHOD"] == "GET")
+if($_SERVER["REQUEST_METHOD"]=="POST")
 {
-    $response=$conn->query("SELECT * FROM groupfare ORDER BY groupFareId DESC")->fetch_all(MYSQLI_ASSOC);
+    $jsonData = json_decode(file_get_contents('php://input'), true);
+    $passengerData=$jsonData["flightPassengerData"];
+    
 
-    if(count($response)>0)
-    {
-        echo json_encode($response);
-    }
-    else
-    {
-        $response["status"] = "Failed";
-        $response["message"] = "Data Not Found";
-        
-        echo json_encode($response);
-    }
-    
-    
-    
+
 }
 else
 {
     $response["status"] = "Failed";
     $response["message"] = "Wrong Request Method";
-    
+        
     echo json_encode($response);
 }
-    $conn->close();
+
+
 ?>

@@ -8,90 +8,116 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 
-if ($_SERVER["REQUEST_METHOD"] == "POST"){
-            
-    $_POST = json_decode(file_get_contents('php://input'), true);
-        $groupId = $_POST['groupId'];
-        $segment = $_POST['segment'];
-        $career = $_POST['career'];
-        $BasePrice = $_POST['basePrice'];
-        $Taxes = $_POST['taxes'];
-        $price = $_POST['price'];
-        $bags = $_POST['bags'];
-        $seat = $_POST['seat'];
-        $journeyTime = $_POST['journeyTime'];
-
-
-        if($segment == 1){
-            $depFrom = $_POST["segments"][0]['depFrom'];
-            $arrTo = $_POST["segments"][0]['arrTo'];
-            $depTime = $_POST['segments'][0]['depTime'];
-            $arrTime = $_POST['segments'][0]['arrTime'];
-            $flightNumber = $_POST['segments'][0]['flightNumber'];
-
-
-             $sql = "UPDATE `groupfare` SET `segment`='$segment',`career`='$career',`BasePrice`='$BasePrice',`Taxes`='$Taxes', `price`='$price', `departure1`='$depFrom', `depTime1`='$depTime', `arrival1`='$arrTo', `arrTime1`='$arrTime', `seat`='$seat', `bags`='$bags', `flightNum1`='$flightNumber', `journeyTime`='$journeyTime' WHERE groupId='$GroupId'";
-             
-
-        }else if($segment == 2){
-            $depFrom = $_POST["segments"][0]['depFrom'];
-            $arrTo = $_POST["segments"][0]['arrTo'];
-            $depTime = $_POST['segments'][0]['depTime'];
-            $arrTime = $_POST['segments'][0]['arrTime'];
-            $flightNumber = $_POST['segments'][0]['flightNumber'];
-
-            //Segment 2
-            $depFrom1 = $_POST["segments"][1]['depFrom'];
-            $arrTo1 = $_POST["segments"][1]['arrTo'];
-            $depTime1 = $_POST['segments'][1]['depTime'];
-            $arrTime1 = $_POST['segments'][1]['arrTime'];
-            $flightNumber1 = $_POST['segments'][1]['flightNumber'];
-            $Transit = $_POST['transit'][0]['time'];
-
-        
-
-            $sql="UPDATE `groupfare` SET `segment`='$segment', `career`='$career', `BasePrice`='$BasePrice', `Taxes`='$Taxes', `price`='$price', `departure1`='$depFrom', `departure2`='$depFrom1', `depTime1`='$depTime',`depTime2`='$depTime1', `arrival1`='$arrTo', `arrival2`='$arrTo1',  `arrTime1`='$arrTime', `arrTime2`='$arrTime1', `seat`='$seat', `bags`='$bags', `flightNum1`='$flightNumber', `flightNum2`='$flightNumber1', `journeyTime`='$journeyTime', `transit1`='$Transit' WHERE groupId='$GroupId'";
-
-
-        }else if($segment == 3){
-            $depFrom = $_POST["segments"][0]['depFrom'];
-            $arrTo = $_POST["segments"][0]['arrTo'];
-            $depTime = $_POST['segments'][0]['depTime'];
-            $arrTime = $_POST['segments'][0]['arrTime'];
-            $flightNumber = $_POST['segments'][0]['flightNumber'];
-
-            //Segment 2
-            $depFrom1 = $_POST["segments"][1]['depFrom'];
-            $arrTo1 = $_POST["segments"][1]['arrTo'];
-            $depTime1 = $_POST['segments'][1]['depTime'];
-            $arrTime1 = $_POST['segments'][1]['arrTime'];
-            $flightNumber1 = $_POST['segments'][1]['flightNumber'];
-
-            //Segment 3
-
-            $depFrom2 = $_POST["segments"][2]['depFrom'];
-            $arrTo2 = $_POST["segments"][2]['arrTo'];
-            $depTime2 = $_POST['segments'][2]['depTime'];
-            $arrTime2 = $_POST['segments'][2]['arrTime'];
-            $flightNumber2 = $_POST['segments'][2]['flightNumber'];
-
-            $Transit = $_POST['transit'][0]['time'];
-            $Transit1 = $_POST['transit'][1]['time'];
-
-            
-            $sql="UPDATE `groupfare` SET `segment`='$segment', `career`='$career', `BasePrice`='$BasePrice', `Taxes`='$Taxes', `price`='$price', `departure1`='$depFrom',`departure2`='$depFrom1', `departure3`='$depFrom2', `depTime1`='$depTime', `depTime2`='$depTime1',`depTime3`='$depTime2',`arrival1`='$arrTo', `arrival2`='$arrTo1',`arrival3`='$arrTo2',`arrTime1`='$arrTime', `arrTime2`='$arrTime1', `arrTime3`='$arrTime2', `seat`='$seat', `bags`='$bags', `flightNum1`='$flightNumber', `flightNum2`='$flightNumber1', `flightNum3`='$flightNumber2', `journeyTime`='$journeyTime', `transit1`='$Transit', `transit2`='$Transit1' WHERE groupId='$GroupId'";
-
-        }
-        
+if($_SERVER["REQUEST_METHOD"] == "POST")
+{   $jsonData = json_decode(file_get_contents('php://input'), true);
     
-        if ($conn->query($sql) === TRUE) {
-            $response["action"] = "success";
-            $response["message"] = "Group Updated Added";
-        }
+    $id=$jsonData["groupfareid"];
+    $segment=$jsonData["segment"];
+    $adtBaseFare=$jsonData["AdultBaseFare"];
+    $totalSeat=$jsonData["TotalSeat"];
+    $transitTime=$jsonData["TransitTime"];
+    $show=$jsonData["show"];
+
+    if(empty($id))
+    {
+        $response["status"] = "Error";
+        $response["message"] = "groupfareid Is Missing";
+        echo json_encode($response);
+        exit();
+    }
+    if($segment==1)
+    {
+        $deptFrom=$jsonData[0]["DepartureFrom"];
+        $deptTime=$jsonData[0]["DepartureTime"];
+        $arriveTo=$jsonData[0]["ArriveTo"];
+        $arriveTime=$jsonData[0]["ArrivalTime"];
+        $carrierName=$jsonData[0]["CarrierName"];
+        $flightNum=$jsonData[0]["FlightNumber"];
+        $flightCode=$jsonData[0]["FlightCode"];
+        $cabin=$jsonData[0]["Cabin"];
+        $class=$jsonData[0]["Class"];
+        $baggage=$jsonData[0]["Baggage"];
+        $travelTime=$jsonData[0]["TravelTime"];
+       
+        
+        $sql="UPDATE groupfare 
+        SET segment='$segment', dept1='$deptFrom', deptTime1='$deptTime',  
+        arrive1='$arriveTo',  arriveTime1='$arriveTime',  carrierName1='$carrierName',  
+        flightNum1='$flightNum',  flightCode1='$flightCode',
+        cabin1='$cabin',  
+        class1='$class',  baggage1='$baggage',  travelTime1='$travelTime', 
+        transitTime='$transitTime', totalSeat='$totalSeat',
+        adtBaseFare='$adtBaseFare'/*, showStatus='$show'*/
+        WHERE groupFareId='$id'";
+
+
+        
+    }
+    else if($segment==2)
+    {
+        $deptFrom1=$jsonData[0]["DepartureFrom"];
+        $deptTime1=$jsonData[0]["DepartureTime"];
+        $arriveTo1=$jsonData[0]["ArriveTo"];
+        $arriveTime1=$jsonData[0]["ArrivalTime"];
+        $carrierName1=$jsonData[0]["CarrierName"];
+        $flightNum1=$jsonData[0]["FlightNumber"];
+        $flightCode1=$jsonData[0]["FlightCode"];
+        $cabin1=$jsonData[0]["Cabin"];
+        $class1=$jsonData[0]["Class"];
+        $baggage1=$jsonData[0]["Baggage"];
+        $travelTime1=$jsonData[0]["TravelTime"];
+        
+
+        $deptFrom2=$jsonData[1]["DepartureFrom"];
+        $deptTime2=$jsonData[1]["DepartureTime"];
+        $arriveTo2=$jsonData[1]["ArriveTo"];
+        $arriveTime2=$jsonData[1]["ArrivalTime"];
+        $carrierName2=$jsonData[1]["CarrierName"];
+        $flightNum2=$jsonData[1]["FlightNumber"];
+        $flightCode2=$jsonData[1]["FlightCode"];
+        $cabin2=$jsonData[1]["Cabin"];
+        $class2=$jsonData[1]["Class"];
+        $baggage2=$jsonData[1]["Baggage"];
+        $travelTime2=$jsonData[1]["TravelTime"];
+       
+        
+        
+        
+        $sql="UPDATE groupfare SET
+        segment='$segment', dept1='$deptFrom1', dept2='$deptFrom2', deptTime1='$deptTime1', deptTime2='$deptTime2', 
+        arrive1='$arriveTo1', arrive2='$arriveTo2', arriveTime1='$arriveTime1', arriveTime2='$arriveTime2', 
+        carrierName1='$carrierName1', carrierName2='$carrierName2', 
+        flightNum1='$flightNum1', flightNum2='$flightNum2', flightCode1='$flightCode1', flightCode2='$flightCode2', 
+        cabin1='$cabin1', cabin2='$cabin2', class1='$class1', class2='$class2', baggage1='$baggage1', 
+        baggage2='$baggage2', travelTime1='$travelTime1', travelTime2='$travelTime2', transitTime='$transitTime', totalSeat='$totalSeat',
+        adtBaseFare='$adtBaseFare'/*, showStatus='$show'*/
+        WHERE groupFareId='$id'";
+    }
+
+    if ($conn->query($sql)) {
+        
+        $response["status"] = "Success";
+        $response["message"] = $id."'s Data Updated Successfully";
+    }
+    else
+    {
+        $response["status"] = "Failed";
+        $response["message"] = "Query Failed";
+    }
+    
     echo json_encode($response);
-                           
+    
+
+}
+else
+{
+    $response["status"] = "Failed";
+    $response["message"] = "Wrong Request Method";
+    
+    echo json_encode($response);
 }
 
+$conn->close();
 
 
 ?>
