@@ -10,8 +10,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 if($_SERVER["REQUEST_METHOD"]=="POST")
 {
     $jsonData = json_decode(file_get_contents('php://input'), true);
-    $flightPassengerData=$jsonData["flightPassengerData"];
-    $passengerData=$jsonData["flightPassengerData"]["passenger"];
+    // $flightPassengerData=$jsonData["groupFarePassengerData"];
+    $passengerData=$jsonData["groupFarePassengerData"]["passengers"];
     $bookingData=$jsonData["bookingInfo"];
     // $saveBookingData=$jsonData["saveBooking"];
     // $saveBookingFlightData=$saveBookingData["flightData"];
@@ -83,9 +83,9 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
         $bookingId = $row['bookingId'];
         
         $values="";
-
+        
         if(isset($bookingId))
-        {
+        {   
             foreach($passengerData as $passenger)
             {
                 $type= $passenger["type"]; 
@@ -104,11 +104,11 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 
             $newValues=substr($values,0,-1);
 
-            $sql="INSERT INTO passenger 
+            $sql="INSERT INTO passengers 
             (bookingId, agentId, fName, lName, dob, type, passNation, passNo, passEx, 
             phone, email, gender, created)
             VALUES".$newValues;
-
+            
             if($conn->query($sql))
             {
                 $response["status"] = "Success";
