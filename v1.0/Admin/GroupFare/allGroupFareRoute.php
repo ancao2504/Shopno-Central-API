@@ -8,8 +8,11 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 if($_SERVER["REQUEST_METHOD"] == "GET")
-{
-    $response=$conn->query("SELECT * FROM groupfare ORDER BY groupFareId DESC")->fetch_all(MYSQLI_ASSOC);
+{   
+
+    $sql="SELECT dept1 AS dept, IF(arrive2='', arrive1, arrive2) AS arrive FROM groupfare gf
+    ORDER BY groupFareId DESC";
+    $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
     if(!empty($response))
     {
