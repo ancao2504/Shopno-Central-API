@@ -62,49 +62,54 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 
 
     $sql="INSERT INTO group_fare_boooking
-    (/*uid*/, agentId,
-   staffId, email, phone, name, refundable,  tripType,
-  journeyType, pax, adultBag, childBag, infantBag, adultCount, 
-  childCount, infantCount,
-   netCost, adultCostBase, childCostBase, infantCostBase,
-  adultCostTax, childCostTax, infantCostTax, grossCost, 
-  baseFare, Tax, 
-  deptFrom, airlines, arriveTo, gds, 
-  status, travelDate, bookedAt, timeLimit, 
-  searchId, resultId,
-  platform, ticketCoupon)
-  VALUES (/*'$uid'*/, '$agentId', '$staffId', '$email', '$phone', '$name',
-  '$refundable', '$tripType', '$journeyType', '$pax','$adultBag','$childBag','$infantBag',
-  '$adultCount','$childCount','$infantCount','$netCost','$adultCostBase','$childCostBase',
-  '$infantCostBase','$adultCostTax','$childCostTax','$infantCostTax','$grossCost','$baseFare',
-  '$Tax','$deptFrom','$airlines','$arriveTo','$gds','Hold','$travelDate','$currentDateTime','$timeLimit','$searchId','$resultId','$platform','$ticketCoupon'
-  )";
+    (/*uid*/, 
+    agentId, staffId, email, phone, name, refundable,  tripType,
+    journeyType, pax, adultBag, childBag, infantBag, adultCount, 
+    childCount, infantCount, netCost, adultCostBase, childCostBase, 
+    infantCostBase, adultCostTax, childCostTax, infantCostTax, grossCost, 
+    baseFare, Tax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
+    bookedAt, timeLimit, searchId, resultId, platform, ticketCoupon)
+    VALUES (/*'$uid'*/, '$agentId', '$staffId', '$email', '$phone', '$name','$refundable',
+    '$tripType', '$journeyType', '$pax','$adultBag','$childBag','$infantBag','$adultCount',
+    '$childCount','$infantCount','$netCost','$adultCostBase','$childCostBase','$infantCostBase',
+    '$adultCostTax','$childCostTax','$infantCostTax','$grossCost','$baseFare','$Tax','$deptFrom',
+    '$airlines','$arriveTo','$gds','Hold','$travelDate','$currentDateTime','$timeLimit','$searchId',
+    '$resultId','$platform','$ticketCoupon')";
 
+    if($conn->query($sql))
+    {
+        $bookingId=$conn->query("SELECT bookingId FROM group_fare_boooking ORDER BY id DESC LIMIT 1")->fetch_assoc();
+        $values="";
+
+        if(!empty($bookingId))
+        {
+            foreach($passengerData as $passenger)
+            {
+                $type= $passenger["type"]; 
+                $fName= $passenger["fName"]; 
+                $lName= $passenger["lName"]; 
+                $gender= $passenger["gender"]; 
+                $dob= $passenger["dob"]; 
+                $passNation= $passenger["passNation"]; 
+                $passNo= $passenger["passNo"]; 
+                $passEx= $passenger["passEx"]; 
+                
+                $values=$values."('$bookingId','$agentId','$fName','$lName','$dob','$type','
+                $passNation','$passNo','$passEx','$phone', '$email', '$gender', '$currentDateTime'),";
+
+            }
+
+            $
+            $sql="INSERT INTO passengers 
+            (bookingId, agentId, fName, lName, dob, type, passNation, passNo, passEx, 
+            phone, email, gender, created)
+            VALUES".$values;
+
+        }
+        
+
+    }
     
-
-
-foreach($passengerData as $passenger)
-{
-    $type= $passenger["type"]; 
-    $fName= $passenger["fName"]; 
-    $lName= $passenger["lName"]; 
-    $gender= $passenger["gender"]; 
-    $dob= $passenger["dob"]; 
-    $passNation= $passenger["passNation"]; 
-    $passNo= $passenger["passNo"]; 
-    $passEx= $passenger["passEx"]; 
-    $
-    $sql="INSERT INTO passengers 
-    (bookingId, agentId, fName, lName, dob, type, passNation, passNo, passEx, 
-    phone, email, gender, created)
-    VALUES
-    ('$agentId','$fName','$lName','$dob','$type','$passNation',
-    '$passNo','$passEx','$phone', '$email', '$gender', '$currentDateTime')
-    ";
-
-
-
-}
     
 
 
