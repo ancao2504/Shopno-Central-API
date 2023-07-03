@@ -72,11 +72,11 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $sql="INSERT INTO groupfare 
             (segment, dept1, dept2, deptTime1, deptTime2, arrive1, arrive2, arriveTime1, arriveTime2, carrierName1, carrierName2, 
             flightNum1, flightNum2, flightCode1, flightCode2, cabin1, cabin2, class1, class2, baggage1, baggage2, travelTime1, 
-            travelTime2, transitTime, totalSeat, adtBaseFare, availableSeat)
+            travelTime2, transitTime, totalSeat, adtBaseFare, availableSeat, status)
             VALUES 
             ('$segment','$deptFrom1','$deptFrom2','$deptTime1','$deptTime2','$arriveTo1','$arriveTo2','$arriveTime1','$arriveTime2',
             '$carrierName1','$carrierName2','$flightNum1','$flightNum2','$flightCode1','$flightCode2', '$cabin1','$cabin2','$class1','$class2',
-            '$baggage1','$baggage2','$travelTime1','$travelTime2','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat')";
+            '$baggage1','$baggage2','$travelTime1','$travelTime2','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat', 'true')";
         }
 
         if ($conn->query($sql)) {

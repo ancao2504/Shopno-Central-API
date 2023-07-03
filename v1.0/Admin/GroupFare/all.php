@@ -11,7 +11,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
 {
     $response=$conn->query("SELECT * FROM groupfare ORDER BY groupFareId DESC")->fetch_all(MYSQLI_ASSOC);
 
-    if(count($response)>0)
+    if(!empty($response))
     {
         echo json_encode($response);
     }

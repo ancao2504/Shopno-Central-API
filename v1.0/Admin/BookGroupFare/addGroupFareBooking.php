@@ -84,7 +84,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
         
         $values="";
 
-        if(!empty($bookingId))
+        if(isset($bookingId))
         {
             foreach($passengerData as $passenger)
             {
