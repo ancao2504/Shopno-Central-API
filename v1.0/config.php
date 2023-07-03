@@ -1,9 +1,14 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname="flyfarin_shopno";
+// $servername = "localhost";
+// $username = "root";
+// $password = "";
+// $dbname="flyfarin_shopno";
 
+// FlyWay Live Database
+$servername = "flyfarint.com";
+$username = "flyfarin_shopno";
+$password = "*04ruXfEfq";
+$dbname = "flyfarin_shopno";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 

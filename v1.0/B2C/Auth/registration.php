@@ -35,24 +35,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $userId = "STU1000";
     }
 
-    $checkUser = "SELECT * FROM agent WHERE email='$Email' OR phone ='$Phone' AND platform = 'B2C'";
-    $result = mysqli_query($conn, $checkUser);
+    $checkUser = "SELECT email, phone FROM agent WHERE (email='$Email' OR phone ='$Phone') AND platform = 'B2C'";
+$result = mysqli_query($conn, $checkUser);
 
-    if (mysqli_num_rows($result) > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $Phone = $row['phone'];
-            if ($row['email'] == $Email) {
-                $response['status'] = "error";
-                $response['message'] = "Email Already Exists";
 
-            } else if ($row['phone'] == $Phone) {
-                $response['status'] = "error";
-                $response['message'] = "Phone Number Registered to Another User";
-
-            }
-
+if (mysqli_num_rows($result) > 0) {
+    while ($row = $result->fetch_assoc()) {
+        if ($row['email'] == $Email) {
+            $response['status'] = "error";
+            $response['message'] = "Email Already Exists";
+        } else if ($row['phone'] == $Phone) {
+            $response['status'] = "error";
+            $response['message'] = "Phone Number Registered to Another User";
         }
-    } else if (mysqli_num_rows($result) <= 0) {
+    }
+} else if (mysqli_num_rows($result) <= 0) {
         $sql = "INSERT INTO `agent`(
                 `userId`,
                 `name`,

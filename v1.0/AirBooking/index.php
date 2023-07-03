@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $bookingInfo = $_POST['bookingInfo'];
     $saveBookingAarray = isset($_POST['saveBooking']) ? $_POST['saveBooking'] :'';
     $gdsSystem = isset($_POST['system']) ? $_POST['system'] : '';
-    $agentId = $_POST['agentId'];
+    $agentId = isset($_POST['agentId'])? $_POST['agentId']: "";
     $subagentId = isset($_POST['subagentId']) ? $_POST['subagentId'] : "";
     $userId = isset($_POST['userId']) ? $_POST['userId'] : "";
     $Platform = isset($_POST['platform']) ? $_POST['platform'] : "";
@@ -746,7 +746,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     }
 
-if ($gdsSystem == 'Sabre'){
+    if ($gdsSystem == 'Sabre') {
 
         $Name = $PassengerData['adult'][0]['afName'] . ' ' . $PassengerData['adult'][0]['alName'];
         $SeatReq = $adult + $child;
@@ -1597,7 +1597,9 @@ if ($gdsSystem == 'Sabre'){
                     }
                 }';
 
+        //print($Request);
 
+        try {
 
             $client_id= base64_encode("V1:593072:14KK:AA");
             //$client_secret = base64_encode("280ff537"); //cert
@@ -1626,7 +1628,11 @@ if ($gdsSystem == 'Sabre'){
             $access_token = $resf['access_token'];
             //echo $access_token;
 
-       
+        } catch (Exception $e) {
+
+        }
+
+        //Curl start
         $curl = curl_init();
 
         curl_setopt_array(
@@ -1686,6 +1692,608 @@ if ($gdsSystem == 'Sabre'){
             exit();
         }
 
+    }else if ($gdsSystem == 'FlyHub') { 
+        
+        $SearchID = $_POST['flightPassengerData']['SearchID'];
+        $ResultID = $_POST['flightPassengerData']['ResultID'];
+
+        $Passenger = array();
+        if ($adult > 0 && $child > 0 && $infants > 0) {
+            for ($x = 0; $x < $adult; $x++) {
+
+                ${'afName' . $x} = $PassengerData['adult'][$x]["afName"];
+                ${'alName' . $x} = $PassengerData['adult'][$x]["alName"];
+                ${'agender' . $x} = $PassengerData['adult'][$x]["agender"];
+                ${'adob' . $x} = $PassengerData['adult'][$x]["adob"];
+                ${'apassNo' . $x} = $PassengerData['adult'][$x]["apassNo"];
+                ${'apassEx' . $x} = $PassengerData['adult'][$x]["apassEx"];
+                ${'apassNation' . $x} = $PassengerData['adult'][$x]["apassNation"];
+
+                if ($x == 0) {
+                    $leadPass = true;
+                } else {
+                    $leadPass = false;
+                }
+
+                if (${'agender' . $x} == 'Male') {
+                    ${'aTitle' . $x} = "MR";
+                } else {
+                    ${'aTitle' . $x} = "MS";
+                }
+
+                $Adultbasic = array(
+                    "Title" => ${'aTitle' . $x},
+                    "FirstName" => ${'afName' . $x},
+                    "LastName" => ${'alName' . $x},
+                    "PaxType" => "Adult",
+                    "DateOfBirth" => ${'adob' . $x},
+                    "Gender" => ${'agender' . $x},
+                    "PassportNumber" => ${'apassNo' . $x},
+                    "PassportExpiryDate" => ${'apassEx' . $x},
+                    "PassportNationality" => ${'apassNation' . $x},
+                    "Address1" => null,
+                    "Address2" => null,
+                    "CountryCode" => "BD",
+                    "Nationality" => "BD",
+                    "ContactNumber" => "+8809606912912",
+                    "Email" => "support@flyfarint.com",
+                    "IsLeadPassenger" => $leadPass,
+                    "FFAirline" => null,
+                    "FFNumber" => null,
+                    "Baggage" => [
+                        array(
+                            "BaggageID" => null,
+                        ),
+                    ],
+                    "Meal" => [
+                        array(
+                            "MealID" => null,
+                        ),
+                    ],
+
+                );
+
+                array_push($Passenger, $Adultbasic);
+
+            }
+
+            for ($x = 0; $x < $child; $x++) {
+
+                ${'cfname' . $x} = $PassengerData['child'][$x]["cfName"];
+                ${'clname' . $x} = $PassengerData['child'][$x]["clName"];
+                ${'cgender' . $x} = $PassengerData['child'][$x]["cgender"];
+                ${'cdob' . $x} = $PassengerData['child'][$x]["cdob"];
+                ${'cpassNo' . $x} = $PassengerData['child'][$x]["cpassNo"];
+                ${'cpassNoEx' . $x} = $PassengerData['child'][$x]["cpassEx"];
+                ${'cpassNation' . $x} = $PassengerData['child'][$x]["cpassNation"];
+
+                if (${'cgender' . $x} == 'Male') {
+                    ${'cTitle' . $x} = "MSTR";
+                } else {
+                    ${'cTitle' . $x} = "MISS";
+                }
+
+                $Childbasic = array(
+                    "Title" => ${'cTitle' . $x},
+                    "FirstName" => ${'cfname' . $x},
+                    "LastName" => ${'clname' . $x},
+                    "PaxType" => "Child",
+                    "DateOfBirth" => ${'cdob' . $x},
+                    "Gender" => ${'cgender' . $x},
+                    "PassportNumber" => ${'cpassNo' . $x},
+                    "PassportExpiryDate" => ${'cpassNoEx' . $x},
+                    "PassportNationality" => ${'cpassNation' . $x},
+                    "Address1" => null,
+                    "Address2" => null,
+                    "CountryCode" => "BD",
+                    "Nationality" => "BD",
+                    "ContactNumber" => "+8809606912912",
+                    "Email" => "support@flyfarint.com",
+                    "IsLeadPassenger" => false,
+                    "FFAirline" => null,
+                    "FFNumber" => null,
+                    "Baggage" => [
+                        array(
+                            "BaggageID" => null,
+                        ),
+                    ],
+                    "Meal" => [
+                        array(
+                            "MealID" => null,
+                        ),
+                    ],
+
+                );
+
+                array_push($Passenger, $Childbasic);
+
+            }
+
+            for ($x = 0; $x < $infants; $x++) {
+
+                ${'ifname' . $x} = $PassengerData['infant'][$x]["ifName"];
+                ${'ilname' . $x} = $PassengerData['infant'][$x]["ilName"];
+                ${'igender' . $x} = $PassengerData['infant'][$x]["igender"];
+                ${'idob' . $x} = $PassengerData['infant'][$x]["idob"];
+                ${'ipassNo' . $x} = $PassengerData['infant'][$x]["ipassNo"];
+                ${'ipassNoEx' . $x} = $PassengerData['infant'][$x]["ipassEx"];
+                ${'ipassNation' . $x} = $PassengerData['infant'][$x]["ipassNation"];
+
+                if (${'igender' . $x} == 'Male') {
+                    ${'iTitle' . $x} = "MSTR";
+                } else {
+                    ${'iTitle' . $x} = "MISS";
+                }
+
+                $Infantbasic = array(
+                    "Title" => ${'iTitle' . $x},
+                    "FirstName" => ${'ifname' . $x},
+                    "LastName" => ${'ilname' . $x},
+                    "PaxType" => "Infant",
+                    "DateOfBirth" => ${'idob' . $x},
+                    "Gender" => ${'igender' . $x},
+                    "PassportNumber" => ${'ipassNo' . $x},
+                    "PassportExpiryDate" => ${'ipassNoEx' . $x},
+                    "PassportNationality" => ${'ipassNation' . $x},
+                    "Address1" => null,
+                    "Address2" => null,
+                    "CountryCode" => "BD",
+                    "Nationality" => "BD",
+                    "ContactNumber" => "+8809606912912",
+                    "Email" => "support@flyfarint.com",
+                    "IsLeadPassenger" => false,
+                    "FFAirline" => null,
+                    "FFNumber" => null,
+                    "Baggage" => [
+                        array(
+                            "BaggageID" => null,
+                        ),
+                    ],
+                    "Meal" => [
+                        array(
+                            "MealID" => null,
+                        ),
+                    ],
+
+                );
+
+                array_push($Passenger, $Infantbasic);
+
+            }
+
+            $FinalResponse = array(
+                "SearchID" => $SearchID,
+                "ResultID" => $ResultID,
+                "Passengers" => $Passenger,
+                "PromotionCode" => null,
+            );
+
+            $FlyHubBookingRequst = (json_encode($FinalResponse, JSON_PRETTY_PRINT));
+
+        } else if ($adult > 0 && $child > 0) {
+            for ($x = 0; $x < $adult; $x++) {
+                ${'afName' . $x} = $PassengerData['adult'][$x]["afName"];
+                ${'alName' . $x} = $PassengerData['adult'][$x]["alName"];
+                ${'agender' . $x} = $PassengerData['adult'][$x]["agender"];
+                ${'adob' . $x} = $PassengerData['adult'][$x]["adob"];
+                ${'apassNo' . $x} = $PassengerData['adult'][$x]["apassNo"];
+                ${'apassEx' . $x} = $PassengerData['adult'][$x]["apassEx"];
+                ${'apassNation' . $x} = $PassengerData['adult'][$x]["apassNation"];
+
+                if ($x == 0) {
+                    $leadPass = true;
+                } else {
+                    $leadPass = false;
+                }
+
+                if (${'agender' . $x} == 'Male') {
+                    ${'aTitle' . $x} = "MR";
+                } else {
+                    ${'aTitle' . $x} = "MRS";
+                }
+
+                $Adultbasic = array(
+                    "Title" => ${'aTitle' . $x},
+                    "FirstName" => ${'afName' . $x},
+                    "LastName" => ${'alName' . $x},
+                    "PaxType" => "Adult",
+                    "DateOfBirth" => ${'adob' . $x},
+                    "Gender" => ${'agender' . $x},
+                    "PassportNumber" => ${'apassNo' . $x},
+                    "PassportExpiryDate" => ${'apassEx' . $x},
+                    "PassportNationality" => ${'apassNation' . $x},
+                    "Address1" => null,
+                    "Address2" => null,
+                    "CountryCode" => "BD",
+                    "Nationality" => "BD",
+                    "ContactNumber" => "+8809606912912",
+                    "Email" => "support@flyfarint.com",
+                    "IsLeadPassenger" => $leadPass,
+                    "FFAirline" => null,
+                    "FFNumber" => null,
+                    "Baggage" => [
+                        array(
+                            "BaggageID" => null,
+                        ),
+                    ],
+                    "Meal" => [
+                        array(
+                            "MealID" => null,
+                        ),
+                    ],
+
+                );
+
+                array_push($Passenger, $Adultbasic);
+
+            }
+
+            for ($x = 0; $x < $child; $x++) {
+                $paxId = "";
+                $result = $conn->query("SELECT * FROM passengers ORDER BY id DESC LIMIT 1");
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]);
+                        $number = (int) $outputString + 1;
+                        $paxId = "FFP$number";
+                    }
+                } else {
+                    $paxId = "FFP1000";
+                }
+
+                ${'cfname' . $x} = $PassengerData['child'][$x]["cfName"];
+                ${'clname' . $x} = $PassengerData['child'][$x]["clName"];
+                ${'cgender' . $x} = $PassengerData['child'][$x]["cgender"];
+                ${'cdob' . $x} = $PassengerData['child'][$x]["cdob"];
+                ${'cpassNo' . $x} = $PassengerData['child'][$x]["cpassNo"];
+                ${'cpassNoEx' . $x} = $PassengerData['child'][$x]["cpassEx"];
+                ${'cpassNation' . $x} = $PassengerData['child'][$x]["cpassNation"];
+
+                if (${'cgender' . $x} == 'Male') {
+                    ${'cTitle' . $x} = "MSTR";
+                } else {
+                    ${'cTitle' . $x} = "MISS";
+                }
+
+                $Childbasic = array(
+                    "Title" => ${'cTitle' . $x},
+                    "FirstName" => ${'cfname' . $x},
+                    "LastName" => ${'clname' . $x},
+                    "PaxType" => "Child",
+                    "DateOfBirth" => ${'cdob' . $x},
+                    "Gender" => ${'cgender' . $x},
+                    "PassportNumber" => ${'cpassNo' . $x},
+                    "PassportExpiryDate" => ${'cpassNoEx' . $x},
+                    "PassportNationality" => ${'cpassNation' . $x},
+                    "Address1" => null,
+                    "Address2" => null,
+                    "CountryCode" => "BD",
+                    "Nationality" => "BD",
+                    "ContactNumber" => "+8809606912912",
+                    "Email" => "support@flyfarint.com",
+                    "IsLeadPassenger" => false,
+                    "FFAirline" => null,
+                    "FFNumber" => null,
+                    "Baggage" => [
+                        array(
+                            "BaggageID" => null,
+                        ),
+                    ],
+                    "Meal" => [
+                        array(
+                            "MealID" => null,
+                        ),
+                    ],
+
+                );
+
+                array_push($Passenger, $Childbasic);
+
+            }
+
+            $FinalResponse = array(
+                "SearchID" => $SearchID,
+                "ResultID" => $ResultID,
+                "Passengers" => $Passenger,
+                "PromotionCode" => null,
+            );
+
+            $FlyHubBookingRequst = (json_encode($FinalResponse, JSON_PRETTY_PRINT));
+
+        } else if ($adult > 0 && $infants > 0) {
+            for ($x = 0; $x < $adult; $x++) {
+
+                ${'afName' . $x} = $PassengerData['adult'][$x]["afName"];
+                ${'alName' . $x} = $PassengerData['adult'][$x]["alName"];
+                ${'agender' . $x} = $PassengerData['adult'][$x]["agender"];
+                ${'adob' . $x} = $PassengerData['adult'][$x]["adob"];
+                ${'apassNo' . $x} = $PassengerData['adult'][$x]["apassNo"];
+                ${'apassEx' . $x} = $PassengerData['adult'][$x]["apassEx"];
+                ${'apassNation' . $x} = $PassengerData['adult'][$x]["apassNation"];
+
+                if ($x == 0) {
+                    $leadPass = true;
+                } else {
+                    $leadPass = false;
+                }
+
+                if (${'agender' . $x} == 'Male') {
+                    ${'aTitle' . $x} = "MR";
+                } else {
+                    ${'aTitle' . $x} = "MRS";
+                }
+
+                $Adultbasic = array(
+                    "Title" => ${'aTitle' . $x},
+                    "FirstName" => ${'afName' . $x},
+                    "LastName" => ${'alName' . $x},
+                    "PaxType" => "Adult",
+                    "DateOfBirth" => ${'adob' . $x},
+                    "Gender" => ${'agender' . $x},
+                    "PassportNumber" => ${'apassNo' . $x},
+                    "PassportExpiryDate" => ${'apassEx' . $x},
+                    "PassportNationality" => ${'apassNation' . $x},
+                    "Address1" => null,
+                    "Address2" => null,
+                    "CountryCode" => "BD",
+                    "Nationality" => "BD",
+                    "ContactNumber" => "+8809606912912",
+                    "Email" => "support@flyfarint.com",
+                    "IsLeadPassenger" => $leadPass,
+                    "FFAirline" => null,
+                    "FFNumber" => null,
+                    "Baggage" => [
+                        array(
+                            "BaggageID" => null,
+                        ),
+                    ],
+                    "Meal" => [
+                        array(
+                            "MealID" => null,
+                        ),
+                    ],
+
+                );
+
+                array_push($Passenger, $Adultbasic);
+
+            }
+
+            for ($x = 0; $x < $infants; $x++) {
+
+                ${'ifname' . $x} = $PassengerData['infant'][$x]["ifName"];
+                ${'ilname' . $x} = $PassengerData['infant'][$x]["ilName"];
+                ${'igender' . $x} = $PassengerData['infant'][$x]["igender"];
+                ${'idob' . $x} = $PassengerData['infant'][$x]["idob"];
+                ${'ipassNo' . $x} = $PassengerData['infant'][$x]["ipassNo"];
+                ${'ipassNoEx' . $x} = $PassengerData['infant'][$x]["ipassEx"];
+                ${'ipassNation' . $x} = $PassengerData['infant'][$x]["ipassNation"];
+
+                if (${'igender' . $x} == 'Male') {
+                    ${'iTitle' . $x} = "MSTR";
+                } else {
+                    ${'iTitle' . $x} = "MISS";
+                }
+
+                $Infantbasic = array(
+                    "Title" => ${'iTitle' . $x},
+                    "FirstName" => ${'ifname' . $x},
+                    "LastName" => ${'ilname' . $x},
+                    "PaxType" => "Infant",
+                    "DateOfBirth" => ${'idob' . $x},
+                    "Gender" => ${'igender' . $x},
+                    "PassportNumber" => ${'ipassNo' . $x},
+                    "PassportExpiryDate" => ${'ipassNoEx' . $x},
+                    "PassportNationality" => ${'ipassNation' . $x},
+                    "Address1" => null,
+                    "Address2" => null,
+                    "CountryCode" => "BD",
+                    "Nationality" => "BD",
+                    "ContactNumber" => "+8809606912912",
+                    "Email" => "support@flyfarint.com",
+                    "IsLeadPassenger" => false,
+                    "FFAirline" => null,
+                    "FFNumber" => null,
+                    "Baggage" => [
+                        array(
+                            "BaggageID" => null,
+                        ),
+                    ],
+                    "Meal" => [
+                        array(
+                            "MealID" => null,
+                        ),
+                    ],
+
+                );
+
+                array_push($Passenger, $Infantbasic);
+
+            }
+
+            $FinalResponse = array(
+                "SearchID" => $SearchID,
+                "ResultID" => $ResultID,
+                "Passengers" => $Passenger,
+                "PromotionCode" => null,
+            );
+
+            $FlyHubBookingRequst = (json_encode($FinalResponse, JSON_PRETTY_PRINT));
+
+        } else if ($adult > 0) {
+
+            for ($x = 0; $x < $adult; $x++) {
+
+                ${'afName' . $x} = $PassengerData['adult'][$x]["afName"];
+                ${'alName' . $x} = $PassengerData['adult'][$x]["alName"];
+                ${'agender' . $x} = $PassengerData['adult'][$x]["agender"];
+                ${'adob' . $x} = $PassengerData['adult'][$x]["adob"];
+                ${'apassNo' . $x} = $PassengerData['adult'][$x]["apassNo"];
+                ${'apassEx' . $x} = $PassengerData['adult'][$x]["apassEx"];
+                ${'apassNation' . $x} = $PassengerData['adult'][$x]["apassNation"];
+
+                if ($x == 0) {
+                    $leadPass = true;
+                } else {
+                    $leadPass = false;
+                }
+
+                if (${'agender' . $x} == 'Male') {
+                    ${'aTitle' . $x} = "MR";
+                } else {
+                    ${'aTitle' . $x} = "MRS";
+                }
+
+                $Adultbasic = array(
+                    "Title" => ${'aTitle' . $x},
+                    "FirstName" => ${'afName' . $x},
+                    "LastName" => ${'alName' . $x},
+                    "PaxType" => "Adult",
+                    "DateOfBirth" => ${'adob' . $x},
+                    "Gender" => ${'agender' . $x},
+                    "PassportNumber" => ${'apassNo' . $x},
+                    "PassportExpiryDate" => ${'apassEx' . $x},
+                    "PassportNationality" => ${'apassNation' . $x},
+                    "Address1" => null,
+                    "Address2" => null,
+                    "CountryCode" => "BD",
+                    "Nationality" => "BD",
+                    "ContactNumber" => "+8809606912912",
+                    "Email" => "support@flyfarint.com",
+                    "IsLeadPassenger" => $leadPass,
+                    "FFAirline" => null,
+                    "FFNumber" => null,
+                    "Baggage" => [
+                        array(
+                            "BaggageID" => null,
+                        ),
+                    ],
+                    "Meal" => [
+                        array(
+                            "MealID" => null,
+                        ),
+                    ],
+
+                );
+
+                array_push($Passenger, $Adultbasic);
+
+            }
+
+            $FinalResponse = array(
+                "SearchID" => $SearchID,
+                "ResultID" => $ResultID,
+                "Passengers" => $Passenger,
+                "PromotionCode" => null,
+            );
+
+            $FlyHubBookingRequst = (json_encode($FinalResponse, JSON_PRETTY_PRINT));
+
+        }
+
+        $curlflyhubauth = curl_init();
+
+        curl_setopt_array(
+            $curlflyhubauth,
+            array(
+                CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => '{
+                    "username": "ceo@flyfarint.com",
+                    "apikey": "ENex7c5Ge+0~SGc1t71iccr1xXacDPdK51g=iTm9SlL+de39HF"
+                    }',
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                ),
+            )
+        );
+
+        $response = curl_exec($curlflyhubauth);
+        $TokenJson = json_decode($response, true);
+        $FlyhubToken = $TokenJson['TokenId']; //echo $FlyhubToken;
+
+        //Pre Booking
+        $curlFlyHubPreBooking = curl_init();
+
+        curl_setopt_array($curlFlyHubPreBooking,
+            array(CURLOPT_URL => 'https://api.flyhub.com/api/v1/AirPreBook',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $FlyHubBookingRequst,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    "Authorization: Bearer $FlyhubToken",),
+            )
+        );
+
+        $flyhubresponse1 = curl_exec($curlFlyHubPreBooking);
+
+        curl_close($curlFlyHubPreBooking);
+
+        // echo  $flyhubresponse1;
+
+        $resutPreBook = json_decode($flyhubresponse1, true);
+
+        if (isset($resutPreBook['Error']['ErrorMessage'])) {
+            $FlyHubRes['status'] = "error";
+            $FlyHubRes['message'] = $resutPreBook['Error']['ErrorMessage'];
+            echo json_encode($FlyHubRes);
+            exit();
+        } else {
+
+            sleep(5);
+
+            $curlFlyHubBooking = curl_init();
+
+            curl_setopt_array($curlFlyHubBooking,
+                array(
+                    CURLOPT_URL => 'https://api.flyhub.com/api/v1/AirBook',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $FlyHubBookingRequst,
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json',
+                        "Authorization: Bearer $FlyhubToken",),
+                )
+            );
+
+            $flyhubresponse = curl_exec($curlFlyHubBooking);
+
+            curl_close($curlFlyHubBooking);
+            $flyhubResult = json_decode($flyhubresponse, true);
+
+            if (isset($flyhubResult['Error'])) {
+                $FlyHubRes['status'] = "error";
+                $FlyHubRes['message'] = $flyhubResult['Error']['ErrorMessage'];
+                echo json_encode($FlyHubRes);
+                exit();
+            } else {
+                if (isset($flyhubResult['BookingID'])) {
+                    $BookingPNR = $flyhubResult['BookingID'];
+                    $AirlinesPNR = '';
+                    $UniversalPnr='';
+                    saveBooking($conn, $BookingPNR, $saveBookingAarray);
+                    addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $bookingInfo, $PassengerData, $saveBookingAarray);
+                }
+
+            }
+        }
     }else if($gdsSystem == 'Galileo'){
         GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo);
     }
@@ -2405,7 +3013,7 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 								<BillingPointOfSaleInfo xmlns="http://www.travelport.com/schema/common_v51_0" OriginApplication="UAPI" />
 									$PassengerNumAll
 								<AgencyContactInfo xmlns="http://www.travelport.com/schema/common_v51_0">
-									<PhoneNumber Location="DAC" Number="01322903298" Text="Fly Far International" />
+									<PhoneNumber Location="DAC" Number="08809606912912" Text="Fly Far International" />
 								</AgencyContactInfo>
 									$AirPricingSolution
 								<ActionStatus xmlns="http://www.travelport.com/schema/common_v51_0" Type="TAW" TicketDate="$tDate" ProviderCode="1G" />
@@ -3271,7 +3879,7 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
 								<BillingPointOfSaleInfo xmlns="http://www.travelport.com/schema/common_v51_0" OriginApplication="UAPI" />
 									$PassengerNumAll
 								<AgencyContactInfo xmlns="http://www.travelport.com/schema/common_v51_0">
-									<PhoneNumber Location="DAC" Number="01322903298" Text="Fly Far International" />
+									<PhoneNumber Location="DAC" Number="08809606912912" Text="Fly Far International" />
 								</AgencyContactInfo>
 									$AirPricingSolution
 								<ActionStatus xmlns="http://www.travelport.com/schema/common_v51_0" Type="TAW" TicketDate="$tDate" ProviderCode="1G" />
@@ -3327,8 +3935,9 @@ function GalileoBooking($conn, $saveBookingAarray, $PassengerData, $bookingInfo)
         if(isset($result['universalUniversalRecord']['@attributes']['LocatorCode'])){
             $BookingPNR = $result['universalUniversalRecord']['universalProviderReservationInfo']['@attributes']['LocatorCode'];
             $UniversalPnr = $result['universalUniversalRecord']['@attributes']['LocatorCode'];
+            $AirlinesPNR = '';
             saveBooking($conn, $BookingPNR, $saveBookingAarray);
-            addBookingQueue($conn, $BookingPNR, $UniversalPnr, $bookingInfo, $PassengerData, $saveBookingAarray);
+            addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $bookingInfo, $PassengerData,  $saveBookingAarray);
         }else{
             $BookingPNR='';
             addPax($conn, $BookingPNR, $agentId, $subagentId, $userId, $bookingId, $PassengerData);
@@ -3370,7 +3979,7 @@ function saveBooking($conn, $BookingPNR, $saveBookingAarray){
             $departureTime1 = $_POST['segments'][0]["departureTime"];
             $arrivalTime1 = $_POST['segments'][0]["arrivalTime"];
             $flightDuration1 = $_POST['segments'][0]["flightduration"];
-            $transit1 = $_POST['transit']["transit1"];
+            $transit1 = '';
             $marketingCareer1 = $_POST['segments'][0]["marketingcareer"];
             $marketingCareerName1 = $_POST['segments'][0]["marketingcareerName"];
             $marketingFlight1 = $_POST['segments'][0]["marketingflight"];
@@ -5055,7 +5664,7 @@ function saveBooking($conn, $BookingPNR, $saveBookingAarray){
 
 }
 
-function addBookingQueue($conn, $BookingPNR, $UniversalPnr, $bookingInfo, $PassengerData, $saveBookingAarray){
+function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $bookingInfo, $PassengerData, $saveBookingAarray){
     $SaveBookingData = $bookingInfo;
 
     if (!empty($BookingPNR)) {
@@ -5234,18 +5843,18 @@ function addBookingQueue($conn, $BookingPNR, $UniversalPnr, $bookingInfo, $Passe
 
         
 
-        $result1 = $conn->query("SELECT * FROM wl_content where agentId='$AgentId' ORDER BY id DESC LIMIT 1")->fetch_all(MYSQLI_ASSOC);
-        if(!empty($result1)){
-            $agentCompanyName = $result1[0]['company_name'];
-            $agentCompanyLogo = $result1[0]['companyImage'];
-            $agentCompanyEmail = $result1[0]['email'];
-            $agentCompanyPhone = $result1[0]['phone'];
-            $agentCompanyAddress = $result1[0]['address'];
-            $agentCompanyWebsiteLink = $result1[0]['websitelink'];
-            $agentCompanyFbLink = $result1[0]['fb_link'];
-            $agentCompanyLinkedinLink = $result1[0]['linkedin_link'];
-            $agentCompanyWhatsappNum = $result1[0]['whatsapp_num'];
-         }
+        // $result1 = $conn->query("SELECT * FROM wl_content where agentId='$AgentId' ORDER BY id DESC LIMIT 1")->fetch_all(MYSQLI_ASSOC);
+        // if(!empty($result1)){
+        //     $agentCompanyName = $result1[0]['company_name'];
+        //     $agentCompanyLogo = $result1[0]['companyImage'];
+        //     $agentCompanyEmail = $result1[0]['email'];
+        //     $agentCompanyPhone = $result1[0]['phone'];
+        //     $agentCompanyAddress = $result1[0]['address'];
+        //     $agentCompanyWebsiteLink = $result1[0]['websitelink'];
+        //     $agentCompanyFbLink = $result1[0]['fb_link'];
+        //     $agentCompanyLinkedinLink = $result1[0]['linkedin_link'];
+        //     $agentCompanyWhatsappNum = $result1[0]['whatsapp_num'];
+        //  }
 
         $sql = "INSERT INTO `booking` (
                           `uid`,
@@ -7016,6 +7625,10 @@ function addBookingQueue($conn, $BookingPNR, $UniversalPnr, $bookingInfo, $Passe
                 $response['message'] = "Mail Doesn't Send";
                 echo json_encode($response);
             }
+
+
+
+
         }
     }
 

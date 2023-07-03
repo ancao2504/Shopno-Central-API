@@ -3240,12 +3240,11 @@ if (array_key_exists("all", $_GET) && array_key_exists("agentId", $_GET)) {
         
 
     echo json_encode($return_arr);
-}else if (array_key_exists("userId", $_GET) && array_key_exists("agentId", $_GET) && array_key_exists("bookingid", $_GET)) {
+}else if (array_key_exists("userId", $_GET) && array_key_exists("bookingid", $_GET)) {
 
-    $agentId = $_GET["agentId"];
     $bookingId = $_GET["bookingid"];
     $userId = $_GET["userId"];
-    $sql = "SELECT * FROM `booking` where agentId='$agentId' AND userId='$userId' AND bookingId='$bookingId'";
+    $sql = "SELECT * FROM `booking` where userId='$userId' AND bookingId='$bookingId'";
     $result = $conn->query($sql);
 
     $return_arr = array();
@@ -3256,7 +3255,7 @@ if (array_key_exists("all", $_GET) && array_key_exists("agentId", $_GET)) {
             $pnr = $row['pnr'];
             $tripType = $row['tripType'];
             
-            $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE agentId='$agentId' AND  staffId='$staffId' ");
+            $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE staffId='$staffId'");
             
 
             $staffRow = mysqli_fetch_array($staffsql, MYSQLI_ASSOC);
@@ -4238,15 +4237,15 @@ if (array_key_exists("all", $_GET) && array_key_exists("agentId", $_GET)) {
 
             }
 
-            $Notes = $conn->query("SELECT * FROM `notes` where reference='$bookingId'")->fetch_all(MYSQLI_ASSOC);
-            $activitylog = $conn->query("SELECT * FROM  `activitylog` where ref='$bookingId'")->fetch_all(MYSQLI_ASSOC);
+            // $Notes = $conn->query("SELECT * FROM `notes` where reference='$bookingId'")->fetch_all(MYSQLI_ASSOC);
+            // $activitylog = $conn->query("SELECT * FROM  `activitylog` where ref='$bookingId'")->fetch_all(MYSQLI_ASSOC);
             $TicketInfo = $conn->query("SELECT DISTINCT  * FROM ticketed WHERE bookingId='$bookingId'")->fetch_all(MYSQLI_ASSOC);
 
             $response = $row;
             $response['passenger'] = $PassengerData;
-            $response['activity'] = $activitylog;
+           // $response['activity'] = $activitylog;
             $response['flightData'] = $FlightData;
-            $response['notes'] = $Notes;
+           // $response['notes'] = $Notes;
             $response['ticketData'] = $TicketInfo;
 
             array_push($return_arr, $response);
