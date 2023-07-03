@@ -7,6 +7,13 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
+
+
+
+
+
+
+
 if($_SERVER["REQUEST_METHOD"]=="POST")
 {
     $jsonData = json_decode(file_get_contents('php://input'), true);
@@ -76,16 +83,24 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     '$airlines','$arriveTo','$gds','Purchase','$travelDate','$currentDateTime','$timeLimit','$searchId',
     '$resultId','$platform','$ticketCoupon')";
 
+
+    $bookingId="";
+    $message="";
+    $book=false;
     if($conn->query($sql))
     {
         $result = $conn->query("SELECT bookingId FROM group_fare_booking ORDER BY id DESC LIMIT 1");
         $row = $result->fetch_assoc();
         $bookingId = $row['bookingId'];
-        
-        $values="";
-        
-        if(isset($bookingId))
-        {   
+        $book=true;
+    }
+    else
+    {
+            $book=false;
+    }
+    
+    $values="";
+           
             foreach($passengerData as $passenger)
             {
                 $type= $passenger["type"]; 
@@ -111,35 +126,35 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
             
             if($conn->query($sql))
             {
-                $response["status"] = "Success";
-                $response["message"] = "Booked Successfully";
+                if($book)
+                {
+                    $response["status"] = "Success";
+                    $response["message"] = "Booking and Passenger Added Successfully";
                     
-                echo json_encode($response);
+                }
+                else
+                {
+                    $response["status"] = "Failed";
+                    $response["message"] = "Passenger Add Done But Boooking Failed";
+                }
+                
             }
             else
             {
-                $response["status"] = "Failed";
-                $response["message"] = "Passenger Not Inserted";
-                    
-                echo json_encode($response);
-            }
+                if($book)
+                {
+                    $response["status"] = "Failed";
+                    $response["message"] = "Booking Done But Passenger Add Failed";
+                }
+                else
+                {
+                    $response["status"] = "Failed";
+                    $response["message"] = "Booking and Passenger Add Failed";
+                }
+            }        
 
-            //we can delete the booking from the database if passengers don't get inserted
-        }
-        
-
-    }
-    else
-    {
-        $response["status"] = "Failed";
-        $response["message"] = "Booking Failed";
+            echo json_encode($response);
             
-        echo json_encode($response);
-    }
-    
-    
-
-
 }
 else
 {
