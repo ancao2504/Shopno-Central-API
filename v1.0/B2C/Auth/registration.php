@@ -34,22 +34,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $userId = "STU1000";
     }
-
-    $checkUser = "SELECT email, phone FROM agent WHERE (email='$Email' OR phone ='$Phone') AND platform = 'B2C'";
+$checkUser = "SELECT `email`,`userId`,`name` FROM agent WHERE (`email`='$Email' AND `email` != '') AND platform = 'B2C'";
 $result = mysqli_query($conn, $checkUser);
 
-
 if (mysqli_num_rows($result) > 0) {
-    while ($row = $result->fetch_assoc()) {
-        if ($row['email'] == $Email) {
-            $response['status'] = "error";
-            $response['message'] = "Email Already Exists";
-        } else if ($row['phone'] == $Phone) {
-            $response['status'] = "error";
-            $response['message'] = "Phone Number Registered to Another User";
-        }
-    }
-} else if (mysqli_num_rows($result) <= 0) {
+while($row = mysqli_fetch_assoc($result)) {
+    $response['userId'] = $row['userId'];
+    $response['name'] = $row['name'];
+    $response['email'] = $row['email'];
+    $response['status'] = "error";
+    $response['message'] = "Email Already Exists";
+    echo json_encode($response);
+    exit;
+}
+} else{
         $sql = "INSERT INTO `agent`(
                 `userId`,
                 `name`,
@@ -81,8 +79,9 @@ if (mysqli_num_rows($result) > 0) {
             $response['status'] = "error";
             $response['message'] = "Registration Failed";
         }
+        echo json_encode($response);
     }
 
-    echo json_encode($response);
-
 }
+$conn->close();
+?>

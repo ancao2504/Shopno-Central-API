@@ -12,11 +12,11 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 // use PHPMailer\PHPMailer\Exception; 
 
 // require("../vendor/autoload.php");
-    if(array_key_exists('agentId', $_GET) && array_key_exists('sender', $_GET) && array_key_exists('ref', $_GET) 
+    if(array_key_exists('userId', $_GET) && array_key_exists('sender', $_GET) && array_key_exists('ref', $_GET) 
         && array_key_exists('receiver', $_GET) && array_key_exists('way', $_GET) && array_key_exists('method', $_GET) 
         && array_key_exists('transactionId', $_GET) && array_key_exists('amount', $_GET) && array_key_exists('staffId', $_GET)){
         
-        $agentId = $_GET['agentId'];    
+        $userId = $_GET['userId'];    
         $sender = $_GET['sender'];
         $reciever = $_GET['receiver']; 
         $way = $_GET['way'];
@@ -38,7 +38,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
         $fileSize  =  $_FILES['file']['size'];
 
         
-
         $DepositId ="";
         $sql = "SELECT * FROM deposit_request ORDER BY depositId DESC LIMIT 1";
         $result = $conn->query($sql);
@@ -54,8 +53,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
       
 
-        if(isset($agentId)){
-            $sql1 = mysqli_query($conn,"SELECT * FROM agent WHERE agentId='$agentId'");
+        if(isset($userId)){
+            $sql1 = mysqli_query($conn,"SELECT * FROM agent WHERE userId='$userId'");
             $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
 
             if(!empty($row1)){
@@ -68,7 +67,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 
         $lastAmount;
-        $sql2 = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' 
+        $sql2 = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where userId = '$userId' 
             ORDER BY id DESC LIMIT 1");
         $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);        
         if(!empty($row2)){
@@ -79,23 +78,14 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
         $newBalance = $lastAmount + $amount;
         
-
-        $staffsql2 = mysqli_query($conn,"SELECT * FROM `staffList` where agentId = '$agentId' AND staffId='$staffId'");
-        $staffrow2 = mysqli_fetch_array($staffsql2,MYSQLI_ASSOC);        
-        if(!empty($staffrow2)){
-            $staffName = $staffrow2['name'];	
-            $Message = "Deposit Request By: $staffName, $companyname";
-        }else{
             $Message = "Deposit Request By: $companyname";
             $staffName ="Agent";
-        }
-
 
         if(empty($fileName)){
                 $errorMSG = json_encode(array("message" => "please select image", "status" => false));	
                 echo $errorMSG;
             }else{
-                $upload_path = "../../asset/Agent/$agentId/Deposit/"; // set upload folder path 
+                $upload_path = "../../../asset/B2C/$userId/Deposit/"; // set upload folder path 
                 
                 if (!file_exists($upload_path)) {
                     mkdir($upload_path, 0777, true);
@@ -104,7 +94,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 $fileExt = strtolower(pathinfo($fileName,PATHINFO_EXTENSION)); // get image extension
                     
                 // valid image extensions
-                $valid_extensions = array('jpeg', 'jpg', 'png', 'pdf','PDF','JPG','PNG','JPEG'); 
+                $valid_extensions = array('jpeg', 'jpg', 'png', 'pdf','PDF','JPG','PNG','JPEG', 'WEBP', 'webp'); 
 
                 $renameFile ="$way-$method-$time-$amount.$fileExt";
 
@@ -117,22 +107,22 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                     if(!file_exists($upload_path . $fileName))
                     {
                         // check file size '5MB'
-                        if($fileSize < 5000000){
+                        if($fileSize < 10000000){
                             move_uploaded_file($tempPath, $upload_path . $renameFile); 
                         }
                         else{		
-                            $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => false));	
+                            $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 10 MB size", "status" => false));	
                             echo $errorMSG;
                         }
                     }
                     else
                     {		
                         // check file size '5MB'
-                        if($fileSize < 5000000){
+                        if($fileSize < 10000000){
                             move_uploaded_file($tempPath, $upload_path . $renameFile);
                         }
                         else{		
-                            $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => false));	
+                            $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 10 MB size", "status" => false));	
                             echo $errorMSG;
                         }
                     }
@@ -149,7 +139,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 $attachment = $renameFile;
                 
                 $sql = "INSERT INTO `deposit_request`(
-                `agentId`,
+                `userId`,
                 `staffId`,
                 `depositId`,
                 `sender`,
@@ -167,7 +157,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 `createdAt`
                 )
                 VALUES( 
-                '$agentId',
+                '$userId',
                 '$staffId',
                 '$DepositId',
                 '$sender',
@@ -179,7 +169,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 '$ref',
                 '$ckDate',
                 '$attachment',
-                'B2B',
+                'B2C',
                 'pending',
                 '$staffName',
                 '$time')";

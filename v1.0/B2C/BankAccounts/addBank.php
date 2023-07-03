@@ -1,5 +1,5 @@
 <?php
-include("../config.php");
+include("../../config.php");
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         
     $_POST = json_decode(file_get_contents('php://input'), true);
 
-        $agentId  = $_POST['agentId'];
+        $userId  = $_POST['userId'];
         $accname = $_POST['accname'];
         $bankname  = $_POST['bankname'];
         $accno  = $_POST['accno'];
@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
         $Date = date("Y-m-d H:i:s");
   
-        $checkUser="SELECT * FROM bank_accounts WHERE bankname='$bankname' AND accno='$accno' AND agentId='$agentId'";
+        $checkUser="SELECT * FROM bank_accounts WHERE bankname='$bankname' AND accno='$accno' AND userId='$userId'";
         $result=mysqli_query($conn,$checkUser);
 
         if(mysqli_num_rows($result)> 0){ 
@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
             echo json_encode($response);      
         }else{
             $sql = "INSERT INTO `bank_accounts`(
-                `agentId`,
+                `userId`,
                 `accname`,
                 `bankname`,
                 `accno`,
@@ -41,17 +41,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
                 `swift`,
                 `address`,
                 `routing`,
+                `platform`,
                 `createdAt`
               )
             VALUES(
-                '$agentId',
+                '$userId',
                 '$accname',
                 '$bankname',
                 '$accno',
                 '$branch',               
                 '$swift',
                 '$address',
-                '$routing',               
+                '$routing',
+                'B2C',              
                 '$Date'
             )";
 

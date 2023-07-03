@@ -4,7 +4,7 @@
 // $password = "";
 // $dbname="flyfarin_shopno";
 
-// FlyWay Live Database
+// Shopno Live Database
 $servername = "flyfarint.com";
 $username = "flyfarin_shopno";
 $password = "*04ruXfEfq";
