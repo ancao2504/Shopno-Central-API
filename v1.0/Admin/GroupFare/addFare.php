@@ -33,10 +33,10 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $sql="INSERT INTO groupfare 
             (segment, dept1, deptTime1,  arrive1,  arriveTime1,  carrierName1,  
             flightNum1,  flightCode1,  cabin1,  class1,  baggage1,  travelTime1, 
-             transitTime, totalSeat, adtBaseFare, availableSeat)
+             transitTime, totalSeat, adtBaseFare, availableSeat, status)
             VALUES 
             ('$segment','$deptFrom','$deptTime','$arriveTo','$arriveTime','$carrierName','$flightNum','$flightCode', '$cabin',
-            '$class','$baggage','$travelTime','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat')";
+            '$class','$baggage','$travelTime','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat', 'true')";
 
         } elseif($segment==2) {
             $deptFrom1=$jsonData[0]["DepartureFrom"];
