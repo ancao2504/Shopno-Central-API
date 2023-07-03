@@ -80,7 +80,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
   '$Tax','$deptFrom','$airlines','$arriveTo','$gds','Hold','$travelDate','$currentDateTime','$timeLimit','$searchId','$resultId','$platform','$ticketCoupon'
   )";
 
-
+    
 
 
 foreach($passengerData as $passenger)
