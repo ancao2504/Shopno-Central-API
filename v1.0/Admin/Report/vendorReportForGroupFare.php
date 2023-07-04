@@ -16,7 +16,8 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
     LEFT JOIN vendor ON vendor.name=group_fare_booking.vendor 
     WHERE status='Ticketed'
     GROUP BY vName  
-    ORDER BY segment DESC;";
+    ORDER BY segment DESC";
+
     $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
     if(!empty($response))
