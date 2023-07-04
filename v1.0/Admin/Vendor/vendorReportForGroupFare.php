@@ -11,8 +11,8 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
 {   
 
     $sql="SELECT vendor.vendorId AS vId, vendor AS vName, COUNT(*) AS totalBooking, SUM(gds_segment) AS segment, SUM(netCost) AS bookingAmount, SUM(invoice) AS vendorAmount
-    FROM booking
-    LEFT JOIN vendor ON vendor.name=booking.vendor 
+    FROM group_fare_booking
+    LEFT JOIN vendor ON vendor.name=group_fare_booking.vendor 
     WHERE status='Ticketed'
     GROUP BY vName  
     ORDER BY segment DESC;";
