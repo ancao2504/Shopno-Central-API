@@ -11,8 +11,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 if($_SERVER["REQUEST_METHOD"] == "GET")
 {   
 
-    $sql="SELECT bookingId, gds, vendor, platform, remarks, gds_segment, netcost, iMarkup, dMarkup, invoice  
-    FROM booking 
+    $sql="SELECT *  
+    FROM group_fare_booking 
     ORDER BY bookingId DESC";
     $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
