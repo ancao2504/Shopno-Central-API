@@ -10,7 +10,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 if($_SERVER["REQUEST_METHOD"] == "GET")
 {   
 
-    $sql="SELECT vendor.vendorId AS vId, vendor AS vName, COUNT(*) AS totalBooking, SUM(gds_segment) AS segment, SUM(netCost) AS bookingAmount, SUM(invoice) AS vendorAmount
+    $sql="SELECT vendor.vendorId AS vId, vendor AS vName, COUNT(*) AS totalBooking, SUM(gds_segment) AS segment, 
+    SUM(netCost) AS bookingAmount, SUM(invoice) AS vendorAmount
     FROM group_fare_booking
     LEFT JOIN vendor ON vendor.name=group_fare_booking.vendor 
     WHERE status='Ticketed'

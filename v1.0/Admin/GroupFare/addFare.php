@@ -15,6 +15,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
         $adtBaseFare=$jsonData["AdultBaseFare"];
         $totalSeat=$jsonData["TotalSeat"];
         $transitTime=$jsonData["TransitTime"];
+        $farePolicyDate=$jsonData["farePolicyDate"];
+        $farePolicyPercentage=$jsonData["farePolicyPercentage"];
 
         if($segment==1) {
             $deptFrom=$jsonData[0]["DepartureFrom"];
@@ -33,10 +35,11 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $sql="INSERT INTO groupfare 
             (segment, dept1, deptTime1,  arrive1,  arriveTime1,  carrierName1,  
             flightNum1,  flightCode1,  cabin1,  class1,  baggage1,  travelTime1, 
-             transitTime, totalSeat, adtBaseFare, availableSeat, status)
+             transitTime, totalSeat, adtBaseFare, availableSeat, status, farePolicyDate, farePolicyPercentage)
             VALUES 
             ('$segment','$deptFrom','$deptTime','$arriveTo','$arriveTime','$carrierName','$flightNum','$flightCode', '$cabin',
-            '$class','$baggage','$travelTime','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat', 'true')";
+            '$class','$baggage','$travelTime','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat', 'true', '$farePolicyDate',
+            '$farePolicyPercentage')";
 
         } elseif($segment==2) {
             $deptFrom1=$jsonData[0]["DepartureFrom"];
@@ -67,11 +70,12 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $sql="INSERT INTO groupfare 
             (segment, dept1, dept2, deptTime1, deptTime2, arrive1, arrive2, arriveTime1, arriveTime2, carrierName1, carrierName2, 
             flightNum1, flightNum2, flightCode1, flightCode2, cabin1, cabin2, class1, class2, baggage1, baggage2, travelTime1, 
-            travelTime2, transitTime, totalSeat, adtBaseFare, availableSeat, status)
+            travelTime2, transitTime, totalSeat, adtBaseFare, availableSeat, status, farePolicyDate, farePolicyPercentage)
             VALUES 
             ('$segment','$deptFrom1','$deptFrom2','$deptTime1','$deptTime2','$arriveTo1','$arriveTo2','$arriveTime1','$arriveTime2',
             '$carrierName1','$carrierName2','$flightNum1','$flightNum2','$flightCode1','$flightCode2', '$cabin1','$cabin2','$class1','$class2',
-            '$baggage1','$baggage2','$travelTime1','$travelTime2','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat', 'true')";
+            '$baggage1','$baggage2','$travelTime1','$travelTime2','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat', 'true', '$farePolicyDate',
+            '$farePolicyPercentage')";
         }
 
         if ($conn->query($sql)) {
