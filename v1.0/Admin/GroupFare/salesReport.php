@@ -12,7 +12,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
 {   
 
     $sql="SELECT *  
-    FROM booking 
+    FROM group_fare_booking 
     ORDER BY bookingId DESC";
     $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
