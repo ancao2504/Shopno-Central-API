@@ -4,6 +4,13 @@ $username = "root";
 $password = "";
 $dbname="flyfarin_shopno";
 
+
+//Fly Far Int
+// $servername = "localhost";
+// $username = "root";
+// $password = "";
+// $dbname="flyfarin_b2bv3";
+
 // Shopno Live Database
 // $servername = "flyfarint.com";
 // $username = "flyfarin_shopno";

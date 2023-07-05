@@ -1,6 +1,6 @@
 <?php
 
-require '../../config.php';
+include("../config.php");
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -8,8 +8,11 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 if($_SERVER["REQUEST_METHOD"] == "GET")
-{
-    $response=$conn->query("SELECT * FROM groupfare ORDER BY groupFareId DESC")->fetch_all(MYSQLI_ASSOC);
+{   
+
+    $sql="SELECT dept1 AS dept, IF(arrive2='', arrive1, arrive2) AS arrive FROM groupfare
+    ORDER BY groupFareId DESC";
+    $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
     if(!empty($response))
     {

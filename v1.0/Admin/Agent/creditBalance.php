@@ -26,7 +26,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId' AND platform='B2B'");
     $data = mysqli_fetch_array($query,MYSQLI_ASSOC);
-
+    
     $companyname = $data['company'];
     $compnayphone = $data['phone'];
     $agentEmail = "chiran@flyfar.tech";/*$data['email'];*/
@@ -36,6 +36,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     if($amount > $creditAm){
        $newAmount = $amount - $creditAm;
     }
+
+  
 
     $amountsql = "SELECT lastAmount, deposit FROM `agent_ledger` WHERE agentId='$agentId' AND platform='B2B' ORDER BY id DESC LIMIT 1";
     $result1 = mysqli_query($conn, $amountsql);

@@ -1,5 +1,5 @@
 <?php
-include("../../config.php");
+include("../config.php");
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -18,24 +18,41 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 {
     $jsonData = json_decode(file_get_contents('php://input'), true);
     // $flightPassengerData=$jsonData["groupFarePassengerData"];
-    $passengerData=$jsonData["groupFarePassengerData"]["passengers"];
-    $bookingData=$jsonData["bookingInfo"];
+    $passengerData=$jsonData["passengers"];
+    // $bookingData=$jsonData["groupFareDetails"];
+    $flightData=$jsonData["flightData"];
     // $saveBookingData=$jsonData["saveBooking"];
     // $saveBookingFlightData=$saveBookingData["flightData"];
     
 
 
-    $agentId=$bookingData["agentId"];
-    $staffId=$bookingData["staffId"];
-    $deptFrom=$bookingData["from"];
-    $gds=$bookingData["system"];
-    $arriveTo=$bookingData["to"];
+    $agentId=$jsonData["agentId"];
+    $name=$jsonData["name"];
+    $phone=$jsonData["phone"];
+    $email=$jsonData["email"];
+
+    $segment=$flightData["segment"];
+    $gds=$flightData["system"];
+    $dept1=$flightData["dept1"];
+    $arrive1=$flightData["arrive1"];
+    $dept2=$flightData["dept2"];
+    $arrive2=$flightData["arrive2"];
+
+    if($segment===1)
+    {
+        
+        
+    }
+    else if ($segment===2)
+    {
+
+    }
+
+
+
     $airlines=$bookingData["airlines"];
     $tripType=$bookingData["tripType"];
     $travelDate=$bookingData["travelDate"];
-    $name=$bookingData["name"];
-    $phone=$bookingData["phone"];
-    $email=$bookingData["email"];
     $pax=$bookingData["pax"];
     $netCost=$bookingData["netcost"];
     $adultCostBase=$bookingData["adultcostbase"];
@@ -110,8 +127,10 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
                 $dob= $passenger["dob"]; 
                 $passNation= $passenger["passNation"]; 
                 $passNo= $passenger["passNo"]; 
-                $passEx= $passenger["passEx"]; 
-                
+                $passEx= $passenger["passEx"];
+
+
+        
                 $values=$values."('$bookingId','$agentId','$fName','$lName','$dob','$type','
                 $passNation','$passNo','$passEx','$phone', '$email', '$gender', '$currentDateTime'),";
 
