@@ -9,13 +9,13 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 
 
-if (array_key_exists("all", $_GET) && array_key_exists("agentId", $_GET)) {
+if (array_key_exists("all", $_GET) && array_key_exists("userId", $_GET)) {
     
-    $agentId = $_GET["agentId"];
+    $userId = $_GET["userId"];
     $staffId = "";
-    $sql = "SELECT * FROM `booking` WHERE agentId='$agentId' ORDER BY id DESC";
+    $sql = "SELECT * FROM `booking` WHERE userId='$userId' ORDER BY id DESC";
     $result = $conn->query($sql);
-    $totaldata = $conn->query("SELECT * FROM `booking` where agentId='$agentId'")->num_rows;
+    $totaldata = $conn->query("SELECT * FROM `booking` where userId='$userId'")->num_rows;
 
     $return_arr = array();
     $Data = array();
@@ -24,18 +24,18 @@ if (array_key_exists("all", $_GET) && array_key_exists("agentId", $_GET)) {
         while ($row = $result->fetch_assoc()) {
             $count++;
             $staffId = $row['staffId'];
-            $agentId = $row['agentId'];
+            $userId = $row['userId'];
             $pnr = $row['pnr'];
             $tripType = $row['tripType'];
 
-            $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
+            $query = mysqli_query($conn, "SELECT * FROM agent WHERE userId='$userId'");
             $data = mysqli_fetch_assoc($query);
             if (!empty($data)) {
                 $companyname = $data['company'];
                 $companyphone = $data['phone'];
             }
 
-            $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE staffId='$staffId' AND agentId ='$agentId'");
+            $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE staffId='$staffId' AND userId ='$userId'");
             $staffRow = mysqli_fetch_array($staffsql, MYSQLI_ASSOC);
 
             if (!empty($staffRow)) {
@@ -72,24 +72,24 @@ if (array_key_exists("all", $_GET) && array_key_exists("agentId", $_GET)) {
         
 
     echo json_encode($return_arr);
-}else if (array_key_exists("agentId", $_GET) && array_key_exists("bookingId", $_GET)) {
+}else if (array_key_exists("userId", $_GET) && array_key_exists("bookingId", $_GET)) {
 
-    $agentId = $_GET["agentId"];
+    $userId = $_GET["userId"];
     $bookingId = $_GET["bookingId"];
-    $sql = "SELECT * FROM `booking` where agentId='$agentId' AND bookingId='$bookingId'";
+    $sql = "SELECT * FROM `booking` where userId='$userId' AND bookingId='$bookingId'";
     $result = $conn->query($sql);
 
     $return_arr = array();
     if ($result->num_rows > 0) {     
         while ($row = $result->fetch_assoc()) {
             $staffId = $row['staffId'];
-            $agentId = $row['agentId'];
+            $userId = $row['userId'];
             $pnr = $row['pnr'];
             $tripType = $row['tripType'];
             // print_r($pnr);
             // print_r($tripType);
             
-            $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE agentId='$agentId' AND  staffId='$staffId' ");
+            $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE userId='$userId' AND  staffId='$staffId' ");
             
 
             $staffRow = mysqli_fetch_array($staffsql, MYSQLI_ASSOC);
@@ -1101,7 +1101,6 @@ if (array_key_exists("all", $_GET) && array_key_exists("agentId", $_GET)) {
             $response['passenger'] = $PassengerData;
             $response['activity'] = $activitylog;
             $response['flightData'] = $FlightData;
-            $response['notes'] = $Notes;
             $response['ticketData'] = $TicketInfo;
 
             array_push($return_arr, $response);
@@ -3118,16 +3117,16 @@ if (array_key_exists("all", $_GET) && array_key_exists("agentId", $_GET)) {
 
     echo json_encode($return_arr);
 
-}else if (array_key_exists("agentId", $_GET) && array_key_exists("page", $_GET)) {
+}else if (array_key_exists("userId", $_GET) && array_key_exists("page", $_GET)) {
     $page = $_GET['page'];
-    $agentId = $_GET['agentId'];
+    $userId = $_GET['userId'];
     $result_per_page = 20;
     $page_first_result = ($page - 1) * $result_per_page;
 
     $staffId = "";
-    $sql = "SELECT * FROM `booking` where agentId='$agentId' ORDER BY id DESC LIMIT $page_first_result,$result_per_page";
+    $sql = "SELECT * FROM `booking` where userId='$userId' ORDER BY id DESC LIMIT $page_first_result,$result_per_page";
     $result = $conn->query($sql);
-    $totaldata = $conn->query("SELECT * FROM `booking` where agentId='$agentId'")->num_rows;
+    $totaldata = $conn->query("SELECT * FROM `booking` where userId='$userId'")->num_rows;
 
     $return_arr = array();
     $Data = array();
@@ -3136,18 +3135,18 @@ if (array_key_exists("all", $_GET) && array_key_exists("agentId", $_GET)) {
         while ($row = $result->fetch_assoc()) {
             $count++;
             $staffId = $row['staffId'];
-            $agentId = $row['agentId'];
+            $userId = $row['userId'];
             $pnr = $row['pnr'];
             $tripType = $row['tripType'];
 
-            $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
+            $query = mysqli_query($conn, "SELECT * FROM agent WHERE userId='$userId'");
             $data = mysqli_fetch_assoc($query);
             if (!empty($data)) {
                 $companyname = $data['company'];
                 $companyphone = $data['phone'];
             }
 
-            $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE staffId='$staffId' AND agentId ='$agentId'");
+            $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE staffId='$staffId' AND userId ='$userId'");
             $staffRow = mysqli_fetch_array($staffsql, MYSQLI_ASSOC);
 
             if (!empty($staffRow)) {

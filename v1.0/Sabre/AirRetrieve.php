@@ -1,19 +1,19 @@
 <?php
-
+include("../config.php");
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if (array_key_exists("BookingID",$_GET)){
-    $BookingID = $_GET['BookingID'];
+if (array_key_exists("bookingId",$_GET)){
+    $BookingID = $_GET['bookingId'];
 
 try{
 
-	$client_id= base64_encode("V1:396724:FD3K:AA");
+	$client_id= base64_encode("V1:593072:14KK:AA");
 	//$client_secret = base64_encode("280ff537"); //cert
-	$client_secret = base64_encode("FlWy967"); //prod
+	$client_secret = base64_encode("f270395"); //prod
 
 	$token = base64_encode($client_id.":".$client_secret);
 	$data='grant_type=client_credentials';
