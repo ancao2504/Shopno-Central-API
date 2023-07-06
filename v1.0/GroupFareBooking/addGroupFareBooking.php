@@ -59,10 +59,11 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     // $bookingData=$jsonData["groupFareDetails"];// $saveBookingData=$jsonData["saveBooking"];
     // $saveBookingFlightData=$saveBookingData["flightData"];
     // $passengerData=$jsonData["passengers"];
-    echo json_encode($jsonData);
+    // echo json_encode($jsonData);
     $flightData=$jsonData["flightData"];
-    $passport=$jsonData["passportImg"];
-    $visa=$jsonData["visaImg"];
+    // $passport=$jsonData["passportImg"];
+    // $visa=$jsonData["visaImg"];
+
     
 
 
@@ -161,24 +162,11 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     'GF', '$netCost')";
 
 
-    $bookingId="";
-    $message="";
-    $book=false;
-    if($conn->query($sql))
-    {
-        $result = $conn->query("SELECT bookingId FROM booking ORDER BY id DESC LIMIT 1");
-        $row = $result->fetch_assoc();
-        $bookingId = $row['bookingId'];
-        $book=true;
-    }
-    else
-    {
-            $book=false;
-    }
     
+    $message="";
+    $book=($conn->query($sql))?true:false;
     $values="";
-    $count=0;
-            foreach($passport as $pass)
+            for($i=0; $i<$pax; $i++)
             {
                 // $type= $passenger["type"]; 
                 // $fName= $passenger["fName"]; 
@@ -188,11 +176,13 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
                 // $passNation= $passenger["passNation"]; 
                 // $passNo= $passenger["passNo"]; 
                 // $passEx= $passenger["passEx"];
-                $passCopy= $pass[$count][$_FILES["image"]["name"]];
-                $visaCopy= $visa[$count][$_FILES["image"]["name"]];
+                $passInd="passport".$i;
+                $visaInd="visa".$i;
+                $passCopy= $_FILES[$passInd]["name"];
+                $visaCopy= $_FILES[$visaInd]["name"];
 
-                uploadImage('image', 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy);
-                uploadImage('image', 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy);
+                uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy);
+                uploadImage($visaInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy);
                 $values=$values."('$bookingId','$passCopy','$visaCopy'),";
 
             }
