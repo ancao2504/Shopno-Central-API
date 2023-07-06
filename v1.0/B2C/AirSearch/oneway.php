@@ -30,7 +30,7 @@ if (array_key_exists('tripType', $_GET)) {
     if ($Way == "oneway") {
         if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GET) && array_key_exists("departuredate", $_GET)) {
             $From = $_GET['journeyfrom'];
-            $To = $_GET['journeyto']; 
+            $To = $_GET['journeyto'];
             $Date = $_GET['departuredate'];
             $ActualDate = $Date . "T00:00:00";
 
@@ -1152,8 +1152,8 @@ if (array_key_exists('tripType', $_GET)) {
                         "career" => "$vCarCode",
                         "careerName" => "$CarrieerName",
                         "lastTicketTime" => "$timelimit",
-                        "basePrice" => "$baseFareAmount",
-                        "taxes" => "$totalTaxAmount",
+                        "BasePrice" => "$baseFareAmount",
+                        "Taxes" => "$totalTaxAmount",
                         "netfare" => "$AgentPrice",
                         "agentprice" => "$WLAgentPrice",
                         //"subagentprice" => "$subAgentPrice",
@@ -1455,8 +1455,8 @@ if (array_key_exists('tripType', $_GET)) {
                         "career" => "$vCarCode",
                         "careerName" => "$CarrieerName",
                         "lastTicketTime" => "$timelimit",
-                        "basePrice" => "$baseFareAmount",
-                        "taxes" => "$totalTaxAmount",
+                        "BasePrice" => "$baseFareAmount",
+                        "Taxes" => "$totalTaxAmount",
                         "netfare" => "$AgentPrice",
                         "agentprice" => "$WLAgentPrice",
                         //"subagentprice" => "$subAgentPrice",
@@ -1913,8 +1913,8 @@ if (array_key_exists('tripType', $_GET)) {
                         "career" => "$vCarCode",
                         "careerName" => "$CarrieerName",
                         "lastTicketTime" => "$timelimit",
-                        "basePrice" => "$baseFareAmount",
-                        "taxes" => "$totalTaxAmount",
+                        "BasePrice" => "$baseFareAmount",
+                        "Taxes" => "$totalTaxAmount",
                         "netfare" => "$AgentPrice",
                         "agentprice" => "$WLAgentPrice",
                         //"subagentprice" => "$subAgentPrice",
@@ -2498,8 +2498,8 @@ if (array_key_exists('tripType', $_GET)) {
                         "uId" => $uId,
                         "career" => "$vCarCode",
                         "careerName" => "$CarrieerName",
-                        "basePrice" => "$baseFareAmount",
-                        "taxes" => "$totalTaxAmount",
+                        "BasePrice" => "$baseFareAmount",
+                        "Taxes" => "$totalTaxAmount",
                         "netfare" => "$AgentPrice",
                         "agentprice" => "$WLAgentPrice",
                         //"subagentprice" => "$subAgentPrice",
@@ -2983,8 +2983,8 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "1",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => $CarrieerName,
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
@@ -3169,8 +3169,8 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "2",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => "$CarrieerName",
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
@@ -3280,8 +3280,8 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "1",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => $CarrieerName,
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
@@ -3470,8 +3470,8 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "2",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => "$CarrieerName",
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
@@ -3582,8 +3582,8 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "1",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => $CarrieerName,
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
@@ -3765,8 +3765,8 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "2",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => "$CarrieerName",
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
@@ -3877,8 +3877,8 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "1",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => $CarrieerName,
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
@@ -4053,10 +4053,10 @@ if ($Galileo == 1) { // Galileo Start
                                     "flightduration" => "$FlightTimeHm1",
                                     "bookingcode" => "$BookingCode1",
                                     "seat" => "$Seat1",
-                                    'cabinClass' => $CabinClass1,
-                                    'fareInfoRef' => $FareInfoRef1,
-                                    'segmentRef' => $SegmentRef1,
-                                    'segmentDetails' => $airAirSegment[$SegmentRef1],
+                                    'CabinClass' => $CabinClass1,
+                                    'FareInfoRef' => $FareInfoRef1,
+                                    'SegmentRef' => $SegmentRef1,
+                                    'SegmentDetails' => $airAirSegment[$SegmentRef1],
 
                                 ),
                             );
@@ -4064,15 +4064,15 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "2",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => "$CarrieerName",
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
                                 "airFareCalc " => $airFareCalc,
-                                "fareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                "FareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
                                 "airFareInfoRef" => $airFareInfoRef,
-                                "latestTicketingTime" => $LatestTicketingTime,
+                                "LatestTicketingTime" => $LatestTicketingTime,
                                 "departure" => "$From",
                                 "departureTime" => "$fromTime",
                                 "departureDate" => "$dpTime",
@@ -4166,10 +4166,10 @@ if ($Galileo == 1) { // Galileo Start
                                     "flightduration" => "$TravelTimeHm",
                                     "bookingcode" => "$BookingCode",
                                     "seat" => $Seat,
-                                    'cabinClass' => $CabinClass,
-                                    'fareInfoRef' => $FareInfoRef,
-                                    'segmentRef' => $SegmentRef,
-                                    'segmentDetails' => $airAirSegment[$SegmentRef],
+                                    'CabinClass' => $CabinClass,
+                                    'FareInfoRef' => $FareInfoRef,
+                                    'SegmentRef' => $SegmentRef,
+                                    'SegmentDetails' => $airAirSegment[$SegmentRef],
 
                                 ),
                             );
@@ -4177,15 +4177,15 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "$sgcount",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => $CarrieerName,
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
                                 "airFareCalc " => $airFareCalc,
-                                "fareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                "FareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
                                 "airFareInfoRef" => $airFareInfoRef,
-                                "latestTicketingTime" => $LatestTicketingTime,
+                                "LatestTicketingTime" => $LatestTicketingTime,
                                 "departure" => $From,
                                 "departureDate" => $dpTime,
                                 "departureTime" => substr($DepartureTime, 11, 5),
@@ -4335,10 +4335,10 @@ if ($Galileo == 1) { // Galileo Start
                                     "flightduration" => "$FlightTimeHm",
                                     "bookingcode" => "$BookingCode",
                                     "seat" => "$Seat",
-                                    'cabinClass' => $CabinClass,
-                                    'fareInfoRef' => $FareInfoRef,
-                                    'segmentRef' => $SegmentRef,
-                                    'segmentDetails' => $airAirSegment[$SegmentRef],
+                                    'CabinClass' => $CabinClass,
+                                    'FareInfoRef' => $FareInfoRef,
+                                    'SegmentRef' => $SegmentRef,
+                                    'SegmentDetails' => $airAirSegment[$SegmentRef],
 
                                 ), array("marketingcareer" => "$markettingCarrier1",
                                     "marketingflight" => "$markettingFN1",
@@ -4355,10 +4355,10 @@ if ($Galileo == 1) { // Galileo Start
                                     "flightduration" => "$FlightTimeHm1",
                                     "bookingcode" => "$BookingCode1",
                                     "seat" => "$Seat1",
-                                    'cabinClass' => $CabinClass1,
-                                    'fareInfoRef' => $FareInfoRef1,
-                                    'segmentRef' => $SegmentRef1,
-                                    'segmentDetails' => $airAirSegment[$SegmentRef1],
+                                    'CabinClass' => $CabinClass1,
+                                    'FareInfoRef' => $FareInfoRef1,
+                                    'SegmentRef' => $SegmentRef1,
+                                    'SegmentDetails' => $airAirSegment[$SegmentRef1],
 
                                 ),
                             );
@@ -4366,15 +4366,15 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "2",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => "$CarrieerName",
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
                                 "airFareCalc " => $airFareCalc,
-                                "fareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                "FareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
                                 "airFareInfoRef" => $airFareInfoRef,
-                                "latestTicketingTime" => $LatestTicketingTime,
+                                "LatestTicketingTime" => $LatestTicketingTime,
                                 "departure" => "$From",
                                 "departureTime" => substr($DepartureTime, 11, 5),
                                 "departureDate" => "$dpTime",
@@ -4582,10 +4582,10 @@ if ($Galileo == 1) { // Galileo Start
                                     "flightduration" => "$FlightTimeHm",
                                     "bookingcode" => "$BookingCode",
                                     "seat" => "$Seat",
-                                    'cabinClass' => $CabinClass,
-                                    'fareInfoRef' => $FareInfoRef,
-                                    'segmentRef' => $SegmentRef,
-                                    'segmentDetails' => $airAirSegment[$SegmentRef],
+                                    'CabinClass' => $CabinClass,
+                                    'FareInfoRef' => $FareInfoRef,
+                                    'SegmentRef' => $SegmentRef,
+                                    'SegmentDetails' => $airAirSegment[$SegmentRef],
 
                                 ), array("marketingcareer" => "$markettingCarrier1",
                                     "marketingflight" => "$markettingFN1",
@@ -4602,10 +4602,10 @@ if ($Galileo == 1) { // Galileo Start
                                     "flightduration" => "$FlightTimeHm1",
                                     "bookingcode" => "$BookingCode1",
                                     "seat" => "$Seat1",
-                                    'cabinClass' => $CabinClass1,
-                                    'fareInfoRef' => $FareInfoRef1,
-                                    'segmentRef' => $SegmentRef1,
-                                    'segmentDetails' => $airAirSegment[$SegmentRef1],
+                                    'CabinClass' => $CabinClass1,
+                                    'FareInfoRef' => $FareInfoRef1,
+                                    'SegmentRef' => $SegmentRef1,
+                                    'SegmentDetails' => $airAirSegment[$SegmentRef1],
 
                                 ),
                                 array("marketingcareer" => "$markettingCarrier2",
@@ -4623,10 +4623,10 @@ if ($Galileo == 1) { // Galileo Start
                                     "flightduration" => "$FlightTimeHm2",
                                     "bookingcode" => "$BookingCode2",
                                     "seat" => "$Seat2",
-                                    'cabinClass' => $CabinClass2,
-                                    'fareInfoRef' => $FareInfoRef2,
-                                    'segmentRef' => $SegmentRef2,
-                                    'segmentDetails' => $airAirSegment[$SegmentRef2],
+                                    'CabinClass' => $CabinClass2,
+                                    'FareInfoRef' => $FareInfoRef2,
+                                    'SegmentRef' => $SegmentRef2,
+                                    'SegmentDetails' => $airAirSegment[$SegmentRef2],
 
                                 ),
                             );
@@ -4634,15 +4634,15 @@ if ($Galileo == 1) { // Galileo Start
                                 "segment" => "3",
                                 "career" => $validatingCarrierCode,
                                 "careerName" => "$CarrieerName",
-                                "basePrice" => $BasePrice,
-                                "taxes" => $Taxes,
+                                "BasePrice" => $BasePrice,
+                                "Taxes" => $Taxes,
                                 "price" => "$Exact",
                                 "airChangePenalty " => $airChangePenalty,
                                 "airCancelPenalty" => $airCancelPenalty,
                                 "airFareCalc " => $airFareCalc,
-                                "fareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                                "FareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
                                 "airFareInfoRef" => $airFareInfoRef,
-                                "latestTicketingTime" => $LatestTicketingTime,
+                                "LatestTicketingTime" => $LatestTicketingTime,
                                 "departure" => "$From",
                                 "departureTime" => "$fromTime",
                                 "departureDate" => "$dpTime1",
@@ -4732,10 +4732,10 @@ if ($Galileo == 1) { // Galileo Start
                                 "flightduration" => $FlightTimeHm,
                                 "bookingcode" => "$BookingCode",
                                 "seat" => "$Seat",
-                                'cabinClass' => $CabinClass,
-                                'fareInfoRef' => $FareInfoRef,
-                                'segmentRef' => $SegmentRef,
-                                'segmentDetails' => $airAirSegment[$SegmentRef],
+                                'CabinClass' => $CabinClass,
+                                'FareInfoRef' => $FareInfoRef,
+                                'SegmentRef' => $SegmentRef,
+                                'SegmentDetails' => $airAirSegment[$SegmentRef],
 
                             ),
                         );
@@ -4743,15 +4743,15 @@ if ($Galileo == 1) { // Galileo Start
                             "segment" => "1",
                             "career" => $validatingCarrierCode,
                             "careerName" => $CarrieerName,
-                            "basePrice" => $BasePrice,
-                            "taxes" => $Taxes,
+                            "BasePrice" => $BasePrice,
+                            "Taxes" => $Taxes,
                             "price" => "$Exact",
                             "airChangePenalty " => $airChangePenalty,
                             "airCancelPenalty" => $airCancelPenalty,
                             "airFareCalc " => $airFareCalc,
-                            "fareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                            "FareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
                             "airFareInfoRef" => $airFareInfoRef,
-                            "latestTicketingTime" => $LatestTicketingTime,
+                            "LatestTicketingTime" => $LatestTicketingTime,
                             "departure" => $From,
                             "departureTime" => substr($DepartureTime, 11, 5),
                             "departureDate" => $dpTime,
@@ -4907,10 +4907,10 @@ if ($Galileo == 1) { // Galileo Start
                         "flightduration" => "$TravelTimeHm",
                         "bookingcode" => "$BookingCode",
                         "seat" => $Seat,
-                        'cabinClass' => $CabinClass,
-                        'fareInfoRef' => $FareInfoRef,
-                        'segmentRef' => $SegmentRef,
-                        'segmentDetails' => $airAirSegment[$SegmentRef],
+                        'CabinClass' => $CabinClass,
+                        'FareInfoRef' => $FareInfoRef,
+                        'SegmentRef' => $SegmentRef,
+                        'SegmentDetails' => $airAirSegment[$SegmentRef],
 
                     ),
                 );
@@ -4918,13 +4918,13 @@ if ($Galileo == 1) { // Galileo Start
                     "segment" => "1",
                     "career" => $validatingCarrierCode,
                     "careerName" => $CarrieerName,
-                    "basePrice" => $BasePrice,
-                    "taxes" => $Taxes,
+                    "BasePrice" => $BasePrice,
+                    "Taxes" => $Taxes,
                     "price" => "$Exact",
                     "airChangePenalty " => $airChangePenalty,
                     "airCancelPenalty" => $airCancelPenalty,
                     "airFareCalc " => $airFareCalc,
-                    "fareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
+                    "FareBasisCode" => $airFareInfo[$FareInfoRef]['FareBasisCode'],
                     "airFareInfoRef" => $airFareInfoRef,
                     "departure" => $From,
                     "departureDate" => $dpTime,
@@ -4946,6 +4946,697 @@ if ($Galileo == 1) { // Galileo Start
         }
     }
 
+}
+
+if ($FlyHub == 1) {
+
+    $FlyHubRequest = '{
+        "AdultQuantity": "' . $adult . '",
+        "ChildQuantity": "' . $child . '",
+        "InfantQuantity": "' . $infants . '",
+        "EndUserIp": "200.69.23.206",
+        "JourneyType": "1",
+        "Segments": [
+            {
+            "Origin": "' . $From . '",
+            "Destination": "' . $To . '",
+            "CabinClass": "Economy",
+            "DepartureDateTime": "' . $Date . '"
+            }
+        ],
+        "PreferredAirlines": [
+            ""
+        ]
+        }';
+
+    //echo $FlyHubRequest;
+
+    //Fly Hub
+
+    $curlflyhubauth = curl_init();
+
+    curl_setopt_array($curlflyhubauth, array(
+        CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => '{
+        "username": "ceo@flyfarint.com",
+        "apikey": "ENex7c5Ge+0~SGc1t71iccr1xXacDPdK51g=iTm9SlL+de39HF"
+        }',
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json',
+        ),
+    ));
+
+    $response = curl_exec($curlflyhubauth);
+
+    $TokenJson = json_decode($response, true);
+
+    $FlyhubToken = $TokenJson['TokenId'];
+
+    $curlflyhusearch = curl_init();
+
+    curl_setopt_array($curlflyhusearch, array(
+        CURLOPT_URL => 'https://api.flyhub.com/api/v1/AirSearch',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => $FlyHubRequest,
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json',
+            "Authorization: Bearer $FlyhubToken",
+        ),
+    ));
+
+    $flyhubresponse = curl_exec($curlflyhusearch);
+
+    curl_close($curlflyhusearch);
+
+    //echo $flyhubresponse;
+
+    // Decode the JSON file
+    $Result = json_decode($flyhubresponse, true);
+
+    $FlightListFlyHub = $Result['Results'];
+    $SearchID = $Result['SearchId'];
+    $FlyHubResponse = array();
+
+    //print_r($FlyHubResponse);
+    $f = 0;
+    foreach ($FlightListFlyHub as $flight) {
+        $f++;
+        $Validatingcarrier = $flight['Validatingcarrier'];
+        $segments = count($flight['segments']);
+        $AgentPrice = $flight['TotalFare'];
+        $Refundable = $flight['IsRefundable'];
+        $Hold = $flight['HoldAllowed'];
+
+        if ($adult > 0 && $child > 0 && $infants > 0) {
+            $BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare'] * $child + $flight['Fares'][2]['BaseFare'] * $infants;
+            $Taxes = $flight['Fares'][0]['Tax'] * $adult + $flight['Fares'][1]['Tax'] * $child + $flight['Fares'][2]['Tax'] * $infants;
+            $Taxes += $flight['Fares'][0]['OtherCharges'] * $adult + $flight['Fares'][1]['OtherCharges'] * $child + $flight['Fares'][2]['OtherCharges'] * $infants;
+            $Taxes += $flight['Fares'][0]['ServiceFee'] * $adult + $flight['Fares'][1]['ServiceFee'] * $child + $flight['Fares'][2]['ServiceFee'] * $infants;
+
+            $adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
+            $adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
+
+            $childBasePrice = $flight['Fares'][1]['BaseFare'] + $flight['Fares'][1]['ServiceFee'];
+            $childTaxAmount = $flight['Fares'][1]['Tax'] + $flight['Fares'][1]['OtherCharges'];
+
+            $infantBasePrice = $flight['Fares'][2]['BaseFare'] + $flight['Fares'][2]['ServiceFee'];
+            $infantTaxAmount = $flight['Fares'][2]['Tax'] + $flight['Fares'][2]['OtherCharges'];
+
+            $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
+                "Tax" => "$adultTaxAmount",
+                "PaxCount" => $adult,
+                "PaxType" => "ADT",
+                "Discount" => "0",
+                "OtherCharges" => "0",
+                "ServiceFee" => "0")
+                ,
+                "1" => array("BaseFare" => "$childBasePrice",
+                    "Tax" => "$childTaxAmount",
+                    "PaxCount" => $child,
+                    "PaxType" => "CNN",
+                    "Discount" => "0",
+                    "OtherCharges" => "0",
+                    "ServiceFee" => "0"),
+                "2" => array("BaseFare" => "$infantBasePrice",
+                    "Tax" => "$infantTaxAmount",
+                    "PaxCount" => $infants,
+                    "PaxType" => "INF",
+                    "Discount" => "0",
+                    "OtherCharges" => "0",
+                    "ServiceFee" => "0"),
+            );
+
+        } else if ($adult > 0 && $child > 0) {
+            $BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare'] * $child;
+            $Taxes = $flight['Fares'][0]['Tax'] * $adult + $flight['Fares'][1]['Tax'] * $child;
+            $Taxes += $flight['Fares'][0]['OtherCharges'] * $adult + $flight['Fares'][1]['OtherCharges'] * $child;
+            $Taxes += $flight['Fares'][0]['ServiceFee'] * $adult + $flight['Fares'][1]['ServiceFee'] * $child;
+
+            $adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
+            $adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
+
+            $childBasePrice = $flight['Fares'][1]['BaseFare'] + $flight['Fares'][1]['ServiceFee'];
+            $childTaxAmount = $flight['Fares'][1]['Tax'] + $flight['Fares'][1]['OtherCharges'];
+
+            $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
+                "Tax" => "$adultTaxAmount",
+                "PaxCount" => $adult,
+                "PaxType" => "ADT",
+                "Discount" => "0",
+                "OtherCharges" => "0",
+                "ServiceFee" => "0")
+                ,
+                "1" => array("BaseFare" => "$childBasePrice",
+                    "Tax" => "$childTaxAmount",
+                    "PaxCount" => $child,
+                    "PaxType" => "CNN",
+                    "Discount" => "0",
+                    "OtherCharges" => "0",
+                    "ServiceFee" => "0"),
+            );
+
+        } else if ($adult > 0 && $infants > 0) {
+            $BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare'] * $infants;
+            $Taxes = $flight['Fares'][0]['Tax'] * $adult + $flight['Fares'][1]['Tax'] * $infants;
+            $Taxes += $flight['Fares'][0]['OtherCharges'] * $adult + $flight['Fares'][1]['OtherCharges'] * $infants;
+            $Taxes += $flight['Fares'][0]['ServiceFee'] * $adult + $flight['Fares'][1]['ServiceFee'] * $infants;
+
+            $adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
+            $adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
+
+            $infantBasePrice = $flight['Fares'][1]['BaseFare'] + $flight['Fares'][1]['ServiceFee'];
+            $infantTaxAmount = $flight['Fares'][1]['Tax'] + $flight['Fares'][1]['OtherCharges'];
+
+            $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
+                "Tax" => "$adultTaxAmount",
+                "PaxCount" => $adult,
+                "PaxType" => "ADT",
+                "Discount" => "0",
+                "OtherCharges" => "0",
+                "ServiceFee" => "0"),
+                "1" => array("BaseFare" => "$infantBasePrice",
+                    "Tax" => "$infantTaxAmount",
+                    "PaxCount" => $infants,
+                    "PaxType" => "INF",
+                    "Discount" => "0",
+                    "OtherCharges" => "0",
+                    "ServiceFee" => "0"),
+            );
+
+        } else if (isset($flight['Fares'][0])) {
+            $BasePrice = $flight['Fares'][0]['BaseFare'] * $adult;
+            $Taxes = $flight['Fares'][0]['Tax'] * $adult;
+            $Taxes += $flight['Fares'][0]['OtherCharges'] * $adult;
+            $Taxes += $flight['Fares'][0]['ServiceFee'] * $adult;
+
+            $adultBasePrice = $flight['Fares'][0]['BaseFare'] + $flight['Fares'][0]['ServiceFee'];
+            $adultTaxAmount = $flight['Fares'][0]['Tax'] + $flight['Fares'][0]['OtherCharges'];
+            $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
+                "Tax" => "$adultTaxAmount",
+                "PaxCount" => $adult,
+                "PaxType" => "ADT",
+                "Discount" => "0",
+                "OtherCharges" => "0",
+                "ServiceFee" => "0"),
+            );
+
+        }
+
+        $customerPrice = $BasePrice + $Taxes;
+
+        if ($flight['IsRefundable'] == 1) {
+            $Refundable = "Refundable";
+        } else {
+            $Refundable = "Nonrefundable";
+        }
+        $Availabilty = $flight['Availabilty'];
+        $ResultID = $flight['ResultID'];
+
+        $sql = mysqli_query($conn, "SELECT name, commission FROM airlines WHERE code='$Validatingcarrier' ");
+        $row = mysqli_fetch_array($sql, MYSQLI_ASSOC);
+
+        if (!empty($row)) {
+            $CarrieerName = $row['name'];
+            $fareRate = $row['commission'];
+        }
+
+        //Agent MarkUP
+        $agentMarksql = mysqli_query($conn, "SELECT dmarkup,imarkup, dmarkuptype,imarkuptype FROM B2C_wl_content WHERE agentId='$agentId' ");
+        $agentmarkrow = mysqli_fetch_array($agentMarksql, MYSQLI_ASSOC);
+
+        if (!empty($agentmarkrow)) {
+            $imarkuptype = $agentmarkrow['imarkuptype'];
+            $dmarkuptype = $agentmarkrow['dmarkuptype'];
+            if ($imarkuptype == 'amount' || $dmarkuptype == 'amount') {
+                if ($TripType == 'Inbound') {
+                    $markup = $agentmarkrow['dmarkup'];
+                } else {
+                    $markup = $agentmarkrow['imarkup'];
+                }
+                $WLAgentPrice = $AgentPrice + $markup;
+
+            } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
+                if ($TripType == 'Inbound') {
+                    $markup = $agentmarkrow['dmarkup'];
+                } else {
+                    $markup = $agentmarkrow['imarkup'];
+                }
+                $WLAgentPrice = ceil($AgentPrice + ($AgentPrice * ($markup / 100)));
+
+            } else {
+                $WLAgentPrice = $AgentPrice;
+            }
+        } else {
+            $WLAgentPrice = $AgentPrice;
+        }
+
+        //SubAgent Markup
+        $subagentMarksql = mysqli_query($conn, "SELECT dmarkup, imarkup, markuptype FROM subagent WHERE agentId='$agentId' AND subagentId='$subagentId' ");
+        $subagentmarkrow = mysqli_fetch_array($subagentMarksql, MYSQLI_ASSOC);
+
+        //echo $TripType;
+
+        if (!empty($subagentmarkrow)) {
+            $markuptype = $subagentmarkrow['markuptype'];
+            if ($markuptype == 'amount') {
+                if ($TripType == 'Inbound') {
+                    $markup = $subagentmarkrow['dmarkup'];
+                } else {
+                    $markup = $subagentmarkrow['imarkup'];
+                }
+                $subAgentPrice = $WLAgentPrice + $markup;
+
+            } else if ($markuptype == 'percentage') {
+                if ($TripType == 'Inbound') {
+                    $markup = $subagentmarkrow['dmarkup'];
+                } else {
+                    $markup = $subagentmarkrow['imarkup'];
+                }
+                $subAgentPrice = ceil($WLAgentPrice + ($WLAgentPrice * ($markup / 100)));
+
+            } else {
+                $subAgentPrice = $WLAgentPrice;
+            }
+        } else {
+            $subAgentPrice = $WLAgentPrice;
+        }
+
+        if ($WLAgentPrice < $subAgentPrice) {
+            $ClientFare = $WLAgentPrice;
+        } else {
+            $ClientFare = $BasePrice + $Taxes;
+        }
+
+        $uId = sha1(md5(time()) . '' . rand());
+
+        if ($segments == 1) {
+            $dAirportCode = $flight['segments'][0]['Origin']['Airport']['AirportCode'];
+            $dAirportName = $flight['segments'][0]['Origin']['Airport']['AirportName'];
+            $dCityName = $flight['segments'][0]['Origin']['Airport']['CityName'];
+            $dCountryCode = $flight['segments'][0]['Origin']['Airport']['CountryCode'];
+
+            $aAirportCode = $flight['segments'][0]['Destination']['Airport']['AirportCode'];
+            $aAirportName = $flight['segments'][0]['Destination']['Airport']['AirportName'];
+            $aCityName = $flight['segments'][0]['Destination']['Airport']['CityName'];
+            $aCountryCode = $flight['segments'][0]['Destination']['Airport']['CountryCode'];
+
+            $DepTime = $flight['segments'][0]['Origin']['DepTime'];
+            $ArrTime = $flight['segments'][0]['Destination']['ArrTime'];
+
+            $AirlineCode = $flight['segments'][0]['Airline']['AirlineCode'];
+            $AirlineName = $flight['segments'][0]['Airline']['AirlineName'];
+            $FlightNumber = $flight['segments'][0]['Airline']['FlightNumber'];
+            $BookingClass = $flight['segments'][0]['Airline']['BookingClass'];
+            $CabinClass = $flight['segments'][0]['Airline']['CabinClass'];
+            $OperatingCarrier = $flight['segments'][0]['Airline']['OperatingCarrier'];
+
+            if (isset($flight['segments'][0]['baggageDetails'][0]['Checkin'])) {
+                $Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
+            } else {
+                $Baggage = 0;
+            }
+
+            //$Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
+
+            $JourneyDuration = $flight['segments'][0]['JourneyDuration'];
+            $Duration = floor($JourneyDuration / 60) . "H " . ($JourneyDuration - ((floor($JourneyDuration / 60)) * 60)) . "Min";
+
+            $transitDetails = array("transit1" => "0");
+
+            $segment = array("0" => array("marketingcareer" => "$AirlineCode",
+                "marketingcareerName" => "$AirlineName",
+                "marketingflight" => "$FlightNumber",
+                "operatingcareer" => "$OperatingCarrier",
+                "operatingflight" => "$FlightNumber",
+                "departure" => "$dAirportCode",
+                "departureAirport" => "$dAirportName ",
+                "departureLocation" => "$dCityName , $dCountryCode",
+                "departureTime" => "$DepTime",
+                "arrival" => "$aAirportCode",
+                "arrivalTime" => "$ArrTime",
+                "arrivalAirport" => "$aAirportName",
+                "arrivalLocation" => "$aCityName , $aCountryCode",
+                "flightduration" => "$Duration",
+                "bookingcode" => "$BookingClass",
+                "seat" => "$Availabilty"),
+            );
+
+            $basic = array("system" => "FlyHub",
+                "segment" => "1",
+                "uId" => $uId,
+                "triptype" => $TripType,
+                "career" => "$Validatingcarrier",
+                "careerName" => "$CarrieerName",
+                "BasePrice" => "$BasePrice",
+                "Taxes" => "$Taxes",
+                "netfare" => "$AgentPrice",
+                "agentprice" => "$WLAgentPrice",
+                //"subagentprice" => "$subAgentPrice",
+                "customerPrice" => $customerPrice,
+                "pricebreakdown" => $PriceBreakDown,
+                "departure" => $dAirportCode,
+                "departureTime" => substr($DepTime, 11, 5),
+                "departureDate" => date("D d M Y", strtotime($DepTime)),
+                "arrival" => "$aAirportCode",
+                "arrivalTime" => substr($ArrTime, 11, 5),
+                "arrivalDate" => date("D d M Y", strtotime($ArrTime)),
+                "flightduration" => "$Duration",
+                "transit" => $transitDetails,
+                "bags" => "$Baggage",
+                "seat" => "$Availabilty",
+                "class" => "$CabinClass",
+                "refundable" => "$Refundable",
+                "segments" => $segment,
+                "hold" => "$Hold",
+                "SearchID" => $SearchID,
+                "ResultID" => $ResultID,
+
+            );
+            array_push($FlyHubResponse, $basic);
+
+        } else if ($segments == 2) {
+
+            ///Leg 1
+            $dAirportCode = $flight['segments'][0]['Origin']['Airport']['AirportCode'];
+            $dAirportName = $flight['segments'][0]['Origin']['Airport']['AirportName'];
+            $dCityName = $flight['segments'][0]['Origin']['Airport']['CityName'];
+            $dCountryCode = $flight['segments'][0]['Origin']['Airport']['CountryCode'];
+
+            $aAirportCode = $flight['segments'][0]['Destination']['Airport']['AirportCode'];
+            $aAirportName = $flight['segments'][0]['Destination']['Airport']['AirportName'];
+            $aCityName = $flight['segments'][0]['Destination']['Airport']['CityName'];
+            $aCountryCode = $flight['segments'][0]['Destination']['Airport']['CountryCode'];
+
+            $DepTime = $flight['segments'][0]['Origin']['DepTime'];
+            $ArrTime = $flight['segments'][0]['Destination']['ArrTime'];
+
+            $AirlineCode = $flight['segments'][0]['Airline']['AirlineCode'];
+            $AirlineName = $flight['segments'][0]['Airline']['AirlineName'];
+            $FlightNumber = $flight['segments'][0]['Airline']['FlightNumber'];
+            $BookingClass = $flight['segments'][0]['Airline']['BookingClass'];
+            $CabinClass = $flight['segments'][0]['Airline']['CabinClass'];
+            $OperatingCarrier = $flight['segments'][0]['Airline']['OperatingCarrier'];
+
+            if (isset($flight['segments'][0]['baggageDetails'][0]['Checkin'])) {
+                $Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
+            } else {
+                $Baggage = 0;
+            }
+            $JourneyDuration = $flight['segments'][0]['JourneyDuration'];
+            $Duration = floor($JourneyDuration / 60) . "H " . ($JourneyDuration - ((floor($JourneyDuration / 60)) * 60)) . "Min";
+
+            // Leg 2
+            $dAirportCode1 = $flight['segments'][1]['Origin']['Airport']['AirportCode'];
+            $dAirportName1 = $flight['segments'][1]['Origin']['Airport']['AirportName'];
+            $dCityName1 = $flight['segments'][1]['Origin']['Airport']['AirportCode'];
+            $dCountryCode1 = $flight['segments'][1]['Origin']['Airport']['CountryCode'];
+
+            $aAirportCode1 = $flight['segments'][1]['Destination']['Airport']['AirportCode'];
+            $aAirportName1 = $flight['segments'][1]['Destination']['Airport']['AirportName'];
+            $aCityName1 = $flight['segments'][1]['Destination']['Airport']['CityName'];
+            $aCountryCode1 = $flight['segments'][1]['Destination']['Airport']['CountryCode'];
+
+            $DepTime1 = $flight['segments'][1]['Origin']['DepTime'];
+            $ArrTime1 = $flight['segments'][1]['Destination']['ArrTime'];
+
+            $AirlineCode1 = $flight['segments'][1]['Airline']['AirlineCode'];
+            $AirlineName1 = $flight['segments'][1]['Airline']['AirlineName'];
+            $FlightNumber1 = $flight['segments'][1]['Airline']['FlightNumber'];
+            $BookingClass1 = $flight['segments'][1]['Airline']['BookingClass'];
+            $CabinClass1 = $flight['segments'][1]['Airline']['CabinClass'];
+            $OperatingCarrier1 = $flight['segments'][1]['Airline']['OperatingCarrier'];
+
+            $JourneyDuration1 = $flight['segments'][1]['JourneyDuration'];
+            $Duration1 = floor($JourneyDuration1 / 60) . "H " . ($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60)) . "Min";
+
+            $segment = array("0" => array("marketingcareer" => "$AirlineCode",
+                "marketingcareerName" => "$AirlineName",
+                "marketingflight" => "$FlightNumber",
+                "operatingcareer" => "$OperatingCarrier",
+                "operatingflight" => "$FlightNumber",
+                "departure" => "$dAirportCode",
+                "departureAirport" => "$dAirportName ",
+                "departureLocation" => "$dCityName , $dCountryCode",
+                "departureTime" => "$DepTime",
+                "arrival" => "$aAirportCode",
+                "arrivalTime" => "$ArrTime",
+                "arrivalAirport" => "$aAirportName",
+                "arrivalLocation" => "$aCityName , $aCountryCode",
+                "flightduration" => "$Duration",
+                "bookingcode" => "$BookingClass",
+                "seat" => "$Availabilty"),
+                "1" => array("marketingcareer" => "$AirlineCode1",
+                    "marketingcareerName" => "$AirlineName1",
+                    "marketingflight" => "$FlightNumber1",
+                    "operatingcareer" => "$OperatingCarrier1",
+                    "operatingflight" => "$FlightNumber1",
+                    "departure" => "$dAirportCode1",
+                    "departureAirport" => "$dAirportName1",
+                    "departureLocation" => "$dCityName1 , $dCountryCode1",
+                    "departureTime" => "$DepTime1",
+                    "arrival" => "$aAirportCode1",
+                    "arrivalTime" => "$ArrTime1",
+                    "arrivalAirport" => "$aAirportName1",
+                    "arrivalLocation" => "$aCityName1 , $aCountryCode1",
+                    "flightduration" => "$Duration1",
+                    "bookingcode" => "$BookingClass1",
+                    "seat" => "$Availabilty"),
+            );
+
+            $TransitTime = round(abs(strtotime($DepTime1) - strtotime($ArrTime)) / 60, 2);
+            $TransitDuration = floor($TransitTime / 60) . "H " . ($TransitTime - ((floor($TransitTime / 60)) * 60)) . "Min";
+
+            $JourneyTime = $JourneyDuration + $JourneyDuration1 + $TransitTime;
+            $TotalDuration = floor($JourneyTime / 60) . "H " . ($JourneyTime - ((floor($JourneyTime / 60)) * 60)) . "Min";
+
+            $transitDetails = array("transit1" => $TransitDuration);
+
+            $basic = array("system" => "FlyHub",
+                "segment" => "2",
+                "uId" => $uId,
+                "triptype" => $TripType,
+                "career" => "$Validatingcarrier",
+                "careerName" => "$CarrieerName",
+                "BasePrice" => "$BasePrice",
+                "Taxes" => "$Taxes",
+                "netfare" => "$AgentPrice",
+                "agentprice" => "$WLAgentPrice",
+                //"subagentprice" => "$subAgentPrice",
+                "customerPrice" => $customerPrice,
+                "pricebreakdown" => $PriceBreakDown,
+                "departure" => "$dAirportCode",
+                "departureTime" => substr($DepTime, 11, 5),
+                "departureDate" => date("D d M Y", strtotime($DepTime)),
+                "arrival" => "$aAirportCode1",
+                "arrivalTime" => substr($ArrTime1, 11, 5),
+                "arrivalDate" => date("D d M Y", strtotime($ArrTime1)),
+                "flightduration" => "$TotalDuration",
+                "transit" => $transitDetails,
+                "bags" => "$Baggage",
+                "seat" => "$Availabilty",
+                "class" => "$CabinClass",
+                "refundable" => "$Refundable",
+                "segments" => $segment,
+                "hold" => "$Hold",
+                "SearchID" => $SearchID,
+                "ResultID" => $ResultID,
+
+            );
+            array_push($FlyHubResponse, $basic);
+
+        } else if ($segments == 3) {
+
+            ///Leg 1
+            $dAirportCode = $flight['segments'][0]['Origin']['Airport']['AirportCode'];
+            $dAirportName = $flight['segments'][0]['Origin']['Airport']['AirportName'];
+            $dCityName = $flight['segments'][0]['Origin']['Airport']['CityName'];
+            $dCountryCode = $flight['segments'][0]['Origin']['Airport']['CountryCode'];
+
+            $aAirportCode = $flight['segments'][0]['Destination']['Airport']['AirportCode'];
+            $aAirportName = $flight['segments'][0]['Destination']['Airport']['AirportName'];
+            $aCityName = $flight['segments'][0]['Destination']['Airport']['CityName'];
+            $aCountryCode = $flight['segments'][0]['Destination']['Airport']['CountryCode'];
+
+            $DepTime = $flight['segments'][0]['Origin']['DepTime'];
+            $ArrTime = $flight['segments'][0]['Destination']['ArrTime'];
+
+            $AirlineCode = $flight['segments'][0]['Airline']['AirlineCode'];
+            $AirlineName = $flight['segments'][0]['Airline']['AirlineName'];
+            $FlightNumber = $flight['segments'][0]['Airline']['FlightNumber'];
+            $BookingClass = $flight['segments'][0]['Airline']['BookingClass'];
+            $CabinClass = $flight['segments'][0]['Airline']['CabinClass'];
+            $OperatingCarrier = $flight['segments'][0]['Airline']['OperatingCarrier'];
+
+            if (isset($flight['segments'][0]['baggageDetails'][0]['Checkin'])) {
+                $Baggage = $flight['segments'][0]['baggageDetails'][0]['Checkin'];
+            } else {
+                $Baggage = 0;
+            }
+
+            $JourneyDuration = $flight['segments'][0]['JourneyDuration'];
+            $Duration = floor($JourneyDuration / 60) . "H " . ($JourneyDuration - ((floor($JourneyDuration / 60)) * 60)) . "Min";
+
+            // Leg 2
+            $dAirportCode1 = $flight['segments'][1]['Origin']['Airport']['AirportCode'];
+            $dAirportName1 = $flight['segments'][1]['Origin']['Airport']['AirportName'];
+            $dCityName1 = $flight['segments'][1]['Origin']['Airport']['CityName'];
+            $dCountryCode1 = $flight['segments'][1]['Origin']['Airport']['CountryCode'];
+
+            $aAirportCode1 = $flight['segments'][1]['Destination']['Airport']['AirportCode'];
+            $aAirportName1 = $flight['segments'][1]['Destination']['Airport']['AirportName'];
+            $aCityName1 = $flight['segments'][1]['Destination']['Airport']['CityName'];
+            $aCountryCode1 = $flight['segments'][1]['Destination']['Airport']['CountryCode'];
+
+            $DepTime1 = $flight['segments'][1]['Origin']['DepTime'];
+            $ArrTime1 = $flight['segments'][1]['Destination']['ArrTime'];
+
+            $AirlineCode1 = $flight['segments'][1]['Airline']['AirlineCode'];
+            $AirlineName1 = $flight['segments'][1]['Airline']['AirlineName'];
+            $FlightNumber1 = $flight['segments'][1]['Airline']['FlightNumber'];
+            $BookingClass1 = $flight['segments'][1]['Airline']['BookingClass'];
+            $CabinClass1 = $flight['segments'][1]['Airline']['CabinClass'];
+            $OperatingCarrier1 = $flight['segments'][1]['Airline']['OperatingCarrier'];
+
+            //$Baggage1 = $flight['segments'][1]['Baggage'];
+            $JourneyDuration1 = $flight['segments'][1]['JourneyDuration'];
+            $Duration1 = floor($JourneyDuration1 / 60) . "H " . ($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60)) . "Min";
+
+            // Leg 3
+            $dAirportCode2 = $flight['segments'][2]['Origin']['Airport']['AirportCode'];
+            $dAirportName2 = $flight['segments'][2]['Origin']['Airport']['AirportName'];
+            $dCityName2 = $flight['segments'][2]['Origin']['Airport']['AirportCode'];
+            $dCountryCode2 = $flight['segments'][2]['Origin']['Airport']['CountryCode'];
+
+            $aAirportCode2 = $flight['segments'][2]['Destination']['Airport']['AirportCode'];
+            $aAirportName2 = $flight['segments'][2]['Destination']['Airport']['AirportName'];
+            $aCityName2 = $flight['segments'][2]['Destination']['Airport']['CityName'];
+            $aCountryCode2 = $flight['segments'][2]['Destination']['Airport']['CountryCode'];
+
+            $DepTime2 = $flight['segments'][2]['Origin']['DepTime'];
+            $ArrTime2 = $flight['segments'][2]['Destination']['ArrTime'];
+
+            $AirlineCode2 = $flight['segments'][2]['Airline']['AirlineCode'];
+            $AirlineName2 = $flight['segments'][2]['Airline']['AirlineName'];
+            $FlightNumber2 = $flight['segments'][2]['Airline']['FlightNumber'];
+            $BookingClass2 = $flight['segments'][2]['Airline']['BookingClass'];
+            $CabinClass2 = $flight['segments'][2]['Airline']['CabinClass'];
+            $OperatingCarrier2 = $flight['segments'][2]['Airline']['OperatingCarrier'];
+
+            //$Baggag2 = $flight['segments'][2]['Baggage'];
+            $JourneyDuration2 = $flight['segments'][2]['JourneyDuration'];
+            $Duration2 = floor($JourneyDuration1 / 60) . "H " . ($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60)) . "Min";
+
+            $segment = array("0" => array("marketingcareer" => "$OperatingCarrier",
+                "marketingcareerName" => "$AirlineName",
+                "marketingflight" => "$FlightNumber",
+                "operatingcareer" => "$OperatingCarrier",
+                "operatingflight" => "$FlightNumber",
+                "departure" => "$dAirportCode",
+                "departureAirport" => "$dAirportName ",
+                "departureLocation" => "$dCityName , $dCountryCode",
+                "departureTime" => "$DepTime",
+                "arrival" => "$aAirportCode",
+                "arrivalTime" => "$ArrTime",
+                "arrivalAirport" => "$aAirportName",
+                "arrivalLocation" => "$aCityName , $aCountryCode",
+                "flightduration" => "$Duration",
+                "bookingcode" => "$BookingClass",
+                "seat" => "$Availabilty"),
+                "1" => array("marketingcareer" => "$OperatingCarrier1",
+                    "marketingcareerName" => "$AirlineName1",
+                    "marketingflight" => "$FlightNumber1",
+                    "operatingcareer" => "$OperatingCarrier1",
+                    "operatingflight" => "$FlightNumber1",
+                    "departure" => "$dAirportCode1",
+                    "departureAirport" => "$dAirportName1 ",
+                    "departureLocation" => "$dCityName1 , $dCountryCode1",
+                    "departureTime" => "$DepTime1",
+                    "arrival" => "$aAirportCode1",
+                    "arrivalTime" => "$ArrTime1",
+                    "arrivalAirport" => "$aAirportName1",
+                    "arrivalLocation" => "$aCityName1 , $aCountryCode1",
+                    "flightduration" => "$Duration1",
+                    "bookingcode" => "$BookingClass1",
+                    "seat" => "$Availabilty"),
+
+                "2" => array("marketingcareer" => "$OperatingCarrier2",
+                    "marketingcareerName" => "$AirlineName2",
+                    "marketingflight" => "$FlightNumber2",
+                    "operatingcareer" => "$OperatingCarrier2",
+                    "operatingflight" => "$FlightNumber2",
+                    "departure" => "$dAirportCode2",
+                    "departureAirport" => "$dAirportName2",
+                    "departureLocation" => "$dCityName2 , $dCountryCode2",
+                    "departureTime" => "$DepTime2",
+                    "arrival" => "$aAirportCode2",
+                    "arrivalTime" => "$ArrTime2",
+                    "arrivalAirport" => "$aAirportName2",
+                    "arrivalLocation" => "$aCityName2 , $aCountryCode2",
+                    "flightduration" => "$Duration2",
+                    "bookingcode" => "$BookingClass2",
+                    "seat" => "$Availabilty"),
+            );
+
+            $TransitTime = round(abs(strtotime($DepTime1) - strtotime($ArrTime)) / 60, 2);
+            $TransitDuration = floor($TransitTime / 60) . "H " . ($TransitTime - ((floor($TransitTime / 60)) * 60)) . "Min";
+
+            $TransitTime1 = round(abs(strtotime($DepTime2) - strtotime($ArrTime1)) / 60, 2);
+            $TransitDuration1 = floor($TransitTime1 / 60) . "H " . ($TransitTime1 - ((floor($TransitTime1 / 60)) * 60)) . "Min";
+
+            $JourneyTime = $JourneyDuration + $JourneyDuration1 + $JourneyDuration2 + $TransitTime + $TransitTime1;
+            $TotalDuration = floor($JourneyTime / 60) . "H " . ($JourneyTime - ((floor($JourneyTime / 60)) * 60)) . "Min";
+
+            $transitDetails = array("transit1" => $TransitDuration,
+                "transit2" => $TransitDuration1);
+
+            $basic = array("system" => "FlyHub",
+                "segment" => "3",
+                "uId" => $uId,
+                "triptype" => $TripType,
+                "career" => $Validatingcarrier,
+                "careerName" => "$CarrieerName",
+                "BasePrice" => "$BasePrice",
+                "Taxes" => "$Taxes",
+                "netfare" => "$AgentPrice",
+                "agentprice" => "$WLAgentPrice",
+                // "subagentprice" => "$subAgentPrice",
+                "customerPrice" => $customerPrice,
+                "pricebreakdown" => $PriceBreakDown,
+                "departure" => "$dAirportCode",
+                "departureTime" => substr($DepTime, 11, 5),
+                "departureDate" => date("D d M Y", strtotime($DepTime)),
+                "arrival" => "$aAirportCode2",
+                "arrivalTime" => substr($ArrTime2, 11, 5),
+                "arrivalDate" => date("D d M Y", strtotime($ArrTime2)),
+                "flightduration" => "$TotalDuration",
+                "transit" => $transitDetails,
+                "bags" => "$Baggage",
+                "seat" => "$Availabilty",
+                "class" => "$CabinClass",
+                "refundable" => "$Refundable",
+                "segments" => $segment,
+                "hold" => "$Hold",
+                "SearchID" => $SearchID,
+                "ResultID" => $ResultID,
+
+            );
+            array_push($FlyHubResponse, $basic);
+
+        }
+    }
 }
 
 if ($Sabre == 1 && $Galileo == 1 && $FlyHub == 1) {
