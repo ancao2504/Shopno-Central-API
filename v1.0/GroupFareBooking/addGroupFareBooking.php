@@ -66,7 +66,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 
     
 
-
+    $gfId=$jsonData["grouFareId"];
     $agentId=$jsonData["agentId"];
     $name=$jsonData["name"];
     $phone=$jsonData["phone"];
@@ -165,6 +165,21 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     
     $message="";
     $book=($conn->query($sql))?true:false;
+    $sql="UPDATE groupfare SET 
+                    availableSeat=((SELECT availableSeat FROM groupfare WHERE groupFareId='$gfId')-1) 
+                    WHERE groupFareId='$gfId'";
+
+    $availableSeatUpdate=false;
+    if($conn->query($sql))
+    {
+        
+    }
+    else
+    {   $response["status"]= "Failed";
+        $response["message"] = "Available Seat Update Failed";
+        echo json_encode($response);
+    }
+
     $values="";
             for($i=0; $i<$pax; $i++)
             {
@@ -199,6 +214,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
                 {
                     $response["status"] = "Success";
                     $response["message"] = "Booking and Passenger Added Successfully";
+                    
                     
                 }
                 else
