@@ -10,7 +10,8 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
 {   
     $sql="SELECT p.bookingId, p.agentId, gf.status, p.fName, p.lName, p.gender, p.dob, p.passNo, p.passEx 
     FROM passengers p
-    JOIN group_fare_booking gf ON p.bookingId=gf.bookingId";
+    JOIN booking b ON p.bookingId=b.bookingId
+    WHERE b.platform='GF'";
     
     $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 

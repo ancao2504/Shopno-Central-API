@@ -130,6 +130,20 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 
 
 
+
+    $bookinId ="";
+        $sql = "SELECT * FROM booking ORDER BY bookingId DESC LIMIT 1";
+        $result = $conn->query($sql);
+        if ($result->num_rows > 0) {
+            while($row = $result->fetch_assoc()) {
+                $outputString = preg_replace('/[^0-9]/', '', $row["bookingId"]); 
+                $number= (int)$outputString + 1;
+                $bookingId = "STB$number"; 								
+            }
+        } else {
+            $bookingId ="STB1000";
+        }
+
     
     // $uid=$saveBookingFlightData["uId"];
     
@@ -141,9 +155,9 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 
     $sql="
     INSERT booking
-    (agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
+    (booingId, agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
     bookedAt, platform, netCost )
-    VALUES ('$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
+    VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
     'GF', '$netCost')";
 
 
