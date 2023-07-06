@@ -55,18 +55,12 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
 if($_SERVER["REQUEST_METHOD"]=="POST")
 {
     $jsonData = json_decode(file_get_contents('php://input'), true);
-    // $flightPassengerData=$jsonData["groupFarePassengerData"];
-    // $bookingData=$jsonData["groupFareDetails"];// $saveBookingData=$jsonData["saveBooking"];
-    // $saveBookingFlightData=$saveBookingData["flightData"];
-    // $passengerData=$jsonData["passengers"];
-    // echo json_encode($jsonData);
+    
     $flightData=$jsonData["flightData"];
-    // $passport=$jsonData["passportImg"];
-    // $visa=$jsonData["visaImg"];
-
+    
     
 
-    $gfId=$jsonData["grouFareId"];
+    $gfId=$jsonData["groupFareId"];
     $agentId=$jsonData["agentId"];
     $name=$jsonData["name"];
     $phone=$jsonData["phone"];
@@ -97,25 +91,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $pax=$flightData["pax"];
     
     $currentDateTime = date('Y-m-d H:i:s');
-    // $adultCount=$bookingData["adultcount"];
-    // $childCount=$bookingData["childcount"];
-    // $infantCount=$bookingData["infantcount"];
-    // $adultCostTax=$bookingData["adultcosttax"];
-    // $childCostTax=$bookingData["childcosttax"];
-    // $infantCostTax=$bookingData["infantcosttax"];
-    // $grossCost=$bookingData["grosscost"];
-    // $baseFare=$bookingData["basefare"];
-    // $Tax=$bookingData["tax"];
-    // $timeLimit=$bookingData["timelimit"];
-    // $searchId=$bookingData["SearchID"];
-    // $resultId=$bookingData["ResultID"];
-    // $journeyType=$bookingData["journeyType"];
-    // $ticketCoupon=$bookingData["coupon"];
-    // $adultBag=$bookingData["adultbag"];
-    // $childBag=$bookingData["childbag"];
-    // $infantBag=$bookingData["infantbag"];
-    // $refundable=$bookingData["refundable"];
-    // $platform=$bookingData["platform"];
+    
     $arrival= (isset($dept2))? $dept2:$dept1;
     $airlines= $carrierName1." and ".$carrierName2;
 
@@ -132,31 +108,26 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 
 
 
-    $bookinId ="";
-        $sql = "SELECT * FROM booking ORDER BY bookingId DESC LIMIT 1";
+    $bookingId ="";
+        $sql = "SELECT * FROM booking ORDER BY id DESC LIMIT 1";
         $result = $conn->query($sql);
         if ($result->num_rows > 0) {
             while($row = $result->fetch_assoc()) {
+                
                 $outputString = preg_replace('/[^0-9]/', '', $row["bookingId"]); 
+                
                 $number= (int)$outputString + 1;
+                
                 $bookingId = "STB$number"; 								
             }
         } else {
             $bookingId ="STB1000";
         }
 
-    
-    // $uid=$saveBookingFlightData["uId"];
-    
-    // $platform=$bookingData["platform"];
-    // $platform=$bookingData["platform"];
-    // $platform=$bookingData["platform"];
-    // $platform=$bookingData["platform"];
-
-
+        
     $sql="
     INSERT booking
-    (booingId, agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
+    (bookingId, agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
     bookedAt, platform, netCost )
     VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
     'GF', '$netCost')";
@@ -165,11 +136,12 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     
     $message="";
     $book=($conn->query($sql))?true:false;
+    
     $sql="UPDATE groupfare SET 
-                    availableSeat=((SELECT availableSeat FROM groupfare WHERE groupFareId='$gfId')-1) 
-                    WHERE groupFareId='$gfId'";
+        availableSeat=((SELECT availableSeat FROM groupfare WHERE groupFareId='$gfId')-$pax) 
+        WHERE groupFareId='$gfId'";
 
-    $availableSeatUpdate=false;
+   
     if($conn->query($sql))
     {
         
@@ -180,17 +152,28 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
         echo json_encode($response);
     }
 
+
+    
+
     $values="";
             for($i=0; $i<$pax; $i++)
             {
-                // $type= $passenger["type"]; 
-                // $fName= $passenger["fName"]; 
-                // $lName= $passenger["lName"]; 
-                // $gender= $passenger["gender"]; 
-                // $dob= $passenger["dob"]; 
-                // $passNation= $passenger["passNation"]; 
-                // $passNo= $passenger["passNo"]; 
-                // $passEx= $passenger["passEx"];
+                
+                $paxId ="";
+                $sql = "SELECT * FROM passengers ORDER BY id DESC LIMIT 1";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                    while($row = $result->fetch_assoc()) {
+                        
+                        $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
+                        
+                        $number= (int)$outputString + 1;
+                        
+                        $paxId = "STP$number"; 								
+                    }
+                } else {
+                    $paxId ="STP1000";
+                }
                 $passInd="passport".$i;
                 $visaInd="visa".$i;
                 $passCopy= $_FILES[$passInd]["name"];
@@ -198,14 +181,14 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 
                 uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy);
                 uploadImage($visaInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy);
-                $values=$values."('$bookingId','$passCopy','$visaCopy'),";
+                $values=$values."('$paxId','$agentId','$bookingId','$passCopy','$visaCopy', '$currentDateTime'),";
 
             }
 
             $newValues=substr($values,0,-1);
 
             $sql="INSERT INTO passengers 
-            (bookingId, passportCopy, visaCopy)
+            (paxId,agentId, bookingId, passportCopy, visaCopy, created)
             VALUES".$newValues;
             
             if($conn->query($sql))

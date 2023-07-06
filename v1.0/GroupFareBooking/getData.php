@@ -8,10 +8,11 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 if(array_key_exists("all", $_GET))
 {   
-    $sql="SELECT p.bookingId, p.agentId, b.status, p.fName, b.platform, p.lName, p.gender, p.dob, p.passNo, p.passEx 
+    $sql="SELECT p.bookingId, p.agentId, b.status, p.fName, b.platform, p.lName, p.gender, p.dob, p.passNo, p.passEx, b.platform 
     FROM passengers p
     JOIN booking b ON p.bookingId=b.bookingId
-    WHERE b.platform='GF'";
+    WHERE b.platform='GF'
+    ";
     
     $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
@@ -30,10 +31,11 @@ if(array_key_exists("all", $_GET))
 
 }else if(array_key_exists("agentId", $_GET)){
        $agentId = $_GET["agentId"];
-        $sql="SELECT b.bookingId, b.agentId, b.status, b.platform, p.fName, p.lName, p.gender, p.dob, p.passNo, p.passEx 
-        FROM booking b
-        JOIN passengers p ON b.bookingId = p.bookingId
-        WHERE b.agentId = '$agentId' AND b.platform = 'GF'";
+       $sql="SELECT p.bookingId, p.agentId, gf.status, p.fName, p.lName, p.gender, p.dob, p.passNo, p.passEx, b.platform 
+       FROM passengers p
+       JOIN booking gf ON p.bookingId=b.bookingId
+       WHERE b.platform='GF' AND p.agentId='$agentId
+        ";
         
         $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
     
