@@ -9011,5 +9011,5 @@ function TimeConvert($startDate, $endDate){
 	$minutes = $interval->format('%i');
 	return  $hours."H ".$minutes."M";
 }
-
+$conn->close();
 ?>
