@@ -55,11 +55,6 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
 if($_SERVER["REQUEST_METHOD"]=="POST")
 {
     $jsonData = json_decode(file_get_contents('php://input'), true);
-    // $flightPassengerData=$jsonData["groupFarePassengerData"];
-    // $bookingData=$jsonData["groupFareDetails"];// $saveBookingData=$jsonData["saveBooking"];
-    // $saveBookingFlightData=$saveBookingData["flightData"];
-    // $passengerData=$jsonData["passengers"];
-    // echo json_encode($jsonData);
     $flightData=$jsonData["flightData"];
     // $passport=$jsonData["passportImg"];
     // $visa=$jsonData["visaImg"];
@@ -97,25 +92,6 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $pax=$flightData["pax"];
     
     $currentDateTime = date('Y-m-d H:i:s');
-    // $adultCount=$bookingData["adultcount"];
-    // $childCount=$bookingData["childcount"];
-    // $infantCount=$bookingData["infantcount"];
-    // $adultCostTax=$bookingData["adultcosttax"];
-    // $childCostTax=$bookingData["childcosttax"];
-    // $infantCostTax=$bookingData["infantcosttax"];
-    // $grossCost=$bookingData["grosscost"];
-    // $baseFare=$bookingData["basefare"];
-    // $Tax=$bookingData["tax"];
-    // $timeLimit=$bookingData["timelimit"];
-    // $searchId=$bookingData["SearchID"];
-    // $resultId=$bookingData["ResultID"];
-    // $journeyType=$bookingData["journeyType"];
-    // $ticketCoupon=$bookingData["coupon"];
-    // $adultBag=$bookingData["adultbag"];
-    // $childBag=$bookingData["childbag"];
-    // $infantBag=$bookingData["infantbag"];
-    // $refundable=$bookingData["refundable"];
-    // $platform=$bookingData["platform"];
     $arrival= (isset($dept2))? $dept2:$dept1;
     $airlines= $carrierName1." and ".$carrierName2;
 
@@ -128,37 +104,11 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     {
 
     }
-
-
-
-
-    $bookinId ="";
-        $sql = "SELECT * FROM booking ORDER BY bookingId DESC LIMIT 1";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                $outputString = preg_replace('/[^0-9]/', '', $row["bookingId"]); 
-                $number= (int)$outputString + 1;
-                $bookingId = "STB$number"; 								
-            }
-        } else {
-            $bookingId ="STB1000";
-        }
-
-    
-    // $uid=$saveBookingFlightData["uId"];
-    
-    // $platform=$bookingData["platform"];
-    // $platform=$bookingData["platform"];
-    // $platform=$bookingData["platform"];
-    // $platform=$bookingData["platform"];
-
-
     $sql="
     INSERT booking
-    (booingId, agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
+    (agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
     bookedAt, platform, netCost )
-    VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
+    VALUES ('$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
     'GF', '$netCost')";
 
 
@@ -183,18 +133,8 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $values="";
             for($i=0; $i<$pax; $i++)
             {
-                // $type= $passenger["type"]; 
-                // $fName= $passenger["fName"]; 
-                // $lName= $passenger["lName"]; 
-                // $gender= $passenger["gender"]; 
-                // $dob= $passenger["dob"]; 
-                // $passNation= $passenger["passNation"]; 
-                // $passNo= $passenger["passNo"]; 
-                // $passEx= $passenger["passEx"];
-                $passInd="passport".$i;
-                $visaInd="visa".$i;
-                $passCopy= $_FILES[$passInd]["name"];
-                $visaCopy= $_FILES[$visaInd]["name"];
+                $passCopy= $pass[$count][$_FILES["image"]["name"]];
+                $visaCopy= $visa[$count][$_FILES["image"]["name"]];
 
                 uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy);
                 uploadImage($visaInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy);
@@ -220,7 +160,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
                 else
                 {
                     $response["status"] = "Failed";
-                    $response["message"] = "Passenger Add Done But Boooking Failed";
+                    $response["message"] = "Passenger Add Done But Booking Failed";
                 }
                 
             }
