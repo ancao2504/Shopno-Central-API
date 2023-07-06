@@ -32,8 +32,8 @@ if(array_key_exists("all", $_GET))
        $agentId = $_GET["agentId"];
         $sql="SELECT b.bookingId, b.agentId, b.status, b.platform, p.fName, p.lName, p.gender, p.dob, p.passNo, p.passEx 
         FROM booking b
-        JOIN passengers p ON b.bookingId=p.bookingId
-        WHERE b.agentId='$agentId' AND b.platform='GF'";
+        JOIN passengers p ON b.bookingId = p.bookingId
+        WHERE b.agentId = '$agentId' AND b.platform = 'GF'";
         
         $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
     

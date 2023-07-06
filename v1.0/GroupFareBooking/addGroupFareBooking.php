@@ -56,8 +56,9 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 {
     $jsonData = json_decode(file_get_contents('php://input'), true);
     $flightData=$jsonData["flightData"];
-    $passport=$jsonData["passportImg"];
-    $visa=$jsonData["visaImg"];
+    // $passport=$jsonData["passportImg"];
+    // $visa=$jsonData["visaImg"];
+
     
 
 
@@ -111,30 +112,17 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     'GF', '$netCost')";
 
 
-    $bookingId="";
-    $message="";
-    $book=false;
-    if($conn->query($sql))
-    {
-        $result = $conn->query("SELECT bookingId FROM booking ORDER BY id DESC LIMIT 1");
-        $row = $result->fetch_assoc();
-        $bookingId = $row['bookingId'];
-        $book=true;
-    }
-    else
-    {
-            $book=false;
-    }
     
+    $message="";
+    $book=($conn->query($sql))?true:false;
     $values="";
-    $count=0;
-            foreach($passport as $pass)
+            for($i=0; $i<$pax; $i++)
             {
                 $passCopy= $pass[$count][$_FILES["image"]["name"]];
                 $visaCopy= $visa[$count][$_FILES["image"]["name"]];
 
-                uploadImage('image', 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy);
-                uploadImage('image', 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy);
+                uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy);
+                uploadImage($visaInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy);
                 $values=$values."('$bookingId','$passCopy','$visaCopy'),";
 
             }
