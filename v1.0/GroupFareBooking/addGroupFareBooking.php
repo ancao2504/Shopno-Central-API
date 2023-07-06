@@ -53,11 +53,13 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
 
 
 if($_SERVER["REQUEST_METHOD"]=="POST")
-{
-    $jsonData = json_decode(file_get_contents('php://input'), true);
+{   
+
+
+    
+    $jsonData = json_decode($_POST["requestedBody"], true);
     
     $flightData=$jsonData["flightData"];
-    
     
 
     $gfId=$jsonData["groupFareId"];
