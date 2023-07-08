@@ -19,6 +19,10 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
             $validExt=['jpg', 'jpeg', 'png'];
             $fileExt= strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
+            
+            if (!file_exists($cdnpath)) {
+                mkdir($cdnpath, 0777, true);
+            }
 
             if(in_array($fileExt, $validExt))
             {
@@ -58,7 +62,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 
     
     $jsonData = json_decode($_POST["requestedBody"], true);
-    
+    // echo json_encode($jsonData);
     $flightData=$jsonData["flightData"];
     
 
