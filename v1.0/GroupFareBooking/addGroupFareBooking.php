@@ -60,12 +60,12 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 {   
 
 
-    
+    // echo $_POST["requestedBody"];
     $jsonData = json_decode($_POST["requestedBody"], true);
     // echo json_encode($jsonData);
     $flightData=$jsonData["flightData"];
     
-
+    $passengersNames=json_decode($_POST["travelerNames"], true);
     $gfId=$jsonData["groupFareId"];
     $agentId=$jsonData["agentId"];
     $name=$jsonData["name"];
@@ -101,15 +101,15 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $arrival= (isset($dept2))? $dept2:$dept1;
     $airlines= $carrierName1." and ".$carrierName2;
 
-    if($segment===1)
-    {
+    // if($segment===1)
+    // {
         
         
-    }
-    else if ($segment===2)
-    {
+    // }
+    // else if ($segment===2)
+    // {
 
-    }
+    // }
 
 
 
@@ -144,7 +144,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $book=($conn->query($sql))?true:false;
     
     $sql="UPDATE groupfare SET 
-        availableSeat=((SELECT availableSeat FROM groupfare WHERE groupFareId='$gfId')-$pax) 
+        availableSeat=availableSeat-'$pax' 
         WHERE groupFareId='$gfId'";
 
    
@@ -184,19 +184,20 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
                 $visaInd="visa".$i;
                 $passCopy= $_FILES[$passInd]["name"];
                 $visaCopy= $_FILES[$visaInd]["name"];
+                $name=$passengersNames[$i];
 
                 uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy);
                 uploadImage($visaInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy);
-                $values=$values."('$paxId','$agentId','$bookingId','$passCopy','$visaCopy', '$currentDateTime'),";
+                $values=$values."('$name','$paxId','$agentId','$bookingId','$passCopy','$visaCopy', '$currentDateTime'),";
 
             }
 
             $newValues=substr($values,0,-1);
 
             $sql="INSERT INTO passengers 
-            (paxId,agentId, bookingId, passportCopy, visaCopy, created)
+            (fName,paxId,agentId, bookingId, passportCopy, visaCopy, created)
             VALUES".$newValues;
-            
+            echo $sql;
             if($conn->query($sql))
             {
                 if($book)

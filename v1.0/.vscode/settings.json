@@ -13,6 +13,20 @@
             "database": "flyfarin_shopno",
             "username": "root",
             "password": ""
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "flyfarint.com",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "Live Shopno",
+            "username": "flyfarin_shopno",
+            "password": "*04ruXfEfq",
+            "database": "flyfarin_shopno"
         }
     ],
     "docwriter.style": "Google"

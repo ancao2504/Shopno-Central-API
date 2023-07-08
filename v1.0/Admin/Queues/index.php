@@ -9,9 +9,9 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 if (array_key_exists("all", $_GET)) {
     //Booking status information
-    $TotalBooking = $conn->query("SELECT * FROM booking")->num_rows;
+    $TotalBooking = $conn->query("SELECT * FROM booking WHERE platform='B2B'")->num_rows;
 
-    $result = $conn->query("SELECT * FROM booking ORDER BY id DESC LIMIT 30");
+    $result = $conn->query("SELECT * FROM booking WHERE platform='B2B' ORDER BY id DESC");
 
     $TotalBookingData = array();
 
@@ -23,8 +23,8 @@ if (array_key_exists("all", $_GET)) {
 
             $query = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
             $data = mysqli_fetch_assoc($query);
-            $companyname = $data['company'];
-            $companyphone = $data['phone'];
+            $companyname = isset($data['company'])? $data['company']:"";
+            $companyphone = isset($data['phone'])? $data['phone']:"";
             $balanceQuery = mysqli_query($conn, "SELECT * FROM agent_ledger WHERE agentId='$agentId'");
             $balanceData = mysqli_fetch_assoc($balanceQuery);
             $balance = isset($balanceData['lastAmount']) ? $balanceData['lastAmount']:"";
@@ -39,20 +39,20 @@ if (array_key_exists("all", $_GET)) {
         }
     }
 
-    $TotalHoldBooking = $conn->query("SELECT * FROM booking where status ='Hold' ORDER BY id DESC")->num_rows;
-    $TotalCancelledBooking = $conn->query("SELECT * FROM booking where status ='Cancelled' ORDER BY id DESC")->num_rows;
-    $TotalTicketedBooking = $conn->query("SELECT * FROM booking where status ='Ticketed' ORDER BY id DESC")->num_rows;
-    $TotalReissueBooking = $conn->query("SELECT * FROM booking where status ='Reissued' ORDER BY id DESC")->num_rows;
-    $TotalReturnBooking = $conn->query("SELECT * FROM booking where status ='Return' ORDER BY id DESC")->num_rows;
-    $TotalRefundedBooking = $conn->query("SELECT * FROM booking where status ='Refunded' ORDER BY id DESC")->num_rows;
-    $TotalVoidBooking = $conn->query("SELECT * FROM booking where status ='Voided' ORDER BY id DESC")->num_rows;
-    $TotalIssueOnProcessBooking = $conn->query("SELECT * FROM booking where status ='Issue In Processing' ORDER BY id DESC")->num_rows;
-    $TotalReissueOnProcessBooking = $conn->query("SELECT * FROM booking where status ='Reissue In Processing' ORDER BY id DESC")->num_rows;
-    $TotalVoidOnProcessBooking = $conn->query("SELECT * FROM booking where status ='Void In Processing' ORDER BY id DESC")->num_rows;
-    $TotalRefundOnProcessBooking = $conn->query("SELECT * FROM booking where status ='Refund In Processing' ORDER BY id DESC")->num_rows;
-    $TotalRefundRejectedBooking = $conn->query("SELECT * FROM booking where status ='Refund Rejected' ORDER BY id DESC")->num_rows;
-    $TotalVoidRejectedBooking = $conn->query("SELECT * FROM booking where status ='Void Rejected' ORDER BY id DESC")->num_rows;
-    $TotalReissueRejectedBooking = $conn->query("SELECT * FROM booking where status ='Reissue Rejected' ORDER BY id DESC")->num_rows;
+    $TotalHoldBooking = $conn->query("SELECT * FROM booking where status ='Hold' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalCancelledBooking = $conn->query("SELECT * FROM booking where status ='Cancelled' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalTicketedBooking = $conn->query("SELECT * FROM booking where status ='Ticketed' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalReissueBooking = $conn->query("SELECT * FROM booking where status ='Reissued' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalReturnBooking = $conn->query("SELECT * FROM booking where status ='Return' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalRefundedBooking = $conn->query("SELECT * FROM booking where status ='Refunded' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalVoidBooking = $conn->query("SELECT * FROM booking where status ='Voided' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalIssueOnProcessBooking = $conn->query("SELECT * FROM booking where status ='Issue In Processing' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalReissueOnProcessBooking = $conn->query("SELECT * FROM booking where status ='Reissue In Processing' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalVoidOnProcessBooking = $conn->query("SELECT * FROM booking where status ='Void In Processing' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalRefundOnProcessBooking = $conn->query("SELECT * FROM booking where status ='Refund In Processing' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalRefundRejectedBooking = $conn->query("SELECT * FROM booking where status ='Refund Rejected' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalVoidRejectedBooking = $conn->query("SELECT * FROM booking where status ='Void Rejected' AND platform='B2B' ORDER BY id DESC")->num_rows;
+    $TotalReissueRejectedBooking = $conn->query("SELECT * FROM booking where status ='Reissue Rejected' AND platform='B2B' ORDER BY id DESC")->num_rows;
 
     //booking status information
     $Total['TotalBooking'] = $TotalBooking;
