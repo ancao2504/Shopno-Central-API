@@ -1,0 +1,13 @@
+[
+  {
+    "bookingId": "STB1125",
+    "groupFareId": "STGF1002",
+    "deptFrom": "{\"code\":\"RJH\",\"name\":\"Shah Makhdum Airport\",\"Address\":\"Rajshahi\"}",
+    "arriveTo": "",
+    "segment": "1",
+    "departAt": "{\"code\":\"RJH\",\"name\":\"Shah Makhdum Airport\",\"Address\":\"Rajshahi\"}",
+    "arriveAt": "2023-07-08T15:15",
+    "totalSeat": 30,
+    "availAbleSeat": "23"
+  }
+]

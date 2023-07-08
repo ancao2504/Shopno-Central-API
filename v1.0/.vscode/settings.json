@@ -6,10 +6,24 @@
                 "enableSsl": "Disabled"
             },
             "previewLimit": 50,
+            "server": "flyfarint.com",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "Live Shopno",
+            "username": "flyfarin_shopno",
+            "password": "*04ruXfEfq",
+            "database": "flyfarin_shopno"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
             "server": "localhost",
             "port": 3306,
             "driver": "MySQL",
-            "name": "shopno",
+            "name": "Local Shopno",
             "database": "flyfarin_shopno",
             "username": "root",
             "password": ""
@@ -20,13 +34,13 @@
                 "enableSsl": "Disabled"
             },
             "previewLimit": 50,
-            "server": "flyfarint.com",
+            "server": "localhost",
             "port": 3306,
             "driver": "MySQL",
-            "name": "Live Shopno",
-            "username": "flyfarin_shopno",
-            "password": "*04ruXfEfq",
-            "database": "flyfarin_shopno"
+            "name": "Local Fly Far",
+            "database": "flyfarin_b2bv3",
+            "username": "root",
+            "password": ""
         }
     ],
     "docwriter.style": "Google"
