@@ -18,6 +18,23 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
         $farePolicyDate=$jsonData["farePolicyDate"];
         $farePolicyPercentage=$jsonData["farePolicyPercentage"];
 
+
+        $groupFareId ="";
+                $sql = "SELECT * FROM groupfare ORDER BY id DESC LIMIT 1";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                    while($row = $result->fetch_assoc()) {
+                        
+                        $outputString = preg_replace('/[^0-9]/', '', $row["groupFareId"]); 
+                        
+                        $number= (int)$outputString + 1;
+                        
+                        $groupFareId = "STGF$number"; 								
+                    }
+                } else {
+                    $groupFareId ="STGF1000";
+                }
+            
         if($segment==1) {
             $deptFrom=$jsonData[0]["DepartureFrom"];
             $deptTime=$jsonData[0]["DepartureTime"];
@@ -32,12 +49,15 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $travelTime=$jsonData[0]["TravelTime"];
 
 
+
+            
+
             $sql="INSERT INTO groupfare 
-            (segment, dept1, deptTime1,  arrive1,  arriveTime1,  carrierName1,  
+            (groupFareId, segment, dept1, deptTime1,  arrive1,  arriveTime1,  carrierName1,  
             flightNum1,  flightCode1,  cabin1,  class1,  baggage1,  travelTime1, 
              transitTime, totalSeat, adtBaseFare, availableSeat, status, farePolicyDate, farePolicyPercentage)
             VALUES 
-            ('$segment','$deptFrom','$deptTime','$arriveTo','$arriveTime','$carrierName','$flightNum','$flightCode', '$cabin',
+            ('$groupFareId','$segment','$deptFrom','$deptTime','$arriveTo','$arriveTime','$carrierName','$flightNum','$flightCode', '$cabin',
             '$class','$baggage','$travelTime','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat', 'true', '$farePolicyDate',
             '$farePolicyPercentage')";
 
@@ -68,11 +88,11 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             $travelTime2=$jsonData[1]["TravelTime"];
 
             $sql="INSERT INTO groupfare 
-            (segment, dept1, dept2, deptTime1, deptTime2, arrive1, arrive2, arriveTime1, arriveTime2, carrierName1, carrierName2, 
+            (groupFareId,segment, dept1, dept2, deptTime1, deptTime2, arrive1, arrive2, arriveTime1, arriveTime2, carrierName1, carrierName2, 
             flightNum1, flightNum2, flightCode1, flightCode2, cabin1, cabin2, class1, class2, baggage1, baggage2, travelTime1, 
             travelTime2, transitTime, totalSeat, adtBaseFare, availableSeat, status, farePolicyDate, farePolicyPercentage)
             VALUES 
-            ('$segment','$deptFrom1','$deptFrom2','$deptTime1','$deptTime2','$arriveTo1','$arriveTo2','$arriveTime1','$arriveTime2',
+            ('$groupFareId','$segment','$deptFrom1','$deptFrom2','$deptTime1','$deptTime2','$arriveTo1','$arriveTo2','$arriveTime1','$arriveTime2',
             '$carrierName1','$carrierName2','$flightNum1','$flightNum2','$flightCode1','$flightCode2', '$cabin1','$cabin2','$class1','$class2',
             '$baggage1','$baggage2','$travelTime1','$travelTime2','$transitTime', '$totalSeat', '$adtBaseFare', '$totalSeat', 'true', '$farePolicyDate',
             '$farePolicyPercentage')";

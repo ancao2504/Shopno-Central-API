@@ -60,7 +60,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
 {   
 
 
-    
+    // echo $_POST["requestedBody"];
     $jsonData = json_decode($_POST["requestedBody"], true);
     // echo json_encode($jsonData);
     $flightData=$jsonData["flightData"];
@@ -101,15 +101,15 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $arrival= (isset($dept2))? $dept2:$dept1;
     $airlines= $carrierName1." and ".$carrierName2;
 
-    if($segment===1)
-    {
+    // if($segment===1)
+    // {
         
         
-    }
-    else if ($segment===2)
-    {
+    // }
+    // else if ($segment===2)
+    // {
 
-    }
+    // }
 
 
 
@@ -144,7 +144,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $book=($conn->query($sql))?true:false;
     
     $sql="UPDATE groupfare SET 
-        availableSeat=((SELECT availableSeat FROM groupfare WHERE groupFareId='$gfId')-$pax) 
+        availableSeat=availableSeat-'$pax' 
         WHERE groupFareId='$gfId'";
 
    
