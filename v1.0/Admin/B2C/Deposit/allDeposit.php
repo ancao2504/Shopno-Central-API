@@ -160,9 +160,9 @@ if (array_key_exists('getall', $_GET)) {
             $userId = $row['userId'];
             $staffId = $row['staffId'];
 
-            $agentSql = mysqli_query($conn, "SELECT company,phone FROM agent WHERE userId='$userId' AND platform='B2C'");
+            $agentSql = mysqli_query($conn, "SELECT name, company,phone FROM agent WHERE userId='$userId' AND platform='B2C'");
             $agentRow = mysqli_fetch_array($agentSql, MYSQLI_ASSOC);
-            $companyName = $agentRow['company'];
+            $userName = $agentRow['name'];
             $phone = $agentRow['phone'];
 
             $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE staffId='$staffId'");
@@ -176,7 +176,7 @@ if (array_key_exists('getall', $_GET)) {
 
             $response = $row;
             $response['bookedby'] = "$staffName";
-            $response['company'] = "$companyName";
+            $response['name'] = "$userName";
             $response['phone'] = "$phone";
             array_push($Data, $response);
         }
