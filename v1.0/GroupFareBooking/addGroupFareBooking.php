@@ -74,12 +74,12 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $platform=$jsonData["platform"];
     $segment=$flightData["segment"];
     
-    $dept1=$flightData["dept1"]["name"];
-    $arrive1=$flightData["arrive1"]["name"];
-    $dept2=$flightData["dept2"]["name"];
-    $arrive2=$flightData["arrive2"]["name"];
-    $carrierName1=$flightData["carrierName1"]["name"];
-    $carrierName2=$flightData["carrierName2"]["name"];
+    $dept1=$flightData["dept1"];
+    $arrive1=$flightData["arrive1"];
+    $dept2=$flightData["dept2"];
+    $arrive2=$flightData["arrive2"];
+    $carrierName1=$flightData["carrierName1"];
+    $carrierName2=$flightData["carrierName2"];
     $flightNum1=$flightData["flightNum1"];
     $flightNum2=$flightData["flightNum2"];
     $flightCode1=$flightData["flightCode1"];
