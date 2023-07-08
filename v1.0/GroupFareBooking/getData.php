@@ -11,7 +11,7 @@ if(array_key_exists("all", $_GET))
     $sql="SELECT p.paxId, p.bookingId, p.agentId, b.status, p.fName, b.platform, p.lName, p.gender, p.dob, p.passNo, p.passEx, b.platform 
     FROM passengers p
     JOIN booking b ON p.bookingId=b.bookingId
-    WHERE b.platform='GF'
+    WHERE b.bookingType='group fare'
     ";
     
     $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
@@ -29,20 +29,37 @@ if(array_key_exists("all", $_GET))
         echo json_encode($response);
     }
 
-}else if(array_key_exists("agentId", $_GET)){
-       $agentId = $_GET["agentId"];
-       $sql="SELECT p.paxId, p.bookingId, p.agentId, b.status, p.fName, p.lName, p.gender, p.dob, p.passNo, p.passEx, b.platform 
-       FROM passengers p
-       JOIN booking b ON p.bookingId=b.bookingId
-       WHERE b.platform='GF' AND p.agentId='$agentId'
+}else if(array_key_exists("bookingId", $_GET) ){
+       
+    $bookingId = $_GET["bookingId"];
+       
+       $sql1="SELECT *
+       FROM passengers p 
+       WHERE p.bookingId='$bookingId'
         ";
         
-        $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
-    
+
+        $passengerData=$conn->query($sql1)->fetch_all(MYSQLI_ASSOC);
+        $response["passengerData"]=$passengerData;
+
+        $sql2="SELECT *
+        FROM groupfare  
+        WHERE groupFareId=(
+        SELECT groupFareId 
+        FROM booking b   
+        WHERE b.bookingId='$bookingId'
+        )
+        ";
+
+        $groupFareData=$conn->query($sql2)->fetch_all(MYSQLI_ASSOC);
+        $response["groupFareData"]=$groupFareData;
+
+
+
     
         if(!empty($response))
         {
-            echo json_encode($response);
+           echo json_encode($response);
         }
         else
         {
