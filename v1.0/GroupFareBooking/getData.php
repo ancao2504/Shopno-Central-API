@@ -11,7 +11,7 @@ if(array_key_exists("all", $_GET))
     $sql="SELECT p.paxId, p.bookingId, p.agentId, b.status, p.fName, b.platform, p.lName, p.gender, p.dob, p.passNo, p.passEx, b.platform 
     FROM passengers p
     JOIN booking b ON p.bookingId=b.bookingId
-    WHERE b.bookingType='group fare'
+    WHERE b.bookingType='groupfare' ORDER BY id DESC
     ";
     
     $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
