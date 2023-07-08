@@ -65,13 +65,13 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     // echo json_encode($jsonData);
     $flightData=$jsonData["flightData"];
     
-    $passengersNames=json_decode($_POST["travelerNames"], true);
+    // $passengersNames=json_decode($_POST["travelerNames"], true);
     $gfId=$jsonData["groupFareId"];
     $agentId=$jsonData["agentId"];
     $name=$jsonData["name"];
     $phone=$jsonData["phone"];
     $email=$jsonData["email"];
-
+    $platform=$jsonData["platform"];
     $segment=$flightData["segment"];
     
     $dept1=$flightData["dept1"]["name"];
@@ -96,20 +96,13 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $netCost=$flightData["netCost"];
     $pax=$flightData["pax"];
     
+    
     $currentDateTime = date('Y-m-d H:i:s');
     
     $arrival= (isset($dept2))? $dept2:$dept1;
     $airlines= $carrierName1." and ".$carrierName2;
 
-    // if($segment===1)
-    // {
-        
-        
-    // }
-    // else if ($segment===2)
-    // {
-
-    // }
+   
 
 
 
@@ -134,9 +127,9 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     $sql="
     INSERT booking
     (bookingId, agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
-    bookedAt, platform, netCost )
+    bookedAt, platform, netCost, bookingType )
     VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
-    'GF', '$netCost')";
+    '$platform', '$netCost', 'group fare')";
 
 
     
@@ -184,7 +177,8 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
                 $visaInd="visa".$i;
                 $passCopy= $_FILES[$passInd]["name"];
                 $visaCopy= $_FILES[$visaInd]["name"];
-                $name=$passengersNames[$i];
+                $passenger="travelername".$i;
+                $name=$_POST[$passenger];
 
                 uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy);
                 uploadImage($visaInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy);
@@ -197,7 +191,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
             $sql="INSERT INTO passengers 
             (fName,paxId,agentId, bookingId, passportCopy, visaCopy, created)
             VALUES".$newValues;
-            echo $sql;
+            
             if($conn->query($sql))
             {
                 if($book)
