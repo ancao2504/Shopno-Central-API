@@ -129,7 +129,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
     (bookingId, agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
     bookedAt, platform, netCost, bookingType, groupFareId)
     VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
-    '$platform', '$netCost', 'group fare', '$gfId')";
+    '$platform', '$netCost', 'groupfare', '$gfId')";
 
         
     
