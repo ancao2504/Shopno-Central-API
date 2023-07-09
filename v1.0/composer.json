@@ -1,9 +1,0 @@
-{
-    "require": {
-        "phpmailer/phpmailer": "^6.6",
-        "kreait/firebase-php": "^6.9",
-        "dompdf/dompdf": "^2.0",
-        "guzzlehttp/guzzle": "^7.5",
-        "fabpot/goutte": "^4.0"
-    }
-}

@@ -198,6 +198,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
                 {
                     $response["status"] = "Success";
                     $response["message"] = "Booking and Passenger Added Successfully";
+                    $response["bookingId"]=$bookingId;
                     
                     
                 }
