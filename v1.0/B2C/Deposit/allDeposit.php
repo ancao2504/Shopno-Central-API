@@ -51,7 +51,7 @@ if (array_key_exists("all", $_GET) && array_key_exists('page', $_GET)) {
     $return_arr['data'] = $Data;
 
     echo json_encode($return_arr);
-} else if (array_key_exists("userId", $_GET) and array_key_exists("page", $_GET)) {
+} else if (array_key_exists("userId", $_GET) && array_key_exists("page", $_GET)) {
     $page = $_GET['page'];
     $userId = $_GET['userId'];
     $result_per_page = 20;
@@ -186,6 +186,48 @@ if (array_key_exists("all", $_GET) && array_key_exists('page', $_GET)) {
     $return_arr['data'] = $Data;
 
     echo json_encode($return_arr);
+}else if (array_key_exists("userId", $_GET) && array_key_exists("all", $_GET)) {
+    $userId = $_GET['userId'];
+
+    /**User Validation Function */
+    userChecker($userId, $conn);
+
+    $sql = "SELECT * FROM `deposit_request` WHERE userId='$userId' ORDER BY id DESC";
+    $result = $conn->query($sql);
+    $return_arr = array();
+    $Data = array();
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $userId = $row['userId'];
+            $staffId = $row['staffId'];
+
+            $agentSql = mysqli_query($conn, "SELECT company FROM agent WHERE userId='$userId'");
+            $agentRow = mysqli_fetch_array($agentSql, MYSQLI_ASSOC);
+            $companyName = $agentRow['company'];
+
+            $staffsql = mysqli_query($conn, "SELECT * FROM staffList WHERE staffId='$staffId'");
+            $staffRow = mysqli_fetch_array($staffsql, MYSQLI_ASSOC);
+
+            if (!empty($staffRow)) {
+                $staffName = $staffRow['name'];
+            } else {
+                $staffName = "Agent";
+            }
+
+            $response = $row;
+            $response['bookedby'] = "$staffName";
+            $response['company'] = "$companyName";
+            array_push($Data, $response);
+        }
+    }
+
+    echo json_encode($Data);
+}
+else {
+    $response['status'] = "error";
+    $response['message'] = "Invalid Url";
+    echo json_encode($response);
 }
 $conn->close();
 

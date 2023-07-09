@@ -14,15 +14,12 @@ if(array_key_exists("all", $_GET)){
     if($result->num_rows > 0){
         while ($row = $result->fetch_assoc()) {
             $UserId = $row['userId'];
-            $lastAmountSql = $conn->query("SELECT lastAmount FROM agent_ledger WHERE userId = '$UserId' ORDER BY id LIMIT 1")->fetch_all(MYSQLI_ASSOC);
-            if(!empty($lastAmountSql)){
-                $LastAmount = $lastAmountSql['lastAmount'];
-            }else{
-                $LastAmount = 0;
-            }
+            $balanceQuery = mysqli_query($conn, "SELECT * FROM agent_ledger WHERE userId='$UserId'");
+            $balanceData = mysqli_fetch_assoc($balanceQuery);
+            $balance = isset($balanceData['lastAmount']) ? $balanceData['lastAmount']:"";
             
             $response = $row;
-            $response['lastBalance'] = $LastAmount;
+            $response['lastBalance'] = $balance;
             array_push($Data, $response);
         }
         echo json_encode($Data);
