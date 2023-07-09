@@ -6,6 +6,12 @@
 // $dbname="flyfarin_shopno";
 
 
+// $servername = "localhost";
+// $username = "root";
+// $password = "";
+// $dbname="flyfarin_b2bV3";
+
+
 // Shopno Live Database
 $servername = "flyfarint.com";/* The lines of code you provided are setting the values for the
 username, password, and database name variables. These variables are

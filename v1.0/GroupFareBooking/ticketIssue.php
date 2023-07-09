@@ -9,7 +9,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 
 
-if($_SERVER['RESQUEST_METHOD'] == 'POST')
+if($_SERVER["REQUEST_METHOD"] == 'POST')
 {
     $jsonData=json_decode(file_get_contents("php://input"), true);
     
@@ -17,7 +17,6 @@ if($_SERVER['RESQUEST_METHOD'] == 'POST')
 
     $agentId=$jsonData["agentId"];
     $bookingId=$jsonData["bookingId"];
-    $pax=$jsonData["pax"];
     $netCost=$jsonData["netCost"];
     $actionBy=$jsonData["ticketedBy"];
     $dateTime= date("Y-m-d H:i:s");
@@ -25,13 +24,17 @@ if($_SERVER['RESQUEST_METHOD'] == 'POST')
     
     $airlinesPNR="HARD_CODED_PNR";
     $transactionId="HARD_CODED_TRANSACTIONID";
-    $agentLedger=$conn->query("SELECT * FROM agent_ledger WHERE agentId='$agentId' ORDER BY id DESC LIMIT 1")->fetch_all(MYSQLI_ASSOC);
-    $lastAmount= $agentLedger["lastAmount"];
+    $paidAmount="HARD_CODED_PA";
+    $paidDate=$dateTime;
+
+
+    $agentLedge=$conn->query("SELECT lastAmount FROM agent_ledger WHERE agentId='$agentId' ORDER BY id DESC LIMIT 1")->fetch_assoc();
+    $lastAmount=$agentLedge["lastAmount"];
     $newLastAmount=NULL;
     
     $response["status"]="N/A";
     $response["message"]="N/A";
-
+    // echo json_encode($jsonData);
     if($netCost<=$lastAmount)
     {   
         $newLastAmount=$lastAmount-$netCost;
@@ -52,7 +55,7 @@ if($_SERVER['RESQUEST_METHOD'] == 'POST')
             }
             else 
             {
-                $ticketId ="STT$number";
+                $ticketId ="STT1000";
             }
 
             $passengerName=$p["fName"];
@@ -75,13 +78,13 @@ if($_SERVER['RESQUEST_METHOD'] == 'POST')
 
         if($conn->query($sql))
         {
-            $details="$netCost Tk Group Fare tickted by $actionBy";
+            $details=$netCost ."Tk Group Fare tickted by $actionBy";
 
             $sql="INSERT INTO agent_ledger
             (agentId, purchase, lastAmount, transactionId, details,
             reference, platform, actionBy, createdAt)
             VALUES('$agentId','$netCost','$newLastAmount','$transactionId',
-            '$details', '$bookingId', '$transactionId', '$platform', '$actionBy', 
+            '$details', '$transactionId', '$platform', '$actionBy', 
             '$dateTime')";
 
             if($conn->query($sql))
