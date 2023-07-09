@@ -11,14 +11,16 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 
 
-function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
+function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName, $name)
 {           
             $tempname=$_FILES[$imagename]['tmp_name'];
             $filesize=$_FILES[$imagename]['size'];
 
             $validExt=['jpg', 'jpeg', 'png'];
             $fileExt= strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
+            
+            $imageType=substr($imagename,0,-1);
+            $savedFileName=$name.$imageType.'.'.$fileExt;
             
             if (!file_exists($cdnpath)) {
                 mkdir($cdnpath, 0777, true);
@@ -28,8 +30,8 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
             {
                 if($filesize<$acceptablesize)
                 {
-                    move_uploaded_file($tempname, $cdnpath.$fileName);
-                    return true;
+                    move_uploaded_file($tempname, $cdnpath.$savedFileName);
+                    return $savedFileName;
                 }
                 else
                 {
@@ -40,7 +42,7 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
                         )
                 
                         );
-                        return false;
+                        return 'Not Found';
                 }
             }
             else
@@ -51,7 +53,7 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
                         "message" => "Invalid Extension"
                     )
                     );
-                    return false;
+                    return 'Not Found';
             }
 }
 
@@ -180,9 +182,9 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
                 $passenger="travelername".$i;
                 $name=$_POST[$passenger];
 
-                uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy);
-                uploadImage($visaInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy);
-                $values=$values."('$name','$paxId','$agentId','$bookingId','$passCopy','$visaCopy', '$currentDateTime'),";
+                $passCopy=uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy, $name);
+                $visaCopy=uploadImage($visaInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy, $name);
+                $values=$values."('$name','$paxId','$agentId','$bookingId','$passInd','$visaInd', '$currentDateTime'),";
 
             }
 
