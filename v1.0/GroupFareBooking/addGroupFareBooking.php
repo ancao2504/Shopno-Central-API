@@ -128,7 +128,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST")
         
     $sql="
     INSERT booking
-    (bookingId, agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds, status, travelDate, 
+    (bookingId, agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds_segment, status, travelDate, 
     bookedAt, platform, netCost, bookingType, groupFareId)
     VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
     '$platform', '$netCost', 'groupfare', '$gfId')";
