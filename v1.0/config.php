@@ -6,10 +6,10 @@
 // $dbname="flyfarin_shopno";
 
 
-$servername = "flyfarint.com";
-  $username = "flyfarin_erp";
-  $password = "@Kayes70455";
-  $dbname = "flyfarin_b2bv3";
+// $servername = "flyfarint.com";
+//   $username = "flyfarin_erp";
+//   $password = "@Kayes70455";
+//   $dbname = "flyfarin_b2bv3";
 
 
 
@@ -37,10 +37,10 @@ $servername = "flyfarint.com";
 
 
 // // FlyWay Live Database
-//       $servername = "200.69.23.30";
-//       $username = "flyfarin_flyway";
-//       $password = "@Flyway321";
-//       $dbname = "flyfarin_flyway";
+      $servername = "200.69.23.30";
+      $username = "flyfarin_flyway";
+      $password = "@Flyway321";
+      $dbname = "flyfarin_flyway";
 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
