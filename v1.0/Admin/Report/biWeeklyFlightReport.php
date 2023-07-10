@@ -7,7 +7,7 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-$sql="SELECT * FROM booking WHERE DATE(travelDate) IN (CURDATE(),  DATE_ADD(travelDate, INTERVAL 15 DAY))";
+$sql = "SELECT * FROM booking WHERE DATE(travelDate) >= CURDATE() AND DATE(travelDate) <= DATE_ADD(CURDATE(), INTERVAL 14 DAY)";
 
 $result=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 

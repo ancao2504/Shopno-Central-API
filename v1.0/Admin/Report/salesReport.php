@@ -11,9 +11,9 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 if($_SERVER["REQUEST_METHOD"] == "GET")
 {   
 
-    $sql="SELECT gf.*, b.platform  
-    FROM group_fare_booking gf
-    JOIN booking b ON gf.bookingId = b.bookingId 
+    $sql="SELECT b.*   
+    FROM booking b
+    WHERE b.status= 'Ticketed' 
     ORDER BY bookingId DESC";
     $response=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
@@ -23,7 +23,7 @@ if($_SERVER["REQUEST_METHOD"] == "GET")
     }
     else
     {
-        $response["status"] = "Failed";
+        $response["status"] = "error";
         $response["message"] = "Data Not Found";
         
         echo json_encode($response);
