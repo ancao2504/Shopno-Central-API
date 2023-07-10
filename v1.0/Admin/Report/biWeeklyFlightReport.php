@@ -3,15 +3,13 @@ include("../../config.php");
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 
-
-// C:\xampp\htdocs\ShwapnaTours\shopno-tours-travels\v1.0\Admin\Report\biWeeklyFlightReport.php
-require '..\..\vendor\autoload.php';
+require '../../vendor/autoload.php';
 
 
-// $reportDate = date('jS F, Y', strtotime('-1 day'));
-
+$reportDate = date('jS F, Y', strtotime('-1 day'));
 $sql = "SELECT a.company AS agency ,b.*
 FROM booking b
 LEFT JOIN agent a ON b.agentId=a.agentId 
@@ -392,7 +390,11 @@ $statement='<!DOCTYPE html>
   </body>
 </html>';
 
+<<<<<<< HEAD
 echo $statement;
+=======
+// echo $statement;
+>>>>>>> ce44c8a34a84b7e1965c87359220a7e2c80eebdf
 
 
 $options = new Options();
