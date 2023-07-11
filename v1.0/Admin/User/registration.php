@@ -89,9 +89,9 @@ if($_SERVER["REQUEST_METHOD"] == 'POST')
 
     $sql="INSERT INTO users 
     (
-    EMP_ID, username, fname, lname, email,
-    pass, role, addd, edit, del, 
-    status, img
+    `EMP_ID`, `username`, `fname`, `lname`, `email`,
+    `password`, `role`, `add`, `edit`, `delete`, 
+    `status`, `img`
     )
     VALUES
     (
