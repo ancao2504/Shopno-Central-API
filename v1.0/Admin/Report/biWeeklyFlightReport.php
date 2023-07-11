@@ -10,7 +10,7 @@ require '../../vendor/autoload.php';
 
 
 $reportDate = date('jS F, Y', strtotime('-1 day'));
-$sql = "SELECT a.company AS agency ,b.*
+$sql = "SELECT a.company AS agency ,a.credit AS credit,b.*
 FROM booking b
 LEFT JOIN agent a ON b.agentId=a.agentId 
 WHERE DATE(travelDate) >= CURDATE() 
@@ -33,6 +33,8 @@ foreach($result as $r)
     $pax=$r['pax'];
     $netCost=$r['netCost'];
     $flightDate=$r['travelDate'];
+    $credit=$r["credit"];
+    $credit=$r["credit"];
 
     $tableData=$tableData.'
     <tr>
