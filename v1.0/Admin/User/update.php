@@ -77,11 +77,11 @@ if(array_key_exists("dataupdate", $_GET))
 
         $sql="UPDATE users 
         SET
-        username='$userName', fname='$fName', lname='$lName', email='$email',
-        pass='$password', role='$role', addd='$add', edit='$delete', del='$delete', 
-        status='$status', img=
-        WHERE
-        EMP_ID= '$empId'
+        `username`='$userName', `fname`='$fName', `lname`='$lName', `email`='$email',
+        `password`='$password', `role`='$role', `add`='$add', `edit`='$delete', `delete`='$delete', 
+         status='$status'
+         WHERE
+         EMP_ID= '$empId'
         ";
 
         if($conn->query($sql))
@@ -106,8 +106,20 @@ if(array_key_exists("dataupdate", $_GET))
 
 }
 
+if(array_key_exists("imageupdate", $_GET))
+{
+    if($_SERVER["REQUEST_METHOD"] == 'POST')
+    {   
+
+        
+        // uploadImage('', $acceptablesize, $cdnpath, $fileName, $name)
+    }   
+}
+
 
 echo json_encode($response);
 
 
 ?>
+
+
