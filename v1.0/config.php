@@ -13,17 +13,17 @@
 
 
 
-// $servername = "localhost";
-// $username = "root";
-// $password = "";
-// $dbname="flyfarin_b2bV3";
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname="flyfarin_b2bV3";
 
 
 // // Shopno Live Database
-$servername = "flyfarint.com";
-$username = "flyfarin_shopno";
-$password = "*04ruXfEfq";
-$dbname = "flyfarin_shopno";
+// $servername = "flyfarint.com";
+// $username = "flyfarin_shopno";
+// $password = "*04ruXfEfq";
+// $dbname = "flyfarin_shopno";
 
 
 

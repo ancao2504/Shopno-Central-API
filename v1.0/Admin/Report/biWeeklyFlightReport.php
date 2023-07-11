@@ -19,7 +19,7 @@ DATE(travelDate) <= DATE_ADD(CURDATE(), INTERVAL 14 DAY)
 ORDER BY travelDate ASC";
 
 $result=$conn->query($sql)->fetch_all(MYSQLI_ASSOC);
-// echo json_encode($result);
+//  echo json_encode($result);
 
 
 
@@ -29,12 +29,12 @@ foreach($result as $r)
 {   
     $bookingId=$r['bookingId'];
     $agency=$r['agency'];
-    $route=$r['deptFrom'].$r['arriveTo'];
+    $route=$r['deptFrom']."-".$r['arriveTo'];
     $pax=$r['pax'];
     $netCost=$r['netCost'];
     $flightDate=$r['travelDate'];
     $credit=$r["credit"];
-    $credit=$r["credit"];
+    $refundable=$r["refundable"];
 
     $tableData=$tableData.'
     <tr>
@@ -129,6 +129,37 @@ foreach($result as $r)
             >
               '.$flightDate.'
             </td>
+            <td
+              align="center"
+              valign="top"
+              style="
+                border-collapse: collapse;
+                border-spacing: 0;
+                font-family: sans-serif;
+                text-align: left;
+                padding-left: 20px;
+                padding-top: 20px;
+                font-size: 12px;
+              "
+            >
+              '.$credit.'
+            </td>
+            <td
+              align="center"
+              valign="top"
+              style="
+                border-collapse: collapse;
+                border-spacing: 0;
+                font-family: sans-serif;
+                text-align: left;
+                padding-left: 20px;
+                padding-top: 20px;
+                font-size: 12px;
+              "
+            >
+              '.$refundable.'
+            </td>
+            
             </tr>';
 }
 
@@ -320,6 +351,34 @@ $statement='<!DOCTYPE html>
             >
               Flight Date
             </th>
+            <th
+            align="center"
+            valign="middle"
+              style="
+                border-collapse: collapse;
+                border-spacing: 0;
+                font-family: sans-serif;
+                text-align: left;
+                padding: 10px;
+                font-size: 12px;
+              "
+            >
+              Credit
+            </th>
+            <th
+            align="center"
+            valign="middle"
+              style="
+                border-collapse: collapse;
+                border-spacing: 0;
+                font-family: sans-serif;
+                text-align: left;
+                padding: 10px;
+                font-size: 12px;
+              "
+            >
+              Refundable
+            </th>
             </tr>
         '.$tableData.'
         </table>
@@ -392,7 +451,7 @@ $statement='<!DOCTYPE html>
   </body>
 </html>';
 
-// echo $statement;
+echo $statement;
 
 
 $options = new Options();
@@ -403,7 +462,7 @@ $dompdf->setPaper('A4', 'landscape');
 $dompdf->render();
 $fileatt = $dompdf->output();
 
-$filename = 'Statment.pdf';
+$filename = 'Biweekly Report.pdf';
 $encoding = 'base64';
 $type = 'application/pdf';
 
@@ -419,15 +478,15 @@ $mail1->Port       = 465;
                                
 
     //Recipients
-$mail1->setFrom('job@b2b.flyfarint.com', 'Daily Ticketed Summary Report');
-$mail1->addAddress("tgchiran23@gmail.com", "Daily Ticketed Summary Report");
+$mail1->setFrom('job@b2b.flyfarint.com', 'Biweekly Flight Summary Report');
+$mail1->addAddress("tgchiran23@gmail.com", "Biweekly Flight Summary Report");
 // $mail1->addCC("fahim@flyfarint.com", "Daily Booking Summary Report");
 // $mail1->addCC("afridi@flyfarint.com", "Daily Booking Summary Report");
 // $mail1->addCC("ceo@flyfarint.com", "Daily Booking Summary Report");
 // $mail1->addCC("sadman@flyfarint.com", "Daily Booking Summary Report");
 
 $mail1->isHTML(true);                                  
-$mail1->Subject = "Daily Ticketed Summary Report";
+$mail1->Subject = "Biweekly Flight Summary Report";
 $mail1->Body    =  $statement;
 $mail1->AddStringAttachment($fileatt, $filename, $encoding, $type);
 if(!$mail1->Send()) {
