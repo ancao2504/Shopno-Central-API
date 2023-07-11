@@ -84,11 +84,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
     $lossProfitAmount=$jsonData["lossProfitAmount"];
     $travelDate=$jsonData["travelDate"];
     $airlines=$jsonData["airlines"];
-
+    $actionBy=$jsonData["actionBy"];
 
     if($agentLastAmount>$agentCost)
     {   
-
 
         // $conn->query(U)
         $sql="SELECT othersId FROM others ORDER BY id DESC LIMIT 1";
@@ -104,28 +103,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
         }
 
         $attachment= $_FILES['attachment']["name"];
-        $attachmentName=uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$othersId/attachment/", $attachment, $othersId);
+        $attachmentName=uploadImage('attachment', 5000000, "../../asset/Passenger/$agentId/$othersId/attachment/", $attachment, $othersId);
 
-        $sql="INSERT INTO others (othersId, agentId, travelType, deptFrom, arriveTo, travelDate, airlines, pax, gds, gdsPNR, airlinesPNR
-        netCost, agentCost, vendorCost, lossProfitAmount, createdAt,createdBy, serviceType, attachment)
+        $sql="INSERT INTO others (othersId, agentId, travelType, deptFrom, arriveTo, 
+        travelDate, airlines, pax, gds, gdsPNR, 
+        airlinesPNR, netCost, agentCost, vendorCost, lossProfitAmount, 
+        createdAt, createdBy, serviceType, attachment)
         VALUES
-        ( '$othersId', '$agentId', '$travelType', '$from', '$to', '$travelDate', '$airlines', '$pax', '$gds', '$gdsPnr', '$airlinesPnr', 
-        '$netCost', '$agentCost', '$vendorCost', '$lossProfitAmount',  '$currentDateTime', '$serviceType', '$attachment'
+        ('$othersId', '$agentId', '$travelType', '$from', '$to', 
+        '$travelDate', '$airlines', '$pax', '$gds', '$gdsPnr', 
+        '$airlinesPnr', '$netCost', '$agentCost', '$vendorCost', '$lossProfitAmount',  
+        '$currentDateTime', '$actionBy', '$serviceType', '$attachmentName'
         )";
         
         if($conn->query($sql))
         {
             $values="";
             $paxId ="";
-            $sql = "SELECT passengerId FROM passengers ORDER BY id DESC LIMIT 1";
+            $sql = "SELECT paxId FROM passengers ORDER BY id DESC LIMIT 1";
+            
             for($i=0; $i<$pax; $i++)
             {
                 
-                $result = $conn->query($sql);
-                if ($result->num_rows > 0) 
+                $result = $conn->query($sql)->fetch_assoc();
+                if (isset($result)) 
                 {
-                    $row = $result->fetch_assoc();
-                    $outputString = preg_replace('/[^0-9]/', '', $row["passengerId"]); 
+                    
+                    $outputString = preg_replace('/[^0-9]/', '', $result["paxId"]); 
                     $number= (int)$outputString + 1;
                     $passengerId = "STP$number"; 								
                 }
@@ -138,7 +142,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
                 $visaInd="visa".$i;
                 $passCopy= $_FILES[$passInd]["name"];
                 $visaCopy= $_FILES[$visaInd]["name"];
-                $passenger="traveler".$i;
+                $passenger="name".$i;
                 $name=$_POST[$passenger];
 
                 $passCopy=uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$othersId/PassportCopy/", $passCopy, $name);
@@ -154,10 +158,31 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
             VALUES".$newValues;
 
             if($conn->query($sql))
-            {
-                $response["status"] = "Success";
-                $response["message"] = "Others Added Successfull";
-                echo json_encode($response);
+            {   
+                $newLastAmount=$agentLastAmount-$agentCost;
+                $details="$agentCost $serviceType purchased by $actionBy";
+
+
+                $sql="INSERT INTO agent_ledger (agentId, others, lastAmount, 
+                transactionId, details, reference, actionBy, createdAt)
+                VALUES
+                (
+                    '$agentId', '$agentCost', '$newLastAmount', '$agentId', 
+                    '$details', '$agentId', '$actionBy', '$currentDateTime' 
+                )";
+
+                if($conn->query($sql))
+                {
+                    $response["status"] = "Success";
+                    $response["message"] = "Others Added Successfull";
+                    echo json_encode($response);
+                }
+                else
+                {
+                    $response["status"] = "error";
+                    $response["message"] = "Others Added Failed";
+                    echo json_encode($response);
+                }
             
             }
             else

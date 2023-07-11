@@ -3,7 +3,7 @@ include("../../config.php");
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use PHPMailer\PHPMailer\Exception;
+
 use PHPMailer\PHPMailer\PHPMailer;
 
 require '../../vendor/autoload.php';
@@ -390,11 +390,7 @@ $statement='<!DOCTYPE html>
   </body>
 </html>';
 
-<<<<<<< HEAD
-echo $statement;
-=======
 // echo $statement;
->>>>>>> ce44c8a34a84b7e1965c87359220a7e2c80eebdf
 
 
 $options = new Options();
