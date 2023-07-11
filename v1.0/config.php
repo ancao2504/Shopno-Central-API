@@ -13,14 +13,14 @@
 
 
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname="flyfarin_b2bV3";
+// $servername = "localhost";
+// $username = "root";
+// $password = "";
+// $dbname="flyfarin_b2bV3";
 
 
 // // Shopno Live Database
-// $servername = "flyfarint.com";/* The lines of code you provided are setting the values for the
+$servername = "flyfarint.com";/* The lines of code you provided are setting the values for the
 // username, password, and database name variables. These variables are
 // used to establish a connection to a MySQL database. In this case, the
 // username is set to "flyfarin_shopno", the password is set to
@@ -28,9 +28,9 @@ $dbname="flyfarin_b2bV3";
 // These values are used later in the code to connect to the database
 // server. */
 
-// $username = "flyfarin_shopno";
-// $password = "*04ruXfEfq";
-// $dbname = "flyfarin_shopno";
+$username = "flyfarin_shopno";
+$password = "*04ruXfEfq";
+$dbname = "flyfarin_shopno";
 
 
 
