@@ -40,12 +40,11 @@ if (array_key_exists("agentId", $_GET) && array_key_exists("page", $_GET)) {
   
 }else if(array_key_exists("agentId",$_GET)){
   $agentId = $_GET["agentId"];
-  $getData =$conn->query("SELECT * FROM `passengers`")->fetch_all(MYSQLI_ASSOC);
+  $getData =$conn->query("SELECT * FROM `passengers` WHERE agentId='$agentId' AND userId =''")->fetch_all(MYSQLI_ASSOC);
   if(!empty($getData)){
     echo json_encode($getData);
   }else{
-    $response['status'] = "error";
-    $response['message'] = "Data not found";
-    echo json_encode($response);
+    
+    echo json_encode([]);
   }
 } 
