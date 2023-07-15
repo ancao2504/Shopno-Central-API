@@ -1,7 +1,7 @@
 <?php
 
 require '../../config.php';
-require 'function.php';
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -11,8 +11,9 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 
 $platform=$_GET["platform"];
+$agentId=$_GET["agentId"];
 // echo json_encode($result);
-$result=getDashBoardData($platform);
+$result=getDashBoardData($platform, $agentId);
 
 $custAm=$result[28]["count"];
 $subagAm=$result[20]["count"];
@@ -70,186 +71,186 @@ echo json_encode($response);
 
 
 
-function getDashBoardData($platform)
+function getDashBoardData($platform, $agentId)
 {   global $conn;
     $sql=
     "SELECT 'Hold' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Hold' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Hold' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Issue In Processing' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Issue In Processing' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Issue In Processing' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Ticketed' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Ticketed' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Ticketed' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Issue Rejected' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Issue Rejected' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Issue Rejected' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Refund In Processing' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Refund In Processing' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Refund In Processing' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Void In Processing' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Void In Processing' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Void In Processing' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Reissue In Processing' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Reissue In Processing' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Reissue In Processing' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Refunded' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Refunded' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Refunded' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Voided' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Voided' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Voided' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Reissued' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Reissued' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Reissued' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Refund Rejected' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Refund Rejected' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Refund Rejected' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Void Rejected' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Void Rejected' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Void Rejected' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Reissue Rejected' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Reissue Rejected' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Reissue Rejected' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'Cancelled' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt) = CURDATE() AND status = 'Cancelled' AND platform='$platform'
+    WHERE DATE(bookedAt) = CURDATE() AND status = 'Cancelled' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'today' AS category, COUNT(*) AS count
     FROM `booking`
-    WHERE DATE(travelDate) = CURDATE() AND status = 'Ticketed' AND platform='$platform'
+    WHERE DATE(travelDate) = CURDATE() AND status = 'Ticketed' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'tomorrow' AS category, COUNT(*) AS count
     FROM `booking`
-    WHERE DATE(travelDate) = DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND status = 'Ticketed' AND platform='$platform'
+    WHERE DATE(travelDate) = DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND status = 'Ticketed' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'dayAfterTomorrow' AS category, COUNT(*) AS count
     FROM `booking`
-    WHERE DATE(travelDate) = DATE_ADD(CURDATE(), INTERVAL 2 DAY) AND status = 'Ticketed' AND platform='$platform'
+    WHERE DATE(travelDate) = DATE_ADD(CURDATE(), INTERVAL 2 DAY) AND status = 'Ticketed' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'totalPendingDepositAmount' AS category, COALESCE(SUM(amount), 0) AS count
     FROM `deposit_request`
-    WHERE DATE(createdAt) = CURDATE() AND status = 'pending' AND platform='$platform'
+    WHERE DATE(createdAt) = CURDATE() AND status = 'pending' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'totalApprovedDepositAmount' AS category, COALESCE(SUM(amount), 0) AS count
     FROM `deposit_request`
-    WHERE DATE(actionAt) = CURDATE() AND status = 'approved' AND platform='$platform'
+    WHERE DATE(actionAt) = CURDATE() AND status = 'approved' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'totalRejectedDepositAmount' AS category, COALESCE(SUM(amount), 0) AS count
     FROM `deposit_request`
-    WHERE DATE(actionAt) = CURDATE() AND status = 'rejected' AND platform='$platform'
+    WHERE DATE(actionAt) = CURDATE() AND status = 'rejected' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'todayTotalTicketedAmount' AS category, COALESCE(SUM(netCost),0) AS count
     FROM `booking`
-    WHERE DATE(lastUpdated) = CURDATE() AND status='ticketed' AND platform='$platform'
+    WHERE DATE(lastUpdated) = CURDATE() AND status='ticketed' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'pendingAgentCount' AS category, COUNT(*) AS count
     FROM `agent`
-    WHERE DATE(joinAt)=CURDATE() AND status='pending' AND platform='$platform'
+    WHERE DATE(joinAt)=CURDATE() AND status='pending' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'totalSearchCount' AS category, COUNT(*) AS count
     FROM search_history
-    WHERE DATE(searchTime)=CURDATE() AND platform='$platform'
+    WHERE DATE(searchTime)=CURDATE() AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL 
 
     SELECT 'totalBookCount' AS category, COUNT(*) AS count
     FROM booking
-    WHERE DATE(bookedAt)=CURDATE() AND platform='$platform'
+    WHERE DATE(bookedAt)=CURDATE() AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'bookingClearanceCount' AS category, COUNT(*) AS count
     FROM booking 
-    WHERE DATE(lastUpdated)=CURDATE() AND status='Issued' AND platform='$platform'
+    WHERE DATE(lastUpdated)=CURDATE() AND status='Issued' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'bookingClearanceAmount' AS category, COALESCE(SUM(netCost),0) AS count
     FROM booking 
-    WHERE DATE(lastUpdated)=CURDATE() AND status='Issued' AND platform='$platform'
+    WHERE DATE(lastUpdated)=CURDATE() AND status='Issued' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'refundCount' AS category, COUNT(*) AS count
     FROM booking 
-    WHERE DATE(lastUpdated)=CURDATE() AND status IN ('Refunded', 'Return') AND platform='$platform'
+    WHERE DATE(lastUpdated)=CURDATE() AND status IN ('Refunded', 'Return') AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'refundAmount' AS category, COALESCE(SUM(netCost),0) AS count
     FROM booking 
-    WHERE DATE(lastUpdated)=CURDATE() AND status IN ('Refunded', 'Return') AND platform='$platform'
+    WHERE DATE(lastUpdated)=CURDATE() AND status IN ('Refunded', 'Return') AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'customerAmount' AS category, COALESCE(SUM(grossCost),0) AS count
     FROM booking 
-    WHERE DATE(lastUpdated)=CURDATE() AND status='Ticketed' AND platform='$platform'
+    WHERE DATE(lastUpdated)=CURDATE() AND status='Ticketed' AND platform='$platform' AND agentId='$agentId'
 
     UNION ALL
 
     SELECT 'agentAmount' AS category, COALESCE(SUM(subagentCost),0) AS count
     FROM booking 
-    WHERE DATE(lastUpdated)=CURDATE() AND status='Ticketed' AND platform='$platform'
+    WHERE DATE(lastUpdated)=CURDATE() AND status='Ticketed' AND platform='$platform' AND agentId='$agentId'
     ";
 
     $result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
