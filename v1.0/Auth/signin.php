@@ -8,107 +8,125 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST"){
+use Firebase\JWT\JWT;
+use Firebase\JWT\KEY;
 
-  $currentTime = date("Y-m-d H:i:s");
-            
-  $_POST = json_decode(file_get_contents('php://input'), true);
+require __DIR__ . '/../../vendor/autoload.php';
 
-  $email =  trim($_POST['email']);
-  $password = trim($_POST['password']);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
+    $currentTime = date("Y-m-d H:i:s");
 
-  if($_SERVER['REMOTE_ADDR']){
-    $ip = $_SERVER['REMOTE_ADDR'];
-    include 'Browser.php';
-    $ua = getBrowser();
-    $browser = $ua['name'];
-    $platform = $ua['platform'];
+    $_POST = json_decode(file_get_contents('php://input'), true);
 
-  }else{
-    $ip = 'No IP';
-  }
-  
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 
-  $agentSql = mysqli_query($conn,"SELECT email, status FROM agent WHERE email='$email'");
-  $agentrow = mysqli_fetch_array($agentSql,MYSQLI_ASSOC);
+    if ($_SERVER['REMOTE_ADDR']) {
+        $ip = $_SERVER['REMOTE_ADDR'];
+        include 'Browser.php';
+        $ua = getBrowser();
+        $browser = $ua['name'];
+        $platform = $ua['platform'];
 
-  $staffSql = mysqli_query($conn,"SELECT email, status FROM staffList WHERE email='$email'");
-  $staffrow = mysqli_fetch_array($staffSql,MYSQLI_ASSOC);
+    } else {
+        $ip = 'No IP';
+    }
 
-  if(empty($agentrow) && empty($staffrow)){
-      $response['status']="error";
-      $response['message']="User does not exist";   						
-  }else if(!empty($agentrow)){
-    $checkUserquery="SELECT agentId, email, name, company, phone, status FROM agent WHERE email='$email' AND `password`=convert('$password' using utf8mb4) collate utf8mb4_bin";
-    $resultant=mysqli_query($conn,$checkUserquery);
+    $agentSql = mysqli_query($conn, "SELECT email, status FROM agent WHERE email='$email'");
+    $agentrow = mysqli_fetch_array($agentSql, MYSQLI_ASSOC);
 
-    if(mysqli_num_rows($resultant)>0){
-      while($row=$resultant->fetch_assoc()){
-          if($row['status'] == 'active'){
-              $agentId = $row['agentId'];
-              $agencyName = $row['company'];     
-              $response['user']=$row;
-              $response['action']="complete";
-              $response['message']="success";
-              $conn->query("UPDATE `agent` SET `isActive`='yes',`loginIp`='$ip',`browser`='$browser' WHERE email='$email'");
-              $conn->query("INSERT INTO `lastLogin`(`agentId`, `agencyName`, `StaffName`, `loginIp`, `success`,`browser`,`platform`, `craetedTime`)
-               VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','$platform','$currentTime')");                 
-          }else if($row['status'] == 'pending'){
-              $response['action']="pending";
-              $response['message']="Your agency registration process is pending.";              
-          }else if($row['status'] == 'deactive'){
-              $response['action']="deactive";
-              $response['message']="Status Is Deactive";              
-          } else{
-            $response['action']="rejected";
-              $response['message']="Status Is Rejected"; 
-          }         
-      }
-           
-    }else{
-          $response['action']="incomplete";
-          $response['message']="Wrong Password";
-    }   
-    
-  }else if(!empty($staffrow)){
-    $checkUserquery="SELECT staffId, agentId, email, phone, name fROM staffList WHERE email='$email' AND password=convert('$password' using utf8mb4) collate utf8mb4_bin";   
-    $resultant=mysqli_query($conn,$checkUserquery);
+    $staffSql = mysqli_query($conn, "SELECT email, status FROM staffList WHERE email='$email'");
+    $staffrow = mysqli_fetch_array($staffSql, MYSQLI_ASSOC);
 
-    if(mysqli_num_rows($resultant)>0){
-      while($row=$resultant->fetch_assoc()){
-          $agentId = $row['agentId'];
-          $checkAgent = mysqli_fetch_array(mysqli_query($conn,"SELECT * FROM agent WHERE agentId='$agentId'"),MYSQLI_ASSOC);        
-          $agentSatus = $checkAgent['status'];
+    if (empty($agentrow) && empty($staffrow)) {
+        $response['status'] = "error";
+        $response['message'] = "User does not exist";
+    } else if (!empty($agentrow)) {
+        $checkUserquery = "SELECT agentId, email, name, company, phone, status FROM agent WHERE email='$email' AND `password`=convert('$password' using utf8mb4) collate utf8mb4_bin";
+        $resultant = mysqli_query($conn, $checkUserquery);
 
-          if(isset($agentSatus)){          
-            if($agentSatus == 'deactive'){
-               $response['action']="incomplete";
-               $response['message']="Agent Is Deactive";
-              
-            }else if($agentSatus == 'active'){
-                $agencyName = $checkAgent['company'];
-                $response['user']=$row;
-                $response['action']="complete";
-                $response['message']="success";
-                $conn->query("INSERT INTO `lastLogin`(`agentId`, `agencyName`, `StaffName`, `loginIp`, `success`,`browser`,`platform`, `craetedTime`)
-                VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','$platform','$currentTime')");   
-            }else{
-              $response['action']="incomplete";
-              $response['message']="Agent Is Deactive";
+        $SECRET_KEY = "qfrfdfgrterdfsgdferersdf9iewfjhfkjsdfifmkknhzxiwreiueridjfdmjihirywtbbxcgsdfsdnnmmklqqzznbnbewfijsfnjkijwhirweijrnmkmllkljojsdfskjqqweewdnfdfjdkfjkljsdfiuirqwhwfnbvqwtvvxfsguyrewijflkdjnvjqwerewrtrctuywernhnliuiywtwhbjcsdughcbbux mnzsncijdshdsfnknuhjsefinbcvijtqwrhxuiwnjcibmchdfgsjjchrdytwilsmdjjddpwwweweqmfhjehuiwezazcvdwewtwttlmkhgrwefaedw";
+        $DOMAIN_NAME = "https://shopnotour.com/";
+
+        if (mysqli_num_rows($resultant) > 0) {
+            while ($row = $resultant->fetch_assoc()) {
+                if ($row['status'] == 'active') {
+                    $adminkey = "shopnotour.com375hijeh3497845hkwre98324iurweij2314ihjfidfihwehihi";
+                    $secretKey = $SECRET_KEY;
+                    $userName = $DOMAIN_NAME;
+                    $issueAt = time();
+                    $expireTime = $issueAt + 60;
+                    $payload = [
+                        'user' => $row,
+                        'admin_secretKey'=>  $adminkey,
+                        'issue_ time' => $issueAt,
+                        'expire_time' => $expireTime,
+                    ];
+
+                    $Token = JWT::encode($payload, $secretKey, 'HS256');
+                    $agentId = $row['agentId'];
+                    $agencyName = $row['company'];
+                    $response['user'] = $row;
+                    $response['token'] = $Token;
+                    $response['action'] = "complete";
+                    $response['message'] = "success";
+                    $conn->query("UPDATE `agent` SET `isActive`='yes',`loginIp`='$ip',`browser`='$browser' WHERE email='$email'");
+                    $conn->query("INSERT INTO `lastLogin`(`agentId`, `agencyName`, `StaffName`, `loginIp`, `success`,`browser`,`platform`, `craetedTime`)
+               VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','$platform','$currentTime')");
+                } else if ($row['status'] == 'pending') {
+                    $response['action'] = "pending";
+                    $response['message'] = "Your agency registration process is pending.";
+                } else if ($row['status'] == 'deactive') {
+                    $response['action'] = "deactive";
+                    $response['message'] = "Status Is Deactive";
+                } else {
+                    $response['action'] = "rejected";
+                    $response['message'] = "Status Is Rejected";
+                }
             }
-          }else{
-              $response['action']="incomplete";
-              $response['message']="Agent doesnt Exists";
-          }             
-      }          
-    }else{
-          $response['action']="incomplete";
-          $response['message']="Wrong Password";
-    }   
-  }
 
-  echo json_encode($response);
+        } else {
+            $response['action'] = "incomplete";
+            $response['message'] = "Wrong Password";
+        }
+
+    } else if (!empty($staffrow)) {
+        $checkUserquery = "SELECT staffId, agentId, email, phone, name fROM staffList WHERE email='$email' AND password=convert('$password' using utf8mb4) collate utf8mb4_bin";
+        $resultant = mysqli_query($conn, $checkUserquery);
+
+        if (mysqli_num_rows($resultant) > 0) {
+            while ($row = $resultant->fetch_assoc()) {
+                $agentId = $row['agentId'];
+                $checkAgent = mysqli_fetch_array(mysqli_query($conn, "SELECT agentId FROM agent WHERE agentId='$agentId'"), MYSQLI_ASSOC);
+                $agentSatus = $checkAgent['status'];
+
+                if (isset($agentSatus)) {
+                    if ($agentSatus == 'deactive') {
+                        $response['action'] = "incomplete";
+                        $response['message'] = "Agent Is Deactive";
+
+                    } else if ($agentSatus == 'active') {
+                        $agencyName = $checkAgent['company'];
+                        $response['user'] = $row;
+                        $response['action'] = "complete";
+                        $response['message'] = "success";
+                        $conn->query("INSERT INTO `lastLogin`(`agentId`, `agencyName`, `StaffName`, `loginIp`, `success`,`browser`,`platform`, `craetedTime`)
+                VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','$platform','$currentTime')");
+                    } else {
+                        $response['action'] = "incomplete";
+                        $response['message'] = "Agent Is Deactive";
+                    }
+                } else {
+                    $response['action'] = "incomplete";
+                    $response['message'] = "Agent doesnt Exists";
+                }
+            }
+        } else {
+            $response['action'] = "incomplete";
+            $response['message'] = "Wrong Password";
+        }
+    }
+
+    echo json_encode($response);
 }
-    
-?>
