@@ -988,7 +988,7 @@ if (array_key_exists('tripType', $_GET)) {
                             $markup = $agentmarkrow['alliMarkup'];
                         }
                         $WLAgentPrice = $AgentPrice + $markup;
-                        echo $WLAgentPrice;
+                        // echo $WLAgentPrice;
 
                     } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
                         if ($TripType == 'Inbound') {
