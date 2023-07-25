@@ -48,7 +48,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 	$tosql = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$To' ");
 	$torow = mysqli_fetch_array($tosql,MYSQLI_ASSOC);
 
-	print_r($To);
+	// print_r($To);
 	
 	if(!empty($torow)){					
 		$toCountry = $torow['countryCode'];				
