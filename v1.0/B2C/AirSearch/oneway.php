@@ -987,7 +987,7 @@ if (array_key_exists('tripType', $_GET)) {
                         } else {
                             $markup = $agentmarkrow['alliMarkup'];
                         }
-                        $WLAgentPrice = $AgentPrice + $markup;
+                        $WLAgentPrice = $AgentPrice + (float)$markup;
                         // echo $WLAgentPrice;
 
                     } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
@@ -5670,7 +5670,6 @@ if ($Sabre == 1 && $Galileo == 1 && $FlyHub == 1) {
     print_r($json_string);
 
 }
-
     $conn->close();
 
 	?>
