@@ -1,17 +1,3 @@
 {
-    "sqltools.connections": [
-        {
-            "mysqlOptions": {
-                "authProtocol": "default"
-            },
-            "previewLimit": 50,
-            "server": "flyfarint.com",
-            "port": 3306,
-            "driver": "MySQL",
-            "database": "flyfarin_b2bv3",
-            "username": "flyfarin_erp",
-            "password": "@Kayes70455",
-            "name": "Live Fly Far"
-        }
-    ]
+    "sqltools.connections": []
 }

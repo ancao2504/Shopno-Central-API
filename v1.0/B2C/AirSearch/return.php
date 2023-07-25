@@ -48,10 +48,13 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 	$tosql = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$To' ");
 	$torow = mysqli_fetch_array($tosql,MYSQLI_ASSOC);
 
+	print_r($To);
+	
 	if(!empty($torow)){					
 		$toCountry = $torow['countryCode'];				
 	}
 
+	
 	if($fromCountry == "BD" && $toCountry =="BD"){
 		$TripType = "Inbound";
 	}else{
@@ -7853,29 +7856,29 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 
 		$curlflyhubauth = curl_init();
 
-		curl_setopt_array($curlflyhubauth, array(
-		CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
-		CURLOPT_RETURNTRANSFER => true,
-		CURLOPT_ENCODING => '',
-		CURLOPT_MAXREDIRS => 10,
-		CURLOPT_TIMEOUT => 0,
-		CURLOPT_FOLLOWLOCATION => true,
-		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-		CURLOPT_CUSTOMREQUEST => 'POST',
-		CURLOPT_POSTFIELDS =>'{
-		"username": "ceo@flyfarint.com",
-		"apikey": "ENex7c5Ge+0~SGc1t71iccr1xXacDPdK51g=iTm9SlL+de39HF"
-		}',
-		CURLOPT_HTTPHEADER => array(
-			'Content-Type: application/json'
-		),
-		));
+	curl_setopt_array($curlflyhubauth, array(
+	CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
+	CURLOPT_RETURNTRANSFER => true,
+	CURLOPT_ENCODING => '',
+	CURLOPT_MAXREDIRS => 10,
+	CURLOPT_TIMEOUT => 0,
+	CURLOPT_FOLLOWLOCATION => true,
+	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	CURLOPT_CUSTOMREQUEST => 'POST',
+	CURLOPT_POSTFIELDS =>'{
+	"username": "ceo@flyfarint.com",
+	"apikey": "ENex7c5Ge+0~SGc1t71iccr1xXacDPdK51g=iTm9SlL+de39HF"
+	}',
+	CURLOPT_HTTPHEADER => array(
+		'Content-Type: application/json'
+	),
+	));
 
-		$response = curl_exec($curlflyhubauth);
+	$response = curl_exec($curlflyhubauth);
 
-		$TokenJson = json_decode($response,true);
+	$TokenJson = json_decode($response,true);
 
-		$FlyhubToken  = $TokenJson['TokenId'];
+	$FlyhubToken  = $TokenJson['TokenId'];
 
 		$curlflyhusearch = curl_init();
 
