@@ -16,8 +16,11 @@ $controlrow = mysqli_fetch_array($control,MYSQLI_ASSOC);
 
 if(!empty($controlrow)){
 	$Sabre = $controlrow['sabre'];
+	// $Sabre = 0;
 	$Galileo =  $controlrow['galileo'];
+	$Galileo =  0;
 	$FlyHub = $controlrow['flyhub'];							
+	$FlyHub = 0;							
 }
 
 $Airportsql =  "SELECT name, cityName,countryCode FROM airports WHERE";
@@ -173,9 +176,8 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 
 
 	if($Sabre == 1){
-		$client_id= base64_encode("V1:593072:14KK:AA");
-		//$client_secret = base64_encode("280ff537"); //cert
-		$client_secret = base64_encode("f270395"); //prod
+		$client_id= base64_encode("V1:351640:27YK:AA");
+		$client_secret = base64_encode("spt5164");
 
 		$token = base64_encode($client_id.":".$client_secret);
 
@@ -2231,7 +2233,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 		//$return = file_get_contents("test.xml");
 		if(isset($return)){
 			$response = preg_replace("/(<\/?)(\w+):([^>]*>)/", "$1$2$3", $return);
-			$xml = new SimpleXMLElement($response); /// to do 
+			$xml = new SimpleXMLElement($return); /// to do 
 			
 			if(isset($xml->xpath('//airLowFareSearchRsp')[0])){
 				$body = $xml->xpath('//airLowFareSearchRsp')[0];
