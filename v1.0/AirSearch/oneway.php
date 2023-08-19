@@ -6,8 +6,6 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-
-
 $All= array();
 $FlightType;
 
@@ -17,13 +15,13 @@ $controlrow = mysqli_fetch_array($control,MYSQLI_ASSOC);
 if(!empty($controlrow)){
 	$Sabre = $controlrow['sabre'];
 	$Galileo =  $controlrow['galileo'];
-	$FlyHub = $controlrow['flyhub'];							
+	$FlyHub = 0;//$controlrow['flyhub'];							
 }
 
 $Airportsql =  "SELECT name, cityName,countryCode FROM airports WHERE";
 
   
-if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) && array_key_exists("departuredate",$_GET) && array_key_exists("adult",$_GET) && array_key_exists("child",$_GET) && array_key_exists("infant",$_GET)){
+if( array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) && array_key_exists("departuredate",$_GET) && array_key_exists("adult",$_GET) && array_key_exists("child",$_GET) && array_key_exists("infant",$_GET)){
 	$From = $_GET['journeyfrom'];
 	$To = $_GET['journeyto'];
 	$Date = $_GET['departuredate'];
@@ -171,11 +169,9 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 	}';
 	
 
-
 	if($Sabre == 1){
-		$client_id= base64_encode("V1:593072:14KK:AA");
-		//$client_secret = base64_encode("280ff537"); //cert
-		$client_secret = base64_encode("f270395"); //prod
+		$client_id= base64_encode("V1:396724:FD3K:AA");
+        $client_secret = base64_encode("fl42763"); //prod
 
 		$token = base64_encode($client_id.":".$client_secret);
 
@@ -2857,7 +2853,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 							$carriersql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
 							$carrierrow = mysqli_fetch_array($carriersql,MYSQLI_ASSOC);
 
-							if(!empty($row)){
+							if(!empty($carrierrow)){
 								$markettingCarrierName = $carrierrow['name'];		
 							}
 
@@ -2913,11 +2909,11 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 							$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
 							$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
 
-							$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-							$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+							$carriersql1 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
+							$carrierrow1 = mysqli_fetch_array($carriersql1,MYSQLI_ASSOC);
 
-							if(!empty($rowmk1)){
-								$markettingCarrierName1 = $rowmk1['name'];		
+							if(!empty($carrierrow1)){
+								$markettingCarrierName1 = $carrierrow1['name'];		
 							}
 
 							// Departure Country
@@ -3065,11 +3061,11 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
 							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+							$carriersql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+							$carrierrow = mysqli_fetch_array($carriersql,MYSQLI_ASSOC);
 
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
+							if(!empty($carrierrow)){
+								$markettingCarrierName = $carrierrow['name'];		
 							}
 
 							// Departure Country
@@ -3124,8 +3120,8 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 							$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
 							$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
 
-							$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-							$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+							$carriersql1 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
+							$carrierrow1 = mysqli_fetch_array($carriersql1,MYSQLI_ASSOC);
 
 							if(!empty($rowmk1)){
 								$markettingCarrierName1 = $rowmk1['name'];		
@@ -3162,10 +3158,8 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 							$FareInfoRef2 = $airPricePoint['airOption'][$op]['airBookingInfo'][2]['@attributes']['FareInfoRef'];
 							$SegmentRef2 = $airPricePoint['airOption'][$op]['airBookingInfo'][2]['@attributes']['SegmentRef'];
 
-
 							$FlightTime2 = $airAirSegment[$SegmentRef2]['FlightTime'];
 							$FlightTimeHm2 = floor($FlightTime2 / 60)."H ".($FlightTime2 - ((floor($FlightTime2 / 60)) * 60))."Min";
-
 
 							$ArrivalTo2 = $airAirSegment[$SegmentRef2]['Destination'];
 							$DepartureFrom2 = $airAirSegment[$SegmentRef2]['Origin'];
@@ -3183,11 +3177,11 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 							$markettingCarrier2 = $airAirSegment[$SegmentRef2]['Carrier'];
 							$markettingFN2 = $airAirSegment[$SegmentRef2]['FlightNumber'];
 
-							$sqlmk1 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier2' ");
-							$rowmk1 = mysqli_fetch_array($sqlmk1,MYSQLI_ASSOC);
+							$carriersql2 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier2' ");
+							$carrierrow2 = mysqli_fetch_array($carriersql2,MYSQLI_ASSOC);
 
-							if(!empty($rowmk1)){
-								$markettingCarrierName2 = $rowmk1['name'];		
+							if(!empty($carrierrow2)){
+								$markettingCarrierName2 = $carrierrow2['name'];		
 							}
 
 							// Departure Country
@@ -3368,7 +3362,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 								$carriersql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
 								$carrierrow = mysqli_fetch_array($carriersql,MYSQLI_ASSOC);
 
-								if(!empty($row)){
+								if(!empty($carrierrow)){
 									$markettingCarrierName = $carrierrow['name'];		
 								}
 
@@ -3425,11 +3419,11 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 								$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
 								$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
 
-								$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE  code='$markettingCarrier1' ");
-								$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+								$carriersql1 = mysqli_query($conn,"SELECT name FROM airlines WHERE  code='$markettingCarrier1' ");
+								$carrierrow1 = mysqli_fetch_array($carriersql1,MYSQLI_ASSOC);
 
-								if(!empty($rowmk1)){
-									$markettingCarrierName1 = $rowmk1['name'];		
+								if(!empty($carrierrow1)){
+									$markettingCarrierName1 = $carrierrow1['name'];		
 								}
 
 								// Departure Country
@@ -3443,7 +3437,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 								}
 
 								// Departure Country
-								$sqlar2 = mysqli_query($conn,"SELECT name FROM airlines WHERE  code='$ArrivalTo1' ");
+								$sqlar2 = mysqli_query($conn,"$Airportsql code='$ArrivalTo1' ");
 								$rowar2 = mysqli_fetch_array($sqlar2,MYSQLI_ASSOC);
 
 								if(!empty($row2)){
@@ -3577,11 +3571,11 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 								$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
 								$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-								$sql = mysqli_query($conn,"SELECT name FROM airlines WHERESELECT name FROM airlines WHERE  code='$markettingCarrier' ");
-								$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+								$carriersql = mysqli_query($conn,"SELECT name FROM airlines WHERE  code='$markettingCarrier' ");
+								$carrierrow = mysqli_fetch_array($carriersql,MYSQLI_ASSOC);
 
-								if(!empty($row)){
-									$markettingCarrierName = $row['name'];		
+								if(!empty($carrierrow)){
+									$markettingCarrierName = $carrierrow['name'];		
 								}
 
 								// Departure Country
@@ -3636,11 +3630,11 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 								$markettingCarrier1 = $airAirSegment[$SegmentRef1]['Carrier'];
 								$markettingFN1 = $airAirSegment[$SegmentRef1]['FlightNumber'];
 
-								$sqlmk = mysqli_query($conn,"SELECT name FROM airlines WHERE  code='$markettingCarrier1' ");
-								$rowmk = mysqli_fetch_array($sqlmk,MYSQLI_ASSOC);
+								$carriersql1 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
+								$carrierrow1 = mysqli_fetch_array($carriersql1,MYSQLI_ASSOC);
 
-								if(!empty($rowmk1)){
-									$markettingCarrierName1 = $rowmk1['name'];		
+								if(!empty($carrierrow1)){
+									$markettingCarrierName1 = $carrierrow1['name'];		
 								}
 
 								// Departure Country
@@ -3695,11 +3689,11 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 								$markettingCarrier2 = $airAirSegment[$SegmentRef2]['Carrier'];
 								$markettingFN2 = $airAirSegment[$SegmentRef2]['FlightNumber'];
 
-								$sqlmk1 = mysqli_query($conn,"$Airportsql code='$markettingCarrier2' ");
-								$rowmk1 = mysqli_fetch_array($sqlmk1,MYSQLI_ASSOC);
+								$carriersql2 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier2' ");
+								$carrierrow2 = mysqli_fetch_array($carriersql2,MYSQLI_ASSOC);
 
-								if(!empty($rowmk1)){
-									$markettingCarrierName2 = $rowmk1['name'];		
+								if(!empty($carrierrow2)){
+									$markettingCarrierName2 = $carrierro2['name'];		
 								}
 
 								// Departure Country
@@ -3867,11 +3861,11 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 							$markettingCarrier = $airAirSegment[$SegmentRef]['Carrier'];
 							$markettingFN = $airAirSegment[$SegmentRef]['FlightNumber'];
 
-							$sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-							$row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+							$carriersql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
+							$carrierrow = mysqli_fetch_array($carriersql,MYSQLI_ASSOC);
 
-							if(!empty($row)){
-								$markettingCarrierName = $row['name'];		
+							if(!empty($carrierrow)){
+								$markettingCarrierName = $carrierrow['name'];		
 							}
 
 							// Departure Country
@@ -4770,5 +4764,4 @@ function CurrencyConversation($TotalPrice, $FareCurrency){
 
 }
 
-$conn->close();
 ?>
