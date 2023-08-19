@@ -176,22 +176,21 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 
 
 	if($Sabre == 1){
-		$client_id= base64_encode("V1:351640:27YK:AA");
+		$client_id = base64_encode("V1:351640:27YK:AA");
+		//$client_secret = base64_encode("280ff537"); //cert
 		$client_secret = base64_encode("spt5164");
 
 		$token = base64_encode($client_id.":".$client_secret);
-
 		$data='grant_type=client_credentials';
 
 		$headers = array(
 			'Authorization: Basic '.$token,
 			'Accept: /',
-			'Content-Type: application/x-www-form-urlencoded'
-		);
+			'Content-Type: application/x-www-form-urlencoded');
 
 		$ch = curl_init();
 		//curl_setopt($ch,CURLOPT_URL,"https://api-crt.cert.havail.sabre.com/v2/auth/token");
-		curl_setopt($ch,CURLOPT_URL,"https://api.platform.sabre.com/v3/auth/token");
+		curl_setopt($ch,CURLOPT_URL,"https://api.platform.sabre.com/v2/auth/token");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch,CURLOPT_POST,1);
 		curl_setopt($ch,CURLOPT_POSTFIELDS,$data);

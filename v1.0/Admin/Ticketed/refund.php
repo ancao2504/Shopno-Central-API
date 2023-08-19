@@ -188,7 +188,7 @@ else if (array_key_exists('quotationsend', $_GET)) {
                   $sql = "UPDATE `refund` SET `status`='Refund Quotation Send',`actionAt`='$createdTime', `quottext`='$QuotationText', `quotamount`='$Amount' WHERE bookingId='$bookingId' AND agentId='$agentId'";
 
                   if ($conn->query($sql) == true) {
-                    $sql1 = "UPDATE `activitylog` SET `status`='Refund Quotation Send', `actionBy`='$ActionBy', `remarks`='$remarkAmount' WHERE ref='$bookingId' AND agentId='$agentId'";
+                    $sql1 = "INSERT INTO `activitylog` (`status`, `actionBy`, `remarks`, `ref`, `agentId`) VALUES ('Refund Quotation Send', '$ActionBy', '$remarkAmount', '$bookingId', '$agentId')";
                     $conn->query($sql1);
 
                     $sql = "UPDATE `booking` SET `status`='Refund Quotation Send' WHERE bookingId='$bookingId' AND agentId='$agentId'";
