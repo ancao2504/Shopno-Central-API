@@ -191,7 +191,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 
 		$ch = curl_init();
 		//curl_setopt($ch,CURLOPT_URL,"https://api-crt.cert.havail.sabre.com/v2/auth/token");
-		curl_setopt($ch,CURLOPT_URL,"https://api.platform.sabre.com/v2/auth/token");
+		curl_setopt($ch,CURLOPT_URL,"https://api.platform.sabre.com/v3/auth/token");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch,CURLOPT_POST,1);
 		curl_setopt($ch,CURLOPT_POSTFIELDS,$data);

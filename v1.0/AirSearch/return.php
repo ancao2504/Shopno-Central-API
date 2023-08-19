@@ -25,9 +25,11 @@ if(!empty($controlrow)){
 
 $Airportsql =  "SELECT name, cityName,countryCode FROM airports WHERE";
 
+print_r($_GET);
 
 if(array_key_exists('tripType',$_GET)){
-  $Way = $_GET['tripType'];
+	
+	$Way = $_GET['tripType'];
   
 		if($Way == "return"){
 
@@ -154,14 +156,14 @@ if(array_key_exists('tripType',$_GET)){
 				}
 
 
-	
+echo($Sabre);
 if($Sabre == 1) // Sabre Start
 
 
+echo ("h");
 try{
-
 	$client_id= base64_encode("V1:351640:27YK:AA");
-	$client_secret = base64_encode("spt5164"); 
+	$client_secret = base64_encode("spt5164");
 	
 	$token = base64_encode($client_id.":".$client_secret);
 	
@@ -184,10 +186,10 @@ try{
 	));
 	$Tokenres = curl_exec($curl);
 	curl_close($curl);
+	print_r ($Tokenres);
 	$resToken = json_decode($Tokenres, true);
 	$access_token = $resToken['access_token'];
 
-	//echo $access_token;
 
 }catch (Exception $e){ 
 	
