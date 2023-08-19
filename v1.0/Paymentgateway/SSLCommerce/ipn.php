@@ -12,20 +12,22 @@ include_once __DIR__ . "/../OrderTransaction.php";
 
 use SslCommerz\SslCommerzNotification;
 
+
 if (empty($_POST['tran_id']) || empty($_POST['status'])) {
-    echo "Invalid Information.";
+    echo "Invalid Information2.";
     exit;
 }
 
-$tran_id = $_POST['tran_id'];
-$status  = $_POST['status'];
 
-$sslc  = new SslCommerzNotification();
+$tran_id = $_POST['tran_id'];
+$status = $_POST['status'];
+
+$sslc = new SslCommerzNotification();
 $ot = new OrderTransaction();
 
-$sql    = $ot->getRecordQuery($tran_id);
-$result = $conn_integration->query($sql);
-$row    = $result->fetch_array(MYSQLI_ASSOC);
+$sql = $ot->getRecordQuery($tran_id);
+$result = $conn->query($sql);
+$row = $result->fetch_array(MYSQLI_ASSOC);
 
 if (empty($row)) {
     echo "Invalid Transaction ID.";
@@ -37,32 +39,32 @@ switch ($status) {
 
         if ($row['status'] == 'Pending') {
 
-            $amount   = $_POST['amount'];
+            $amount = $_POST['amount'];
             $currency = $_POST['currency'];
 
             if (empty($_POST['amount']) || empty($_POST['currency'])) {
 
-                echo "Invalid Information.";
+                echo "Invalid Information3.";
                 exit;
 
             }
 
-            $validation = $sslc->orderValidate($tran_id, $amount, $currency, $_POST);
+            $validation = $sslc->orderValidate($_POST, $tran_id, $amount, $currency);
 
             if ($validation == true) {
 
-                $sql   = $ot->updateTransactionQuery($tran_id, 'Processing');
+                $sql = $ot->updateTransactionQuery($tran_id, 'Processing');
 
-                if ($conn_integration->query($sql) === true) {
+                if ($conn->query($sql) === true) {
                     echo "Payment Record Updated Successfully";
                 } else {
-                    echo "Error updating record: " . $conn_integration->error;
+                    echo "Error updating record: " . $conn->error;
                 }
 
             } else {
 
                 $sql = $ot->updateTransactionQuery($tran_id, 'Failed');
-                $conn_integration->query($sql);
+                $conn->query($sql);
                 echo "Payment was not valid";
 
             }
@@ -78,7 +80,7 @@ switch ($status) {
     case 'FAILED':
 
         $sql = $ot->updateTransactionQuery($tran_id, 'Failed');
-        $conn_integration->query($sql);
+        $conn->query($sql);
 
         echo "Payment was failed";
 
@@ -87,7 +89,7 @@ switch ($status) {
     case 'CANCELLED':
 
         $sql = $ot->updateTransactionQuery($tran_id, 'Cancelled');
-        $conn_integration->query($sql);
+        $conn->query($sql);
 
         echo "Payment was Cancelled";
 
@@ -95,7 +97,7 @@ switch ($status) {
 
     default:
 
-        echo "Invalid Information.";
+        echo "Invalid Information4.";
 
         break;
 }

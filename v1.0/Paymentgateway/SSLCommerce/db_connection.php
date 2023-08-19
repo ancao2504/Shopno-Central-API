@@ -1,19 +1,20 @@
 <?php
+date_default_timezone_set('Asia/Dhaka');
 
+
+// Shopno Live Database
 $servername = "flyfarint.com";
-$username = "flyfarin_erp"; // Put the MySQL Username
-$password = "@Kayes70455"; // Put the MySQL Password
-$database = "flyfarin_b2bv3"; // Put the Database Name
+$username = "flyfarin_shopno";
+$password = "*04ruXfEfq";
+$dbname = "flyfarin_shopno";
 
-// $servername = "flyfarint.com";
-// $username = "flyfarin_erp";
-// $password = "@Kayes70455";
-// $dbname = "flyfarin_b2bv3";
 
-// Create connection for integration
-$conn_integration = mysqli_connect($servername, $username, $password, $database);
-
-// Check connection for integration
-if (!$conn_integration) {
-    die("Connection failed: " . mysqli_connect_error());
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+} else {
+    echo '';
 }
+
+?>
