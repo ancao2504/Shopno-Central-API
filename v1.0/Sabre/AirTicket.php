@@ -81,7 +81,7 @@ curl_setopt_array($curl, array(
   CURLOPT_POSTFIELDS =>'{
     "AirTicketRQ":{
        "version":"1.2.1",
-       "targetCity":"FD3K",
+       "targetCity":"27YK",
        "DesignatePrinter":{
           "Printers":{
              "Ticket":{

@@ -1510,7 +1510,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $Request = '{
       "CreatePassengerNameRecordRQ":{
-         "targetCity":"FD3K",
+         "targetCity":"27YK",
          "haltOnAirPriceError":true,
          "TravelItineraryAddInfo":{
             "AgencyInfo":{

@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $AllSsr = array();
     $AllSecureFlight = array();
     $FlyHubPassenger = array();
-
+    // print_r($_POST);
     if ($adult > 0 && $child > 0 && $infants > 0) {
         $paxRequest = '{
                         "Code": "ADT",
@@ -1496,7 +1496,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $Request = '{
                         "CreatePassengerNameRecordRQ":{
-                        "targetCity":"14KK",
+                        "targetCity":"27YK",
                         "haltOnAirPriceError":true,
                         "TravelItineraryAddInfo":{
                             "AgencyInfo":{
@@ -1597,10 +1597,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
                 }';
 
-        //print($Request);
+        // print($Request);
 
         try {
 
+          
             $client_id= base64_encode("V1:351640:27YK:AA");
             //$client_secret = base64_encode("280ff537"); //cert
             $client_secret = base64_encode("spt5164"); //prod
@@ -1626,7 +1627,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             curl_close($ch);
             $resf = json_decode($res, 1);
             $access_token = $resf['access_token'];
-            //echo $access_token;
+            // echo json_encode($access_token);
 
         } catch (Exception $e) {
 
