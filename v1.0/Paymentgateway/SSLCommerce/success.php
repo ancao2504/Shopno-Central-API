@@ -1,6 +1,7 @@
 <?php
 
-require "../../emailfunction.php";
+// require "../../emailfunction.php";
+require "../../config.php";
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -9,7 +10,7 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 require_once(__DIR__ . "/lib/SslCommerzNotification.php");
-include_once(__DIR__ . "/db_connection.php");
+
 include_once(__DIR__ . "/OrderTransaction.php");
 
 use SslCommerz\SslCommerzNotification;
@@ -24,7 +25,7 @@ $sql = $ot->getRecordQuery($tran_id);
 $result = $conn->query($sql);
 $row = $result->fetch_array(MYSQLI_ASSOC);
 $agentId = $row['agentId'];
-
+// echo ($agentId);
 
 if ($row['status'] == 'Pending' || $row['status'] == 'Processing') {
   $validated = $sslc->orderValidate($_POST, $tran_id, $amount, $currency);
@@ -100,7 +101,7 @@ function DepositRequest($conn, $tran_id, $amount, $agentId, $bank_trxId)
     $lessamount = $amount * 0.978;
 
     $newAmount = $lastAmount + $lessamount;
-
+    echo($agentId);
 
     $sql = "INSERT INTO `deposit_request`(
                     `agentId`,
@@ -113,23 +114,25 @@ function DepositRequest($conn, $tran_id, $amount, $agentId, $bank_trxId)
                     `amount`,
                     `ref`,
                     `status`,
-                    `createdAt`)
+                    `createdAt`,
+                    `platform`)
                     VALUES( 
                     '$agentId',
                     '$DepositId',
                     '$CompanyName',
-                    'FWT Marchant',
+                    'ST Marchant',
                     'sslcommerce',
                     'SSL',
                     '$tran_id',
                     '$lessamount',
                     '$bank_trxId',
                     'approved',
-                    '$createdAt')";
-
+                    '$createdAt',
+                    'B2B')";
+  // echo ($sql);
     if ($conn->query($sql) === TRUE) {
-      $conn->query("INSERT INTO `agent_ledger`(`agentId`,`deposit`, `lastAmount`,`details`, `transactionId`,`reference`,`createdAt`)
-                        VALUES ('$agentId','$lessamount','$newAmount','$lessamount TK Deposit successfully SSL Commerce - PaymentId-$bank_trxId','$tran_id','$DepositId','$createdAt')");
+      $conn->query("INSERT INTO `agent_ledger`(`agentId`,`deposit`, `lastAmount`,`details`, `transactionId`,`reference`,`createdAt`, `platform`)
+                        VALUES ('$agentId','$lessamount','$newAmount','$lessamount TK Deposit successfully SSL Commerce - PaymentId-$bank_trxId','$tran_id','$DepositId','$createdAt', 'B2B')");
 
       //send email
       // $adminMessage = "We sent you new deposit request amount of $amount BDT, Which has been approved.";
@@ -149,11 +152,11 @@ function DepositRequest($conn, $tran_id, $amount, $agentId, $bank_trxId)
 
       //redirect
       header("Location: https://b2b.shopnotour.com/dashboard/depositreq/successful");
-      //header("Location: http://localhost:3001/dashboard/account/deposite/successful");
+      // header("Location: http://localhost:3002/dashboard/depositreq/successful");
       ////////////////////////
     }
   } else {
-    header("Location:  https://b2b.shopnotour.com/dashboard/depositreq/fail");
+    header("Location: https://b2b.shopnotour.com/dashboard/depositreq/fail");
     exit();
   }
 

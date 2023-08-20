@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-
+    
     if ($_SERVER['REMOTE_ADDR']) {
         $ip = $_SERVER['REMOTE_ADDR'];
         include 'Browser.php';
@@ -64,16 +64,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         'expire_time' => $expireTime,
                     ];
 
-                    $Token = JWT::encode($payload, $secretKey, 'HS256');
+                    // $Token = JWT::encode($payload, $secretKey, 'HS256');
                     $agentId = $row['agentId'];
                     $agencyName = $row['company'];
                     $response['user'] = $row;
-                    $response['token'] = $Token;
+                    // $response['token'] = $Token;
                     $response['action'] = "complete";
                     $response['message'] = "success";
                     $conn->query("UPDATE `agent` SET `isActive`='yes',`loginIp`='$ip',`browser`='$browser' WHERE email='$email'");
                     $conn->query("INSERT INTO `lastLogin`(`agentId`, `agencyName`, `StaffName`, `loginIp`, `success`,`browser`,`platform`, `craetedTime`)
-               VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','$platform','$currentTime')");
+               VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','B2B','$currentTime')");
                 } else if ($row['status'] == 'pending') {
                     $response['action'] = "pending";
                     $response['message'] = "Your agency registration process is pending.";
@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $response['action'] = "complete";
                         $response['message'] = "success";
                         $conn->query("INSERT INTO `lastLogin`(`agentId`, `agencyName`, `StaffName`, `loginIp`, `success`,`browser`,`platform`, `craetedTime`)
-                VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','$platform','$currentTime')");
+                VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','B2B','$currentTime')");
                     } else {
                         $response['action'] = "incomplete";
                         $response['message'] = "Agent Is Deactive";

@@ -20,7 +20,7 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
     include("db_connection.php");
     include("OrderTransaction.php");
 
-
+    
     $agentId = $_GET["agentId"];
     $_SESSION['agentId'] = $agentId;
     $_SESSION['amount'] = $_GET["amount"];

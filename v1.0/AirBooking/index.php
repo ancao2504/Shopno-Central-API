@@ -245,9 +245,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ${'infantSSR' . $x} = date_format(${'idate' . $x}, "dMy");
             ${'dobCount' . $x} = new DateTime(${'idob' . $x});
             ${'AgeCount' . $x} = $now->diff(${'dobCount' . $x});
-            ${'age' . $x} = ${'AgeCount' . $x}->m;
+            ${'age' . $x} = (${'AgeCount' . $x}->y * 12) +${'AgeCount' . $x}->m;
             ${'iAge' . $x} = str_pad(${'age' . $x}, 2, '0', STR_PAD_LEFT);
-
+            
+            //
+            if(${'iAge' . $x}=="00")
+            {
+                ${'iAge' . $x}=01;
+            }
+            
             if (${'igender' . $x} == 'Male') {
                 ${'igender' . $x} = 'M';
                 ${'ititle' . $x} = 'MSTR';
@@ -595,8 +601,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ${'infantSSR' . $x} = date_format(${'idate' . $x}, "dMy");
             ${'dobCount' . $x} = new DateTime(${'idob' . $x});
             ${'AgeCount' . $x} = $now->diff(${'dobCount' . $x});
-            ${'age' . $x} = ${'AgeCount' . $x}->y;
+            ${'age' . $x} = (${'AgeCount' . $x}->y * 12) +${'AgeCount' . $x}->m;
             ${'iAge' . $x} = str_pad(${'age' . $x}, 2, '0', STR_PAD_LEFT);
+
+            //
+            if(${'iAge' . $x}=="00")
+            {
+                ${'iAge' . $x}=01;
+            }
 
             if (${'igender' . $x} == 'Male') {
                 ${'igender' . $x} = 'M';
@@ -1614,7 +1626,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'Accept: /',
                 'Content-Type: application/x-www-form-urlencoded',
             );
-
+            
             $ch = curl_init();
             //curl_setopt($ch,CURLOPT_URL,"https://api-crt.cert.havail.sabre.com/v2/auth/token");
             curl_setopt($ch, CURLOPT_URL, "https://api.platform.sabre.com/v2/auth/token");
@@ -1635,7 +1647,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         //Curl start
         $curl = curl_init();
-
+        // print_r($Request);
         curl_setopt_array(
             $curl,
             array(

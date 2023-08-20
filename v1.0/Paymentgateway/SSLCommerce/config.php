@@ -7,31 +7,31 @@ if (!defined('PROJECT_PATH')) {
 }
 
 if (!defined('IS_SANDBOX')) {
-    define('IS_SANDBOX', false); // 'true' for sandbox, 'false' for live
+    define('IS_SANDBOX', true); // 'true' for sandbox, 'false' for live
 }
 
 
 //production
 
-if (!defined('STORE_ID')) {
-    define('STORE_ID', 'shopnotour0live'); // your store id. For sandbox, register at https://developer.sslcommerz.com/registration/
-}
-
-// sandbox
 // if (!defined('STORE_ID')) {
 //     define('STORE_ID', 'shopnotour0live'); // your store id. For sandbox, register at https://developer.sslcommerz.com/registration/
 // }
 
-
-//production
-if (!defined('STORE_PASSWORD')) {
-    define('STORE_PASSWORD', '64DCC29186EDF14916'); // your store password.
+// sandbox
+if (!defined('STORE_ID')) {
+    define('STORE_ID', 'sixse63fd6f58d5390'); // your store id. For sandbox, register at https://developer.sslcommerz.com/registration/
 }
 
-//sandbox
+
+//production
 // if (!defined('STORE_PASSWORD')) {
-//     define('STORE_PASSWORD', 'shopnotour0live'); // your store password.
+//     define('STORE_PASSWORD', '64DCC29186EDF14916'); // your store password.
 // }
+
+//sandbox
+if (!defined('STORE_PASSWORD')) {
+    define('STORE_PASSWORD', 'sixse63fd6f58d5390@ssl'); // your store password.
+}
 
 return [
     'success_url' => 'success.php',
