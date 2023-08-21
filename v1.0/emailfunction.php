@@ -58,8 +58,8 @@ function sendToAdmin($subject, $message, $agentId, $header, $property, $data)
                       padding-bottom: 10px;
                     "
                   >
-                   <a href="https://flywaytravel.com.bd/">
-                    <img style="z-index: 10000;" src="https://flyway.api.flyfarint.com/asset/ownerlogo/Logo.png" alt="" >
+                   <a href="https://b2b.shopnotour.com//">
+                    <img style="z-index: 10000;" src="https://shopno.api.flyfarint.com/asset/company/SHOPNO_TOUR_LOGO.png" alt="Logo" >
                    </a>
                     
                     
@@ -121,7 +121,7 @@ function sendToAdmin($subject, $message, $agentId, $header, $property, $data)
                       background-color: white;
                     "
                   >
-                    Dear Flyway Travel, ' . $message . '
+                    Dear Shopno Tour, ' . $message . '
                   </td>
                 </tr>
       
@@ -289,8 +289,8 @@ function sendToAgent($subject, $message, $agentId, $header, $property, $data)
                   padding-bottom: 10px;
                 "
               >
-               <a href="https://flywaytravel.com.bd/">
-                <img style="z-index: 10000;" src="https://flyway.api.flyfarint.com/asset/ownerlogo/Logo.png" alt="" >
+               <a href="https://b2b.shopnotour.com/">
+                <img style="z-index: 10000;" src="https://shopno.api.flyfarint.com/asset/company/SHOPNO_TOUR_LOGO.png" alt="Logo" >
                </a>
                 
                 
@@ -450,7 +450,7 @@ function sendToAgent($subject, $message, $agentId, $header, $property, $data)
                   padding-bottom: 20px;
                 "
               >
-                Flyway Travel
+                Shopno Tour
               </td>
             </tr>
   

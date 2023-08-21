@@ -1,6 +1,7 @@
 <?php
 
 require '../../config.php';
+require '../../emailfunction.php';
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -42,6 +43,18 @@ if (!empty($data)) {
     if ($conn->query($sql) === true) {
         $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`platform`,`actionBy`, `actionAt`)
             VALUES ('$agentId','$agentId','Deactive','','B2B','$actionBy','$createdTime')");
+
+
+      $header = $subject = "Agent Deactivate";
+      $property = "Agent: ";
+      $data = $agentName . ", " . $companyname;
+      $adminMessage = "Our Agent Acccount is deactivated.";
+      $agentMessage = " Your Agent Account is deactivate.";
+
+
+      sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
+      sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
+
 
         $response['status']="success";
         $response['message']="Agent Deactivated Successfully";

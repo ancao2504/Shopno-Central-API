@@ -1,6 +1,7 @@
 <?php
 
 require '../../config.php';
+require '../../emailfunction.php';
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -231,8 +232,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $SabreResponse = curl_exec($curl);
       curl_close($curl);   
-    } 
+    }
+    
+    
 
+    $subject = $header = "Booking Issue Request Rejected";
+    $property = "Booking ID: ";
+    $data = $bookingId;
+    $adminMessage = "Our Booking Issue Request has been Rejected";
+    $agentMessage = "Your Booking Issue Request has been Rejected";
+    sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
+    sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
   
     $response['status']="success";
     $response['InvoiceId']="$bookingId";

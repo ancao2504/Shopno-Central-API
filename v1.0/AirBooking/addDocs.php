@@ -35,7 +35,7 @@ if(array_key_exists('paxId', $_GET) && array_key_exists('passportCopy', $_GET)){
 		$fileExt = strtolower(pathinfo($fileName,PATHINFO_EXTENSION)); // get image extension
 			
 		// valid image extensions
-		$valid_extensions = array('png', 'PNG','JPG','jpg','jpeg','JPEG'); 
+		$valid_extensions = array('png', 'PNG','JPG','jpg','jpeg','JPEG','jfif','JFIF','pdf','PDF'); 
 
 		$renameFile ="passportCopy.$fileExt";
 		
@@ -106,7 +106,7 @@ if(array_key_exists('paxId', $_GET) && array_key_exists('passportCopy', $_GET)){
 		$fileExt = strtolower(pathinfo($fileName,PATHINFO_EXTENSION)); // get image extension
 			
 		// valid image extensions
-		$valid_extensions = array('png', 'PNG','JPG','jpg','jpeg','JPEG'); 
+		$valid_extensions = array('png', 'PNG','JPG','jpg','jpeg','JPEG','jfif','JFIF','pdf','PDF');  
 
 		$renameFile ="visaCopy.$fileExt";
 		

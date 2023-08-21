@@ -1,6 +1,7 @@
 <?php
 
 require '../../config.php';
+require '../../emailfunction.php';
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -28,6 +29,22 @@ if (array_key_exists('agentId', $_GET) && array_key_exists('actionBy', $_GET)) {
         if ($conn->query($sql) === true) {
             $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `platform`,`actionAt`)
                   VALUES ('$agentId','$agentId','Approved',' ','$actionBy','B2B','$createdTime')");
+            
+            
+            $subject = "Agent Request Approved";
+            $headerAdmin = "Welcome $companyname";
+            $headerAgent = "Agent Request Approved";
+            $property = $data = "";
+            $agentProperty = "Username: $agentEmail <br>";
+            $agentData = "Password: $password";
+            $adminMessage = "Thank you for accepting our agent request, It will be great journey for us.";
+            $agentMessage = "Congratulation you are now our authorized agent.";
+      
+      
+            sendToAdmin($subject, $adminMessage, $agentId, $headerAdmin, $property, $data);
+            sendToAgent($subject, $agentMessage, $agentId, $headerAgent, $agentProperty, $agentData);
+      
+            
             $response['action'] = "success";
             $response['message'] = "Agent Approved Successfully";
         }

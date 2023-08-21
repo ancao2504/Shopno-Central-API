@@ -1,6 +1,6 @@
 <?php
 
-// require "../../emailfunction.php";
+require "../../emailfunction.php";
 require "../../config.php";
 
 header("Access-Control-Allow-Origin: *");
@@ -135,15 +135,15 @@ function saveData($conn, $tran_id, $amount, $agentId, $bank_trxId)
                         VALUES ('$agentId','$lessamount','$newAmount','$lessamount TK Deposit successfully SSL Commerce - PaymentId-$bank_trxId','$tran_id','$DepositId','$createdAt', 'B2B')");
 
       //send email
-      // $adminMessage = "We sent you new deposit request amount of $amount BDT, Which has been approved.";
-      // $agentMessage = "Your new deposit request amount of $amount BDT has been accepeted, Thank you";
-      // $subject = "Deposit Request Approved";
-      // $header = $subject;
-      // $property = "Deposit ID: ";
-      // $data = $DepositId;
+      $adminMessage = "We sent you new deposit request amount of $amount BDT, Which has been approved.";
+      $agentMessage = "Your new deposit request amount of $amount BDT has been accepeted, Thank you";
+      $subject = "Deposit Request Approved";
+      $header = $subject;
+      $property = "Deposit ID: ";
+      $data = $DepositId;
 
-      // sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
-      // sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
+      sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
+      sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
       ///////////////////////////
 
       $response['status'] = 'success';
@@ -161,10 +161,3 @@ function saveData($conn, $tran_id, $amount, $agentId, $bank_trxId)
   }
 
 }
-
-
-
-
-
-
-?>
