@@ -19,10 +19,10 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["activityId"]); 
                 $number= (int)$outputString + 1;
-                $Search_Id = "FFAC$number"; 								
+                $Search_Id = "STAC$number"; 								
             }
         } else {
-                $Search_Id ="FFAC1000";
+                $Search_Id ="STAC1000";
         }
 
         $Agent_Id = $_POST['agentId'];

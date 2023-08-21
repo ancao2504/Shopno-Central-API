@@ -1,3 +1,4 @@
+
 <?php
 
 error_reporting(E_ALL);
@@ -25,6 +26,8 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
     $_SESSION['agentId'] = $agentId;
     $_SESSION['amount'] = $_GET["amount"];
 
+
+    
     $agentdata = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'"), MYSQLI_ASSOC);
 
     if (!empty($agentdata)) {

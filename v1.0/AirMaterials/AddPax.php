@@ -29,10 +29,10 @@ $_POST = json_decode(file_get_contents('php://input'), true);
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
                 $number= (int)$outputString + 1;
-                $paxId = "FFP$number"; 								
+                $paxId = "STP$number"; 								
             }
         } else {
-                $paxId ="FFP1000";
+                $paxId ="STP1000";
         }
 
         ${'afName'.$x} = strtoupper($_POST['adult'][$x]["afName"]);
@@ -79,10 +79,10 @@ $_POST = json_decode(file_get_contents('php://input'), true);
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
                 $number= (int)$outputString + 1;
-                $paxId = "FFP$number"; 								
+                $paxId = "STP$number"; 								
             }
         } else {
-                $paxId ="FFP1000";
+                $paxId ="STP1000";
         }
 
         ${'cfName'.$x} = strtoupper($_POST['child'][$x]["cfName"]);
@@ -119,10 +119,10 @@ $_POST = json_decode(file_get_contents('php://input'), true);
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
                 $number= (int)$outputString + 1;
-                $paxId = "FFP$number"; 								
+                $paxId = "STP$number"; 								
             }
         } else {
-                $paxId ="FFP1000";
+                $paxId ="STP1000";
         }
 
         ${'ifName'.$x} = strtoupper($_POST['infant'][$x]["ifName"]);
@@ -166,10 +166,10 @@ $_POST = json_decode(file_get_contents('php://input'), true);
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
                 $number= (int)$outputString + 1;
-                $paxId = "FFP$number"; 								
+                $paxId = "STP$number"; 								
             }
         } else {
-                $paxId ="FFP1000";
+                $paxId ="STP1000";
         }
 
         ${'afName'.$x} = strtoupper($_POST['adult'][$x]["afName"]);
@@ -220,10 +220,10 @@ $_POST = json_decode(file_get_contents('php://input'), true);
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
                 $number= (int)$outputString + 1;
-                $paxId = "FFP$number"; 								
+                $paxId = "STP$number"; 								
             }
         } else {
-                $paxId ="FFP1000";
+                $paxId ="STP1000";
         }
 
         ${'cfName'.$x} = strtoupper($_POST['child'][$x]["cfName"]);
@@ -274,10 +274,10 @@ $_POST = json_decode(file_get_contents('php://input'), true);
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
                 $number= (int)$outputString + 1;
-                $paxId = "FFP$number"; 								
+                $paxId = "STP$number"; 								
             }
         } else {
-                $paxId ="FFP1000";
+                $paxId ="STP1000";
         }
 
         ${'afName'.$x} = strtoupper($_POST['adult'][$x]["afName"]);
@@ -326,10 +326,10 @@ $_POST = json_decode(file_get_contents('php://input'), true);
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
                 $number= (int)$outputString + 1;
-                $paxId = "FFP$number"; 								
+                $paxId = "STP$number"; 								
             }
         } else {
-                $paxId ="FFP1000";
+                $paxId ="STP1000";
         }
 
         ${'ifName'.$x} = strtoupper($_POST['infant'][$x]["ifName"]);
@@ -380,10 +380,10 @@ $_POST = json_decode(file_get_contents('php://input'), true);
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
                 $number= (int)$outputString + 1;
-                $paxId = "FFP$number"; 								
+                $paxId = "STP$number"; 								
             }
         } else {
-                $paxId ="FFP1000";
+                $paxId ="STP1000";
         }
 
             ${'afName'.$x} = strtoupper($_POST['adult'][$x]["afName"]);

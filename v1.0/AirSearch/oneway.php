@@ -228,7 +228,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 			$result = json_decode($response, true);
 		}
 			
-			
+	
 		if(isset($result['groupedItineraryResponse']['statistics']['itineraryCount']) && $result['groupedItineraryResponse']['statistics']['itineraryCount'] > 0){
 			$SabreItenary = $result['groupedItineraryResponse']['itineraryGroups'];
 			$flightListSabre = $SabreItenary[0]['itineraries'];

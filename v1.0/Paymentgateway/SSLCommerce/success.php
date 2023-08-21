@@ -39,7 +39,7 @@ if ($row['status'] == 'Pending' || $row['status'] == 'Processing') {
       $bank_trxId = $_POST['bank_tran_id'];
       $amount = $_POST['amount'];
 
-      DepositRequest($conn, $tran_id, $amount, $agentId, $bank_trxId);
+      saveData($conn, $tran_id, $amount, $agentId, $bank_trxId);
 
     } else {
 
@@ -56,7 +56,7 @@ if ($row['status'] == 'Pending' || $row['status'] == 'Processing') {
   echo 'Invalid Information1';
 
 }
-function DepositRequest($conn, $tran_id, $amount, $agentId, $bank_trxId)
+function saveData($conn, $tran_id, $amount, $agentId, $bank_trxId)
 {
 
   $DuplicateItem = $conn->query("SELECT * from deposit_request where transactionId='$tran_id'")->num_rows;

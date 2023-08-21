@@ -15,9 +15,9 @@ if(array_key_exists('all',$_GET)){
         $iddata = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM visa_info ORDER BY id DESC LIMIT 1"));
         if(isset($iddata)){
             $id = substr($iddata['visaId'],4) + 1;
-            $visaId = "FFVS$id";
+            $visaId = "STVS$id";
         }else{
-            $visaId = "FFVS1000";
+            $visaId = "STVS1000";
         }
 
         $createdAt = date('Y-m-d H:i:s');

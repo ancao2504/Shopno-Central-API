@@ -23,10 +23,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         while($row = $result->fetch_assoc()) {
             $outputString = preg_replace('/[^0-9]/', '', $row["refundId"]); 
             $number= (int)$outputString + 1;
-            $refundId = "FWRF$number"; 								
+            $refundId = "STRF$number"; 								
         }
     } else {
-            $refundId ="FWRF1000";
+            $refundId ="STRF1000";
     }
     
     $agentId = $_POST["agentId"];
