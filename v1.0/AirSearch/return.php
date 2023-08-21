@@ -15,8 +15,10 @@ $controlrow = mysqli_fetch_array($control,MYSQLI_ASSOC);
 
 if(!empty($controlrow)){
 	$Sabre = $controlrow['sabre'];
-	$Galileo = $controlrow['galileo'];
-	$FlyHub = $controlrow['flyhub'];
+	// $Galileo = $controlrow['galileo'];
+	$Galileo = 0;
+	// $FlyHub = $controlrow['flyhub'];
+	$FlyHub = 0;
 	$gdsPrice = $controlrow['gdsPrice'];
 	$farePrice = $controlrow['farePrice'];
 }
@@ -158,8 +160,8 @@ if($Sabre == 1) // Sabre Start
 
 try{
 
-	$client_id= base64_encode("V1:396724:FD3K:AA");
-	$client_secret = base64_encode("FlWy967"); //prod
+	$client_id= base64_encode("V1:351640:27YK:AA");
+	$client_secret = base64_encode("spt5164"); 
 	
 	$token = base64_encode($client_id.":".$client_secret);
 	

@@ -26,7 +26,7 @@ $Airportsql = "SELECT name, cityName,countryCode FROM airports WHERE";
 
 if (array_key_exists('tripType', $_GET)) {
     $Way = $_GET['tripType'];
-
+    
     if ($Way == "oneway") {
         if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GET) && array_key_exists("departuredate", $_GET)) {
             $From = $_GET['journeyfrom'];
@@ -34,6 +34,7 @@ if (array_key_exists('tripType', $_GET)) {
             $Date = $_GET['departuredate'];
             $ActualDate = $Date . "T00:00:00";
 
+            // echo ("Hello");
             // Trip Type
             $fromsql = mysqli_query($conn, "SELECT countryCode FROM airports WHERE code='$From' ");
             $fromrow = mysqli_fetch_array($fromsql, MYSQLI_ASSOC);
@@ -986,8 +987,8 @@ if (array_key_exists('tripType', $_GET)) {
                         } else {
                             $markup = $agentmarkrow['alliMarkup'];
                         }
-                        $WLAgentPrice = $AgentPrice + $markup;
-                        echo $WLAgentPrice;
+                        $WLAgentPrice = $AgentPrice + (float)$markup;
+                        // echo $WLAgentPrice;
 
                     } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
                         if ($TripType == 'Inbound') {
@@ -4969,35 +4970,35 @@ if ($FlyHub == 1) {
         ]
         }';
 
-    //echo $FlyHubRequest;
+  
 
     //Fly Hub
 
     $curlflyhubauth = curl_init();
 
-    curl_setopt_array($curlflyhubauth, array(
-        CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => '{
-        "username": "ceo@flyfarint.com",
-        "apikey": "ENex7c5Ge+0~SGc1t71iccr1xXacDPdK51g=iTm9SlL+de39HF"
-        }',
-        CURLOPT_HTTPHEADER => array(
-            'Content-Type: application/json',
-        ),
-    ));
+	curl_setopt_array($curlflyhubauth, array(
+	CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
+	CURLOPT_RETURNTRANSFER => true,
+	CURLOPT_ENCODING => '',
+	CURLOPT_MAXREDIRS => 10,
+	CURLOPT_TIMEOUT => 0,
+	CURLOPT_FOLLOWLOCATION => true,
+	CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+	CURLOPT_CUSTOMREQUEST => 'POST',
+	CURLOPT_POSTFIELDS =>'{
+	"username": "ceo@flyfarint.com",
+	"apikey": "ENex7c5Ge+0~SGc1t71iccr1xXacDPdK51g=iTm9SlL+de39HF"
+	}',
+	CURLOPT_HTTPHEADER => array(
+		'Content-Type: application/json'
+	),
+	));
 
-    $response = curl_exec($curlflyhubauth);
+	$response = curl_exec($curlflyhubauth);
 
-    $TokenJson = json_decode($response, true);
+	$TokenJson = json_decode($response,true);
 
-    $FlyhubToken = $TokenJson['TokenId'];
+	$FlyhubToken  = $TokenJson['TokenId'];
 
     $curlflyhusearch = curl_init();
 
@@ -5021,11 +5022,11 @@ if ($FlyHub == 1) {
 
     curl_close($curlflyhusearch);
 
-    //echo $flyhubresponse;
+    // echo $flyhubresponse;
 
     // Decode the JSON file
+    
     $Result = json_decode($flyhubresponse, true);
-
     $FlightListFlyHub = $Result['Results'];
     $SearchID = $Result['SearchId'];
     $FlyHubResponse = array();
@@ -5669,7 +5670,6 @@ if ($Sabre == 1 && $Galileo == 1 && $FlyHub == 1) {
     print_r($json_string);
 
 }
-
     $conn->close();
 
 	?>
