@@ -11,7 +11,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 
 $platform=$_GET["platform"];
-$agentId=$_GET["agentId"];
+// $agentId=$_GET["agentId"];
 // echo json_encode($result);
 $result=getDashBoardData($platform, $agentId);
 

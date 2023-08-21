@@ -1,6 +1,7 @@
 <?php
 
 require '../../config.php';
+require '../../emailfunction.php';
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -73,12 +74,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql1 = "UPDATE deposit_request SET status='rejected', remarks='$reason',rejectBy='$actionBy',actionAt='$Time' WHERE id='$id' AND platform='B2B'";
 
     if ($conn->query($sql1) === true) {
-                $response['status'] = "success";
-                $response['message'] = "Deposit Rejected Successful";
+
+        $subject = $header = "Deposit Request Rejected";
+        $property = "Deposit ID: ";
+        $data = $depositId;
+        $adminMessage = "We Send you deposit request amount of $amount BDT, 
+        Which has been Rejected";
+        $agentMessage = "Your new deposit request amount of  $amount BDT 
+        has been rejected, due to lack of valid infromation. Please try again";
+        sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
+        sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
+
+        $response['status'] = "success";
+        $response['message'] = "Deposit Rejected Successful";
     }
 
     echo json_encode($response);
-
 }
 $conn->close();
-?>

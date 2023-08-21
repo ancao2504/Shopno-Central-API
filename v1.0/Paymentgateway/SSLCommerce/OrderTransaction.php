@@ -1,6 +1,7 @@
 <?php
 
-class OrderTransaction {
+class OrderTransaction
+{
 
     public function getRecordQuery($tran_id)
     {
@@ -10,6 +11,7 @@ class OrderTransaction {
 
     public function saveTransactionQuery($post_data)
     {
+        $agentId = $post_data['agentId'];
         $name = $post_data['cus_name'];
         $email = $post_data['cus_email'];
         $phone = $post_data['cus_phone'];
@@ -18,8 +20,8 @@ class OrderTransaction {
         $transaction_id = $post_data['tran_id'];
         $currency = $post_data['currency'];
 
-        $sql = "INSERT INTO orders (name, email, phone, amount, address, status, transaction_id,currency)
-                                    VALUES ('$name', '$email', '$phone','$transaction_amount','$address','Pending', '$transaction_id','$currency')";
+        $sql = "INSERT INTO orders (agentId,name, email, phone, amount, address, status, transaction_id,currency, operator)
+                            VALUES ('$agentId','$name', '$email', '$phone','$transaction_amount','$address','Pending', '$transaction_id','$currency', 'SSLCOMMERZ')";
 
         return $sql;
     }
@@ -30,5 +32,5 @@ class OrderTransaction {
 
         return $sql;
     }
-}
 
+}

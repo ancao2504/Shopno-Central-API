@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $AllSsr = array();
     $AllSecureFlight = array();
     $FlyHubPassenger = array();
-
+    // print_r($_POST);
     if ($adult > 0 && $child > 0 && $infants > 0) {
         $paxRequest = '{
                         "Code": "ADT",
@@ -245,9 +245,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ${'infantSSR' . $x} = date_format(${'idate' . $x}, "dMy");
             ${'dobCount' . $x} = new DateTime(${'idob' . $x});
             ${'AgeCount' . $x} = $now->diff(${'dobCount' . $x});
-            ${'age' . $x} = ${'AgeCount' . $x}->m;
+            ${'age' . $x} = (${'AgeCount' . $x}->y * 12) +${'AgeCount' . $x}->m;
             ${'iAge' . $x} = str_pad(${'age' . $x}, 2, '0', STR_PAD_LEFT);
-
+            
+            //
+            if(${'iAge' . $x}=="00")
+            {
+                ${'iAge' . $x}=01;
+            }
+            
             if (${'igender' . $x} == 'Male') {
                 ${'igender' . $x} = 'M';
                 ${'ititle' . $x} = 'MSTR';
@@ -595,8 +601,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             ${'infantSSR' . $x} = date_format(${'idate' . $x}, "dMy");
             ${'dobCount' . $x} = new DateTime(${'idob' . $x});
             ${'AgeCount' . $x} = $now->diff(${'dobCount' . $x});
-            ${'age' . $x} = ${'AgeCount' . $x}->y;
+            ${'age' . $x} = (${'AgeCount' . $x}->y * 12) +${'AgeCount' . $x}->m;
             ${'iAge' . $x} = str_pad(${'age' . $x}, 2, '0', STR_PAD_LEFT);
+
+            //
+            if(${'iAge' . $x}=="00")
+            {
+                ${'iAge' . $x}=01;
+            }
 
             if (${'igender' . $x} == 'Male') {
                 ${'igender' . $x} = 'M';
@@ -1496,7 +1508,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         $Request = '{
                         "CreatePassengerNameRecordRQ":{
-                        "targetCity":"14KK",
+                        "targetCity":"27YK",
                         "haltOnAirPriceError":true,
                         "TravelItineraryAddInfo":{
                             "AgencyInfo":{
@@ -1597,13 +1609,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     }
                 }';
 
-        //print($Request);
+        // print($Request);
 
         try {
 
-            $client_id= base64_encode("V1:593072:14KK:AA");
+          
+            $client_id= base64_encode("V1:351640:27YK:AA");
             //$client_secret = base64_encode("280ff537"); //cert
-            $client_secret = base64_encode("f270395"); //prod
+            $client_secret = base64_encode("spt5164"); //prod
 
             $token = base64_encode($client_id . ":" . $client_secret);
             $data = 'grant_type=client_credentials';
@@ -1613,7 +1626,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 'Accept: /',
                 'Content-Type: application/x-www-form-urlencoded',
             );
-
+            
             $ch = curl_init();
             //curl_setopt($ch,CURLOPT_URL,"https://api-crt.cert.havail.sabre.com/v2/auth/token");
             curl_setopt($ch, CURLOPT_URL, "https://api.platform.sabre.com/v2/auth/token");
@@ -1626,7 +1639,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             curl_close($ch);
             $resf = json_decode($res, 1);
             $access_token = $resf['access_token'];
-            //echo $access_token;
+            // echo json_encode($access_token);
 
         } catch (Exception $e) {
 
@@ -1634,7 +1647,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         //Curl start
         $curl = curl_init();
-
+        // print_r($Request);
         curl_setopt_array(
             $curl,
             array(

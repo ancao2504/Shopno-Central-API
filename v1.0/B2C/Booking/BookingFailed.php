@@ -24,10 +24,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
           while($row = $result->fetch_assoc()) {
               $outputString = preg_replace('/[^0-9]/', '', $row["bookingId"]); 
               $number= (int)$outputString + 1;
-              $bookingId = "FFBF$number"; 								
+              $bookingId = "STBF$number"; 								
           }
       } else {
-              $bookingId ="FFBF1000";
+              $bookingId ="STBF1000";
       }
     
       $agentId = $_POST['agentId'];

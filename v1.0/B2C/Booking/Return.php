@@ -172,9 +172,8 @@ if($conn->query($sql)){
 
     }else if($GDS == "Sabre"){
       try{
-        $client_id= base64_encode("V1:593072:14KK:AA");
-      //$client_secret = base64_encode("280ff537"); //cert
-      $client_secret = base64_encode("f270395"); //prod
+        $client_id= base64_encode("V1:351640:27YK:AA");
+        $client_secret = base64_encode("spt5164");
 
       $token = base64_encode($client_id.":".$client_secret);
       $data='grant_type=client_credentials';

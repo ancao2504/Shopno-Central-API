@@ -25,13 +25,13 @@ class SslCommerzNotification extends AbstractSslCommerz
      */
     public function __construct()
     {
-        $this->config = include(__DIR__ . '/../config/config.php');
+        $this->config = include(__DIR__ . '../../config.php');
 
         $this->setStoreId($this->config['apiCredentials']['store_id']);
         $this->setStorePassword($this->config['apiCredentials']['store_password']);
     }
 
-    public function orderValidate($trx_id = '', $amount = 0, $currency = "BDT", $post_data)
+    public function orderValidate($post_data, $trx_id = '', $amount = 0, $currency = "BDT")
     {
         if ($post_data == '' && $trx_id == '' && !is_array($post_data)) {
             $this->error = "Please provide valid transaction ID and post request data";
@@ -39,6 +39,7 @@ class SslCommerzNotification extends AbstractSslCommerz
         }
 
         $validation = $this->validate($trx_id, $amount, $currency, $post_data);
+
 
         if ($validation) {
             return true;
@@ -59,7 +60,7 @@ class SslCommerzNotification extends AbstractSslCommerz
             $post_data['store_id'] = $this->getStoreId();
             $post_data['store_pass'] = $this->getStorePassword();
 
-            if ($this->SSLCOMMERZ_hash_verify($this->getStorePassword(), $post_data)) {
+            if ($this->SSLCOMMERZ_hash_verify($post_data, $this->getStorePassword())) {
 
                 $val_id = urlencode($post_data['val_id']);
                 $store_id = urlencode($this->getStoreId());
@@ -74,7 +75,7 @@ class SslCommerzNotification extends AbstractSslCommerz
                     curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
                     curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
                 } else {
-                    curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, true);
+                    curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
                     curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, true);
                 }
 
@@ -160,8 +161,9 @@ class SslCommerzNotification extends AbstractSslCommerz
     }
 
     # FUNCTION TO CHECK HASH VALUE
-    protected function SSLCOMMERZ_hash_verify($store_passwd = "", $post_data)
+    protected function SSLCOMMERZ_hash_verify($post_data, $store_passwd = "")
     {
+
         if (!$this->config['verify_hash']) {
             return true;
         }
@@ -336,39 +338,39 @@ class SslCommerzNotification extends AbstractSslCommerz
         $this->data['ipn_url'] = $this->getIpnUrl();
 
         /*
-         * Type: string (30)
-         * Do not Use! If you do not customize the gateway list - You can control to display the gateway list at SSLCommerz gateway selection page by providing this parameters.
-         * Multi Card:
-            brac_visa = BRAC VISA
-            dbbl_visa = Dutch Bangla VISA
-            city_visa = City Bank Visa
-            ebl_visa = EBL Visa
-            sbl_visa = Southeast Bank Visa
-            brac_master = BRAC MASTER
-            dbbl_master = MASTER Dutch-Bangla
-            city_master = City Master Card
-            ebl_master = EBL Master Card
-            sbl_master = Southeast Bank Master Card
-            city_amex = City Bank AMEX
-            qcash = QCash
-            dbbl_nexus = DBBL Nexus
-            bankasia = Bank Asia IB
-            abbank = AB Bank IB
-            ibbl = IBBL IB and Mobile Banking
-            mtbl = Mutual Trust Bank IB
-            bkash = Bkash Mobile Banking
-            dbblmobilebanking = DBBL Mobile Banking
-            city = City Touch IB
-            upay = Upay
-            tapnpay = Tap N Pay Gateway
-         * GROUP GATEWAY
-            internetbank = For all internet banking
-            mobilebank = For all mobile banking
-            othercard = For all cards except visa,master and amex
-            visacard = For all visa
-            mastercard = For All Master card
-            amexcard = For Amex Card
-         * */
+        * Type: string (30)
+        * Do not Use! If you do not customize the gateway list - You can control to display the gateway list at SSLCommerz gateway selection page by providing this parameters.
+        * Multi Card:
+        brac_visa = BRAC VISA
+        dbbl_visa = Dutch Bangla VISA
+        city_visa = City Bank Visa
+        ebl_visa = EBL Visa
+        sbl_visa = Southeast Bank Visa
+        brac_master = BRAC MASTER
+        dbbl_master = MASTER Dutch-Bangla
+        city_master = City Master Card
+        ebl_master = EBL Master Card
+        sbl_master = Southeast Bank Master Card
+        city_amex = City Bank AMEX
+        qcash = QCash
+        dbbl_nexus = DBBL Nexus
+        bankasia = Bank Asia IB
+        abbank = AB Bank IB
+        ibbl = IBBL IB and Mobile Banking
+        mtbl = Mutual Trust Bank IB
+        bkash = Bkash Mobile Banking
+        dbblmobilebanking = DBBL Mobile Banking
+        city = City Touch IB
+        upay = Upay
+        tapnpay = Tap N Pay Gateway
+        * GROUP GATEWAY
+        internetbank = For all internet banking
+        mobilebank = For all mobile banking
+        othercard = For all cards except visa,master and amex
+        visacard = For all visa
+        mastercard = For All Master card
+        amexcard = For Amex Card
+        * */
         $this->data['multi_card_name'] = (isset($info['multi_card_name'])) ? $info['multi_card_name'] : null;
 
         /*
@@ -425,15 +427,15 @@ class SslCommerzNotification extends AbstractSslCommerz
         $this->data['product_category'] = (isset($info['product_category'])) ? $info['product_category'] : ''; // String (100)	Mandatory - Mention the product category. Example: Electronic or topup or bus ticket or air ticket
 
         /*
-         * String (100)
-         * Mandatory - Mention goods vertical. It is very much necessary for online transactions to avoid chargeback.
-         * Please use the below keys :
-            1) general
-            2) physical-goods
-            3) non-physical-goods
-            4) airline-tickets
-            5) travel-vertical
-            6) telecom-vertical
+        * String (100)
+        * Mandatory - Mention goods vertical. It is very much necessary for online transactions to avoid chargeback.
+        * Please use the below keys :
+        1) general
+        2) physical-goods
+        3) non-physical-goods
+        4) airline-tickets
+        5) travel-vertical
+        6) telecom-vertical
         */
         $this->data['product_profile'] = (isset($info['product_profile'])) ? $info['product_profile'] : '';
 
@@ -451,11 +453,11 @@ class SslCommerzNotification extends AbstractSslCommerz
         $this->data['country_topup'] = (isset($info['country_topup'])) ? $info['country_topup'] : null; // string (30)	Mandatory, if product_profile is telecom-vertical - Provide the country name in where the service is given. Example: Bangladesh
 
         /*
-         * Type: JSON
-         * JSON data with two elements. product : Max 255 characters, quantity : Quantity in numeric value and amount : Decimal (12,2)
-         * Example:
-           [{"product":"DHK TO BRS AC A1","quantity":"1","amount":"200.00"},{"product":"DHK TO BRS AC A2","quantity":"1","amount":"200.00"},{"product":"DHK TO BRS AC A3","quantity":"1","amount":"200.00"},{"product":"DHK TO BRS AC A4","quantity":"2","amount":"200.00"}]
-         * */
+        * Type: JSON
+        * JSON data with two elements. product : Max 255 characters, quantity : Quantity in numeric value and amount : Decimal (12,2)
+        * Example:
+        [{"product":"DHK TO BRS AC A1","quantity":"1","amount":"200.00"},{"product":"DHK TO BRS AC A2","quantity":"1","amount":"200.00"},{"product":"DHK TO BRS AC A3","quantity":"1","amount":"200.00"},{"product":"DHK TO BRS AC A4","quantity":"2","amount":"200.00"}]
+        * */
         $this->data['cart'] = (isset($info['cart'])) ? $info['cart'] : null;
         $this->data['product_amount'] = (isset($info['product_amount'])) ? $info['product_amount'] : null; // decimal (10,2)	Product price which will be displayed in your merchant panel and will help you to reconcile the transaction. It shall be decimal value (10,2). Example : 50.40
         $this->data['vat'] = (isset($info['vat'])) ? $info['vat'] : null; // decimal (10,2)	The VAT included on the product price which will be displayed in your merchant panel and will help you to reconcile the transaction. It shall be decimal value (10,2). Example : 4.00

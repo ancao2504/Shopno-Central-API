@@ -38,10 +38,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             while ($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["ticketId"]);
                 $number = (int) $outputString + 1;
-                $ticketId = "FWT$number";
+                $ticketId = "ST$number";
             }
         } else {
-            $ticketId = "FWT1000";
+            $ticketId = "ST1000";
         }
 
         //Agent Info

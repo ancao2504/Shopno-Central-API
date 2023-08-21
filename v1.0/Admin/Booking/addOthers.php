@@ -29,10 +29,10 @@ require("../../vendor/autoload.php");
             while($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["othersId"]); 
                 $number= (int)$outputString + 1;
-                $othersId = "FFO$number"; 								
+                $othersId = "STO$number"; 								
             }
         } else {
-                $othersId ="FFO1000";
+                $othersId ="STO1000";
         }
 
        

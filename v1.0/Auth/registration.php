@@ -58,16 +58,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($row['email'] == $userEmail) {
                 $response['status'] = "error";
                 $response['message'] = "Email Already Exists";
-
             } else if ($row['phone'] == $phone) {
                 $response['status'] = "error";
                 $response['message'] = "Phone Number Registered to Another User";
-
             } else if ($row['company'] == $company_name) {
                 $response['status'] = "error";
                 $response['message'] = "Company Name Already Registered";
             }
-
         }
     } else if (mysqli_num_rows($result) <= 0 && mysqli_num_rows($resultStaff) <= 0) {
         $sql = "INSERT INTO `agent`(
@@ -102,10 +99,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             )";
 
         if ($conn->query($sql) === true) {
+
+            $header = $subject = "New Agent Register";
+            $property = "Agent: ";
+            $data = $name . ", " . $company_name;
+            $adminMessage = "We Register as a new agent in your portal. Please approve our agnet request.";
+            $agentMessage = "Your registation is now under processing, Please wait for a while we will get back to you as soon as possible.";
+            sendToAdmin($subject, $adminMessage, $AgentId, $header, $property, $data);
+            sendToAgent($subject, $agentMessage, $AgentId, $header, $property, $data);
+
             $response['agentId'] = $AgentId;
             $response['status'] = "success";
             $response['message'] = "Registration Successful";
-
         } else {
             $response['status'] = "error";
             $response['message'] = "Registration Failed";
@@ -113,5 +118,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     echo json_encode($response);
-
 }

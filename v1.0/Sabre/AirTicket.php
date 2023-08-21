@@ -11,9 +11,8 @@ if (array_key_exists("BookingID",$_GET)){
 
 try{
 
-	$client_id= base64_encode("V1:396724:FD3K:AA");
-	//$client_secret = base64_encode("280ff537"); //cert
-	$client_secret = base64_encode("FlWy967"); //prod
+   $client_id= base64_encode("V1:351640:27YK:AA");
+   $client_secret = base64_encode("spt5164");
 
 	$token = base64_encode($client_id.":".$client_secret);
 	$data='grant_type=client_credentials';
@@ -82,7 +81,7 @@ curl_setopt_array($curl, array(
   CURLOPT_POSTFIELDS =>'{
     "AirTicketRQ":{
        "version":"1.2.1",
-       "targetCity":"FD3K",
+       "targetCity":"27YK",
        "DesignatePrinter":{
           "Printers":{
              "Ticket":{

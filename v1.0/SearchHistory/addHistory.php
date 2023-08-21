@@ -46,6 +46,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
         $child = $_POST['child'];
         $infant = $_POST['infant'];
         $searchTime = date('Y-m-d H:i:s');
+        $platform= $_POST['platform'];
 
         $sql = "INSERT INTO `search_history`(
             `searchId`,
@@ -64,7 +65,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             `adult`,
             `child`,
             `infant`,
-            `searchTime`
+            `searchTime`,
+            `platform`
         )
         VALUES(
             '$Search_Id',
@@ -83,7 +85,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
             '$adult',
             '$child',
             '$infant',
-            '$searchTime'
+            '$searchTime',
+            '$platform'
         )";
 
         if ($conn->query($sql) === TRUE) {

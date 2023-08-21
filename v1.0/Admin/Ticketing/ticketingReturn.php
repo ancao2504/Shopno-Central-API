@@ -1,6 +1,7 @@
 <?php
 
 require '../../config.php';
+require '../../emailfunction.php';
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -173,9 +174,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
     }else if($GDS == "Sabre"){
       try{
-        $client_id= base64_encode("V1:396724:FD3K:AA");
-      //$client_secret = base64_encode("280ff537"); //cert
-      $client_secret = base64_encode("FlWy967"); //prod
+        $client_id= base64_encode("V1:351640:27YK:AA");
+		    $client_secret = base64_encode("spt5164");
 
       $token = base64_encode($client_id.":".$client_secret);
       $data='grant_type=client_credentials';
@@ -232,8 +232,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $SabreResponse = curl_exec($curl);
       curl_close($curl);   
-    } 
+    }
+    
+    
 
+    $subject = $header = "Booking Issue Request Rejected";
+    $property = "Booking ID: ";
+    $data = $bookingId;
+    $adminMessage = "Our Booking Issue Request has been Rejected";
+    $agentMessage = "Your Booking Issue Request has been Rejected";
+    sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
+    sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
   
     $response['status']="success";
     $response['InvoiceId']="$bookingId";

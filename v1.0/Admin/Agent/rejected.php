@@ -1,6 +1,7 @@
 <?php
 
 require '../../config.php';
+require '../../emailfunction.php';
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -32,6 +33,18 @@ if (array_key_exists("agentId", $_GET) && array_key_exists("actionBy", $_GET)) {
             if ($conn->query($sql) === true) {
                 $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`,`platform`, `actionAt`)
                     VALUES ('$agentId','$agentId','Rejected',' ','$actionBy', 'B2B','$createdTime')");
+
+                $header = $subject = "Agent Request Rejected";
+                $property = $data = "";
+                $adminMessage = "Our Registration has been cancelled.";
+                $agentMessage = "Due to lack of valid information, your Agent Register Request has been cancelled.";
+
+
+                sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
+                sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
+
+
+
 
                 $response['action'] = "success";
                 $response['message'] = "Agent Rejected Successfully";

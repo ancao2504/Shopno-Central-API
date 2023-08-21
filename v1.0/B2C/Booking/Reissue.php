@@ -24,10 +24,10 @@ if (array_key_exists('request', $_GET)) {
             while ($row = $result->fetch_assoc()) {
                 $outputString = preg_replace('/[^0-9]/', '', $row["reissueId"]);
                 $number = (int) $outputString + 1;
-                $reissueId = "FFRI$number";
+                $reissueId = "STRI$number";
             }
         } else {
-            $reissueId = "FFRI1000";
+            $reissueId = "STRI1000";
         }
 
         $paxDetails = $_POST['passengerData'];
