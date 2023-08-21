@@ -1,0 +1,71 @@
+[21-Aug-2023 15:03:02 Asia/Dhaka] PHP Warning:  Undefined array key "file" in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 92
+[21-Aug-2023 15:03:02 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 92
+[21-Aug-2023 15:03:02 Asia/Dhaka] PHP Warning:  Undefined array key "file" in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 93
+[21-Aug-2023 15:03:02 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 93
+[21-Aug-2023 15:03:02 Asia/Dhaka] PHP Warning:  Undefined array key "file" in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 94
+[21-Aug-2023 15:03:02 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 94
+[21-Aug-2023 15:04:17 Asia/Dhaka] PHP Warning:  Undefined array key "file" in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 92
+[21-Aug-2023 15:04:17 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 92
+[21-Aug-2023 15:04:17 Asia/Dhaka] PHP Warning:  Undefined array key "file" in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 93
+[21-Aug-2023 15:04:17 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 93
+[21-Aug-2023 15:04:17 Asia/Dhaka] PHP Warning:  Undefined array key "file" in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 94
+[21-Aug-2023 15:04:17 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 94
+[21-Aug-2023 15:34:32 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1 in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:34:40 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'FWRI1000' in 'where clause' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:34:48 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'FWRI1000' in 'where clause' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:35:07 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'FWRI1000' in 'where clause' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:35:13 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'FWRI1000' in 'where clause' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:35:17 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'FWRI1000' in 'where clause' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:35:21 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'FWRI1000' in 'where clause' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:35:27 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1 in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:36:33 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'FWRI1000' in 'where clause' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:36:57 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'FWRI1000' in 'where clause' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php:517
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php(517): mysqli->query()
+#1 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 517
+[21-Aug-2023 15:40:19 Asia/Dhaka] PHP Warning:  Array to string conversion in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:40:47 Asia/Dhaka] PHP Warning:  Array to string conversion in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:41:12 Asia/Dhaka] PHP Warning:  Array to string conversion in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:41:40 Asia/Dhaka] PHP Warning:  Array to string conversion in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:42:11 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:49:58 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:50:14 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:50:31 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:51:36 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519

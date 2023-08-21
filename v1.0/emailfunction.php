@@ -59,7 +59,7 @@ function sendToAdmin($subject, $message, $agentId, $header, $property, $data)
                     "
                   >
                    <a href="https://b2b.shopnotour.com//">
-                    <img style="z-index: 10000;" src="https://shopno.api.flyfarint.com/asset/company/SHOPNO_TOUR_LOGO.png" alt="Logo" >
+                    <img width:"150px" style="z-index: 10000;" src="https://shopno.api.flyfarint.com/asset/company/SHOPNO_TOUR_LOGO.png" alt="Logo" >
                    </a>
                     
                     
@@ -290,7 +290,7 @@ function sendToAgent($subject, $message, $agentId, $header, $property, $data)
                 "
               >
                <a href="https://b2b.shopnotour.com/">
-                <img style="z-index: 10000;" src="https://shopno.api.flyfarint.com/asset/company/SHOPNO_TOUR_LOGO.png" alt="Logo" >
+                <img width:"150px" style="z-index: 10000;" src="https://shopno.api.flyfarint.com/asset/company/SHOPNO_TOUR_LOGO.png" alt="Logo" >
                </a>
                 
                 

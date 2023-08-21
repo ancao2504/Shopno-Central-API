@@ -161,7 +161,7 @@ if (array_key_exists("bookingId", $_GET)) {
                       VALUES ('$bookingId','$agentId','Refund Rejected','$remarks','$actionBy','$createdTime')");
 
             if ($conn->query($sqlBooking) === true) {
-                
+
                 $subject = $header = "Booking Refund Request Cancelled";
                 $property = "Booking ID: ";
                 $data = $bookingId;
@@ -169,7 +169,7 @@ if (array_key_exists("bookingId", $_GET)) {
                 $agentMessage = " Your Booking Refund Request has been Cancelled.";
                 sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
                 sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
-                
+
                 $response['status'] = "success";
                 $response['message'] = "Refund Rejected Successfully";
             }
