@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response['message'] = 'Notes Added successfully';
     }else{
         $response['status'] = 'error';
-        $response['message'] = 'Notes Doesnt Added successfully';
+        $response['message'] = "Notes doesn't Added successfully";
     }
 
     echo json_encode($response);
