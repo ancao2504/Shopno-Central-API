@@ -84,6 +84,7 @@ if (array_key_exists("bookingId", $_GET)) {
     $bookingId = $_POST['bookingId'];
     $agentId = $_POST['agentId'];
     $actionBy = $_POST['actionBy'];
+    $reissuecharge = $_POST['reissuecharge'];
 
     $createdTime = date("Y-m-d H:i:s");
 
@@ -115,58 +116,50 @@ if (array_key_exists("bookingId", $_GET)) {
 
 
 
-    if(empty($fileName)){
-      $errorMSG = json_encode(array("message" => "please select image", "status" => false));	
+    if (empty($fileName)) {
+      $errorMSG = json_encode(array("message" => "please select image", "status" => false));
       echo $errorMSG;
-  }else{
-      $upload_path = "../../asset/Agent/$agentId/Reissue/"; // set upload folder path 
-      
+    } else {
+      $upload_path = "../../../asset/Agent/$agentId/Reissue/"; // set upload folder path 
+
       if (!file_exists($upload_path)) {
-          mkdir($upload_path, 0777, true);
+        mkdir($upload_path, 0777, true);
       }
-      
-      $fileExt = strtolower(pathinfo($fileName,PATHINFO_EXTENSION)); // get image extension
-          
+
+      $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION)); // get image extension
+
       // valid image extensions
-      $valid_extensions = array('jpeg', 'jpg', 'png', 'pdf','PDF','JPG','PNG','JPEG'); 
+      $valid_extensions = array('jpeg', 'jpg', 'png', 'pdf', 'PDF', 'JPG', 'PNG', 'JPEG');
 
-      $renameFile ="$bookingId.$fileExt";
+      $renameFile = "$reissueId.pdf";
 
-      $attach = "$upload_path/".$renameFile;
-                      
+      $attach = "$upload_path/" . $renameFile; 
+
       // allow valid image file formats
-      if(in_array($fileExt, $valid_extensions))
-      {				
-          //check file not exist our upload folder path
-          if(!file_exists($upload_path . $fileName))
-          {
-              // check file size '5MB'
-              if($fileSize < 5000000){
-                  move_uploaded_file($tempPath, $upload_path . $renameFile); 
-              }
-              else{		
-                  $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => false));	
-                  echo $errorMSG;
-              }
+      if (in_array($fileExt, $valid_extensions)) {
+        //check file not exist our upload folder path
+        if (!file_exists($upload_path . $fileName)) {
+          // check file size '5MB'
+          if ($fileSize < 5000000) {
+            move_uploaded_file($tempPath, $upload_path . $renameFile);
+          } else {
+            $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => false));
+            echo $errorMSG;
           }
-          else
-          {		
-              // check file size '5MB'
-              if($fileSize < 5000000){
-                  move_uploaded_file($tempPath, $upload_path . $renameFile);
-              }
-              else{		
-                  $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => false));	
-                  echo $errorMSG;
-              }
+        } else {
+          // check file size '5MB'
+          if ($fileSize < 5000000) {
+            move_uploaded_file($tempPath, $upload_path . $renameFile);
+          } else {
+            $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => false));
+            echo $errorMSG;
           }
+        }
+      } else {
+        $errorMSG = json_encode(array("message" => "Sorry, only JPG, JPEG, PNG & GIF files are allowed", "status" => false));
+        echo $errorMSG;
       }
-      else
-      {		
-          $errorMSG = json_encode(array("message" => "Sorry, only JPG, JPEG, PNG & GIF files are allowed", "status" => false));	
-          echo $errorMSG;		
-      }
-  }
+    }
 
     if (isset($reissueId)) {
       $sqlvoid = mysqli_query($conn, "SELECT * FROM reissue WHERE bookingId='$bookingId'");
@@ -188,23 +181,37 @@ if (array_key_exists("bookingId", $_GET)) {
       $lastAmount = $rowcheckBalanced['lastAmount'];
     }
 
+    if ($lastAmount < 1) {
+      echo (json_encode(
+        array(
+          "status" => "error",
+          "message" => "Balance is not enough"
+        )
+      )
+      );
+      exit;
+    }
+
+
     $checker = $conn->query("SELECT * FROM `reissue` WHERE bookingId='$bookingId'")->fetch_all(MYSQLI_ASSOC);
     $status = $checker[0]['status'];
     if ($status == 'approved') {
       $response['status'] = 'error';
       $response['message'] = "Booking Reissue Already Approved";
     } else {
-      //$newBalance = $lastAmount - ($reissuecharge);
-      $attachment="shopno.api.flyfarint.com/asset/Agent/$agentId/Reissue/$renameFile";
-      $sql = "UPDATE `reissue` SET `status`='approved',`charge`='',`actionBy`='$actionBy',`actionAt`='$createdTime', `attachment`='$attachment' WHERE bookingId='$bookingId' AND agentId='$agentId'";
+
+      $newBalance = $lastAmount - (int)$reissuecharge;
+      $attachment = "shopno.api.flyfarint.com/asset/Agent/$agentId/Reissue/$renameFile";
+
+      $sql = "UPDATE `reissue` SET `status`='approved',`charge`='',`actionBy`='$actionBy',`actionAt`='$createdTime', `attachment`='$attachment', `servicefee`='$reissuecharge' WHERE bookingId='$bookingId' AND agentId='$agentId'";
 
       if ($conn->query($sql) === true) {
         $details = "Reissue $TicketId Ticket Invoice $Type Air Ticket $deptFrom - $arriveTo with carrier $Airlines was Requested By $reissuerequestedBy";
 
         $conn->query("INSERT INTO `agent_ledger`(`agentId`,`reissue`, `lastAmount`, `transactionId`, `details`, `reference`, `actionBy`, `createdAt`)
-            VALUES ('$agentId','','','$bookingId','$details','$reissueId','$actionBy','$createdTime')");
+            VALUES ('$agentId','$reissuecharge','$newBalance','$bookingId','$details','$reissueId','$actionBy','$createdTime')");
 
-        $conn->query("UPDATE `booking` SET `status`='Reissued',`lastUpdated`='$createdTime' where bookingId='$bookingId'");
+        $conn->query("UPDATE `booking` SET `status`='Reissued',`lastUpdated`='$createdTime', `reissueId`='$reissueId' where bookingId='$bookingId'");
         $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
                 VALUES ('$bookingId','$agentId','Reissued',' ','$actionBy','$createdTime')");
 
@@ -220,7 +227,7 @@ if (array_key_exists("bookingId", $_GET)) {
 
         $response['status'] = "success";
         $response['message'] = "Booking Reissue Request Approved";
-        $response['reissueAttachment']=$attachment;
+        $response['reissueId'] = $reissueId;
       }
     }
 
@@ -400,17 +407,20 @@ if (array_key_exists("bookingId", $_GET)) {
       $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
                 VALUES ('$bookingId','$agentId','Reissue To Be Corfirmed','$remarks','$actionBy','$createdTime')");
 
-      
-          $response['status'] = "success";
-          $response['InvoiceId'] = "$reissueId";
-          $response['message'] = "Void Rejected Successfully";
-          $response['error'] = "Reissue Rejected Successfully";
-        
+
+      $response['status'] = "success";
+      $response['InvoiceId'] = "$reissueId";
+      $response['message'] = "Void Rejected Successfully";
+      $response['error'] = "Reissue Rejected Successfully";
+
 
       echo json_encode($response);
     }
   }
 }
+
+
+
 
 if (array_key_exists('getquotadata', $_GET)) {
   if ($_SERVER['REQUEST_METHOD'] == "POST") {
@@ -496,4 +506,16 @@ if (array_key_exists('option', $_GET)) {
       }
     }
   }
+}
+
+
+if(array_key_exists('reissueId', $_GET))
+{ 
+  $reissueId=$_GET['reissueId'];
+  $sql="SELECT attachment FROM reissue WHERE reissueId='$reissueId'";
+
+  $attachment=$conn->query($sql)->fetch_assoc();
+
+  $response['attachment'] = $attachment['attachment'];
+  echo json_encode($response);
 }
