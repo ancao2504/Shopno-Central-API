@@ -5756,37 +5756,10 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
             $JourneyDTime = date_format($JourneyDateTime, "Y-m-d H:i");
             $diff_time = round(((strtotime($travelDate)) - strtotime(date("Y-m-d H:i"))) / 3600);
 
-            if ($diff_time > 146) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+24 hours"));
-            } else if ($diff_time > 122 && $diff_time < 146) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+22 hours"));
-            } else if ($diff_time > 98 && $diff_time < 122) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+18 hours"));
-            } else if ($diff_time > 84 && $diff_time < 98) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+16 hours"));
-            } else if ($diff_time > 84 && $diff_time < 98) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+12 hours"));
-            } else if ($diff_time > 72 && $diff_time < 84) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+6 hours"));
-            } else if ($diff_time > 24 && $diff_time < 72) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+5 hours"));
-            } else if ($diff_time > 12 && $diff_time < 24) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+3 hours"));
-            } else if ($diff_time > 6 && $diff_time < 12) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+60 minutes"));
-            } else if ($diff_time > 4 && $diff_time < 6) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+20 minutes"));
-            } else if ($diff_time > 2 && $diff_time < 4) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+10 minutes"));
-            } else if ($diff_time < 2) {
-                $newTimeLimit = date("Y-m-d H:i", strtotime("+5 minutes"));
-            }
-
-            $LastTicketTime = isset($newTimeLimit) ? $newTimeLimit: '';
-
-        } else {
+            
             $LastTicketTime = $SaveBookingData["timeLimit"];
-        }
+        
+            
 
         $DateTime = date("D d M Y h:i A");
 

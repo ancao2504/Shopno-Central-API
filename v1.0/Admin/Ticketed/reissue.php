@@ -131,9 +131,12 @@ if (array_key_exists("bookingId", $_GET)) {
       // valid image extensions
       $valid_extensions = array('jpeg', 'jpg', 'png', 'pdf', 'PDF', 'JPG', 'PNG', 'JPEG');
 
-      $renameFile = "$reissueId.pdf";
 
-      $attach = "$upload_path/" . $renameFile; 
+      $renameFile = $reissueId . "." . $fileExt;
+
+
+
+      $attach = "$upload_path/" . $renameFile;
 
       // allow valid image file formats
       if (in_array($fileExt, $valid_extensions)) {
@@ -417,12 +420,7 @@ if (array_key_exists("bookingId", $_GET)) {
       echo json_encode($response);
     }
   }
-}
-
-
-
-
-if (array_key_exists('getquotadata', $_GET)) {
+} else if (array_key_exists('getquotadata', $_GET)) {
   if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $_POST = json_decode(file_get_contents('php://input'), true);
     $agentId = $_POST['agentId'];
@@ -436,8 +434,7 @@ if (array_key_exists('getquotadata', $_GET)) {
       $response['message'] = "Data Not Found";
     }
   }
-}
-if (array_key_exists('option', $_GET)) {
+} else if (array_key_exists('option', $_GET)) {
 
   if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $_POST = json_decode(file_get_contents('php://input'), true);
@@ -506,16 +503,14 @@ if (array_key_exists('option', $_GET)) {
       }
     }
   }
-}
+} else if (array_key_exists('reissueId', $_GET)) {
+  $reissueId = $_GET['reissueId'];
+  $sql = "SELECT attachment FROM reissue WHERE reissueId='$reissueId'";
 
+  $attachment = $conn->query($sql)->fetch_assoc();
 
-if(array_key_exists('reissueId', $_GET))
-{ 
-  $reissueId=$_GET['reissueId'];
-  $sql="SELECT attachment FROM reissue WHERE reissueId='$reissueId'";
-
-  $attachment=$conn->query($sql)->fetch_assoc();
-
-  $response['attachment'] = $attachment['attachment'];
-  echo json_encode($response);
+  // $response['attachment'] 
+  $url= $attachment['attachment'];
+  echo json_encode($url);
+  header("Location: https://$url");
 }
