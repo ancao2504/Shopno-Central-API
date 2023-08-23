@@ -5750,16 +5750,11 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
             $travelDate = date("Y-m-d H:i", strtotime("+6 hours"));
         }
 
-        if (empty($SaveBookingData["timeLimit"])) {
-
-            $JourneyDateTime = date_create($travelDate);
-            $JourneyDTime = date_format($JourneyDateTime, "Y-m-d H:i");
-            $diff_time = round(((strtotime($travelDate)) - strtotime(date("Y-m-d H:i"))) / 3600);
-
-            
-            $LastTicketTime = $SaveBookingData["timeLimit"];
         
-            
+
+            $LastTicketTime = isset($newTimeLimit) ? $newTimeLimit: '';
+
+        
 
         $DateTime = date("D d M Y h:i A");
 
