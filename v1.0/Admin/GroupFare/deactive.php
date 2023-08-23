@@ -7,21 +7,34 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
-    $sql = "SELECT dept1 AS dept, IF(arrive2='', arrive1, arrive2) AS arrive FROM groupfare
-    WHERE deactivated='false' AND deleted='false'
-    ORDER BY groupFareId DESC";
-    $response = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    $id = $_POST["groupfareid"];
+    // $deactivatedStatus = $_POST["deactivatedStatus"];
 
-    if (!empty($response)) {
-        echo json_encode($response);
-    } else {
+    $sql = "UPDATE groupfare SET deactivated='true' WHERE groupFareId='$id'";
+
+    if (empty($id)) {
+
         $response["status"] = "error";
-        $response["message"] = "Data Not Found";
+        $response["message"] = "groupfareid Is Missing";
         echo json_encode($response);
-    }
+        exit();
 
+    } else if ($conn->query($sql)) {
+        
+        $response["status"] = "success";
+        $response["message"] = "$id group fare is deactivated";
+        echo json_encode($response);
+
+    } else {
+        
+        $response["status"] = "error";
+        $response["message"] = "Update Failed";
+        echo json_encode($response);
+
+    }
 } else {
 
     $response["status"] = "error";

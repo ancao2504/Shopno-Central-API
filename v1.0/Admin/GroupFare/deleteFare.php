@@ -7,41 +7,38 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if($_SERVER["REQUEST_METHOD"] == "POST")
-{
-    $id=$_POST["groupfareid"];
-    $sql="DELETE FROM groupfare WHERE groupFareId='$id'";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    if(empty($id))
-    {
-        $response["status"] = "Error";
+    $id = $_POST["groupfareid"];
+    $sql = "UPDATE groupfare SET deleted='true' WHERE groupFareId='$id'";
+
+    if (empty($id)) {
+        
+        $response["status"] = "error";
         $response["message"] = "groupfareid Is Missing";
         echo json_encode($response);
         exit();
-    }
-    else if($conn->query($sql))
-    {
-        $response["status"] = "Success";
-        $response["message"] = $id."Deleted";
+
+    } else if ($conn->query($sql)) {
         
+        $response["status"] = "success";
+        $response["message"] = $id . "Deleted";
         echo json_encode($response);
-    }
-    else
-    {
-        $response["status"] = "Failed";
+
+    } else {
+        
+        $response["status"] = "error";
         $response["message"] = "Delete Failed";
-        
         echo json_encode($response);
+
     }
-}
-else
-{
-    $response["status"] = "Failed";
-    $response["message"] = "Wrong Request Method";
+
+} else {
     
+    $response["status"] = "error";
+    $response["message"] = "Wrong Request Method";
     echo json_encode($response);
+
 }
 
 $conn->close();
-
-?>
