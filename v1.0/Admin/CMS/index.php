@@ -10,17 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_POST = json_decode(file_get_contents('php://input'), true);
     if (array_key_exists("option", $_GET)) {
         $Option = $_GET['option'];
-        if($Option == 'all'){
-            $data = $conn->query("SELECT * FROM cms")->fetch_all(MYSQLI_ASSOC);
-            if(!empty($data)){
-                echo json_encode($data);
-            }else {
-                $response['status'] = 'error';
-                $response['message'] = "Data not found";
-                echo json_encode($response);
-            }
-
-        }else if ($Option == 'companylogo') {
+         if ($Option == 'companylogo') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
             $fileSize = $_FILES['file']['size'];
@@ -800,6 +790,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo json_encode($response);
         }
 
+    }
+
+}else if(array_key_exists('all', $_GET)){
+    $data = $conn->query("SELECT * FROM cms")->fetch_all(MYSQLI_ASSOC);
+    if(!empty($data)){
+        echo json_encode($data);
+    }else {
+        $response['status'] = 'error';
+        $response['message'] = "Data not found";
+        echo json_encode($response);
     }
 
 }
