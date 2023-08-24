@@ -74,7 +74,7 @@ function saveData($conn, $tran_id, $amount, $agentId, $bank_trxId)
         $DepositId = "STD$number";
       }
     } else {
-      $DepositId = "STD1000";
+      $DepositId ="STD1000";
     }
 
     $agentdata = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'"), MYSQLI_ASSOC);

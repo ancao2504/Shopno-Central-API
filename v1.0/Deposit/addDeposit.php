@@ -51,7 +51,7 @@ if (
             $DepositId = "STD$number";
         }
     } else {
-        $DepositId = "STD1000";
+        $DepositId ="STD1000";
     }
 
 

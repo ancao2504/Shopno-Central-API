@@ -7,231 +7,153 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-
-function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName, $name)
-{           
-            $tempname=$_FILES[$imagename]['tmp_name'];
-            $filesize=$_FILES[$imagename]['size'];
-
-            $validExt=['jpg', 'jpeg', 'png'];
-            $fileExt= strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-            
-            $imageType=substr($imagename,0,-1);
-            $savedFileName=$name.$imageType.'.'.$fileExt;
-            
-            if (!file_exists($cdnpath)) {
-                mkdir($cdnpath, 0777, true);
-            }
-
-            if(in_array($fileExt, $validExt))
-            {
-                if($filesize<$acceptablesize)
-                {
-                    move_uploaded_file($tempname, $cdnpath.$savedFileName);
-                    return $savedFileName;
-                }
-                else
-                {
-                    echo json_encode(
-                        array(
-                            "status" => "error",
-                            "message" => "Large Image Size"
-                        )
-                
-                        );
-                        return 'Not Found';
-                }
-            }
-            else
-            {
-                echo json_encode(
-                    array(
-                        "status" => "error",
-                        "message" => "Invalid Extension"
-                    )
-                    );
-                    return 'Not Found';
-            }
-}
-
-
-if($_SERVER["REQUEST_METHOD"]=="POST")
-{   
-
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // echo $_POST["requestedBody"];
-    $jsonData = json_decode($_POST["requestedBody"], true);
+    $jsonData = json_decode(file_get_contents('php://input'), true);
     // echo json_encode($jsonData);
-    $flightData=$jsonData["flightData"];
-    
+
+
     // $passengersNames=json_decode($_POST["travelerNames"], true);
-    $gfId=$jsonData["groupFareId"];
-    $agentId=$jsonData["agentId"];
-    $name=$jsonData["name"];
-    $phone=$jsonData["phone"];
-    $email=$jsonData["email"];
-    $platform=$jsonData["platform"];
-    $segment=$flightData["segment"];
-    
-    $dept1=$flightData["dept1"];
-    $arrive1=$flightData["arrive1"];
-    $dept2=$flightData["dept2"];
-    $arrive2=$flightData["arrive2"];
-    $carrierName1=$flightData["carrierName1"];
-    $carrierName2=$flightData["carrierName2"];
-    $flightNum1=$flightData["flightNum1"];
-    $flightNum2=$flightData["flightNum2"];
-    $flightCode1=$flightData["flightCode1"];
-    $flightCode2=$flightData["flightCode2"];
-    $cabin1=$flightData["cabin1"];
-    $cabin2=$flightData["cabin2"];
-    $class1=$flightData["cabin1"];
-    $class2=$flightData["cabin2"];
-    $baggage1=$flightData["baggage1"];
-    $baggage2=$flightData["baggage2"];
-    $travelTime1=$flightData["travelTime1"];
-    $travelTime2=$flightData["travelTime2"];
-    $transitTime=$flightData["transitTime"];
-    $netCost=$flightData["netCost"];
-    $pax=$flightData["pax"];
-    
-    
+    $gfId = $jsonData["groupFareId"];
+    $agentId = $jsonData["agentId"];
+    $name = $jsonData["name"];
+    $phone = $jsonData["phone"];
+    $email = $jsonData["email"];
+    $pax = $jsonData["pax"];
+    $grossCost = $jsonData["grossCost"];
+    $platform = "B2B";
+
+    // echo json_encode($jsonData);
+
+
+    /* The line of code is executing a SQL query to select all the columns and rows from the "groupfare"
+table where the "groupFareId" column matches the value of the variable "". The fetch_all()
+function is then used to retrieve all the rows returned by the query as an array. */
+    $flightData = $conn->query("SELECT * FROM groupfare WHERE groupFareId='$gfId'")->fetch_assoc();
+
+    $dept1 = $flightData["dept1"];
+    $arrive1 = $flightData["arrive1"];
+    $dept2 = $flightData["dept2"];
+    $arrive2 = $flightData["arrive2"];
+    $carrierName1 = $flightData["carrierName1"];
+    $carrierName2 = $flightData["carrierName2"];
+    $flightNum1 = $flightData["flightNum1"];
+    $flightNum2 = $flightData["flightNum2"];
+    $flightCode1 = $flightData["flightCode1"];
+    $flightCode2 = $flightData["flightCode2"];
+    $cabin1 = $flightData["cabin1"];
+    $cabin2 = $flightData["cabin2"];
+    $class1 = $flightData["cabin1"];
+    $class2 = $flightData["cabin2"];
+    $baggage1 = $flightData["baggage1"];
+    $baggage2 = $flightData["baggage2"];
+    $travelTime1 = $flightData["travelTime1"];
+    $travelTime2 = $flightData["travelTime2"];
+    $transitTime = $flightData["transitTime"];
+    $availableSeat = $flightData["availableSeat"];
+    $segment = $flightData["segment"];
+    $deptTime1=$flightData["deptTime1"];
+    $deptTime2=$flightData["deptTime2"];
     $currentDateTime = date('Y-m-d H:i:s');
-    
-    $arrival= (isset($dept2))? $dept2:$dept1;
-    $airlines= $carrierName1." and ".$carrierName2;
 
+    $arrival = (empty($dept2)) ? $arrive1 : $arrive2;
+    $airlines = $carrierName1 . "," . $carrierName2;
    
+    /* This code block is checking if the number of groupfare passengers is greater than the available
+    seats left in the group fare, which can be found in database. 
+    This is a validation check to ensure that the number of passengers does not exceed the available
+    seats before proceeding with the booking process. */
 
 
-
-
-    $bookingId ="";
-        $sql = "SELECT * FROM booking ORDER BY id DESC LIMIT 1";
-        $result = $conn->query($sql);
-        if ($result->num_rows > 0) {
-            while($row = $result->fetch_assoc()) {
-                
-                $outputString = preg_replace('/[^0-9]/', '', $row["bookingId"]); 
-                
-                $number= (int)$outputString + 1;
-                
-                $bookingId = "STB$number"; 								
-            }
-        } else {
-            $bookingId ="STB1000";
-        }
-
-        
-    $sql="
-    INSERT booking
-    (bookingId, agentId, email, phone, name, pax, deptFrom, airlines, arriveTo, gds_segment, status, travelDate, 
-    bookedAt, platform, netCost, bookingType, groupFareId)
-    VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
-    '$platform', '$netCost', 'groupfare', '$gfId')";
-
-        
-    
-    $message="";
-    $book=($conn->query($sql))?true:false;
-    
-    $sql="UPDATE groupfare SET 
-        availableSeat=availableSeat-'$pax' 
-        WHERE groupFareId='$gfId'";
-
-   
-    if($conn->query($sql))
-    {
-        
-    }
-    else
-    {   $response["status"]= "Failed";
-        $response["message"] = "Available Seat Update Failed";
+    if ($pax > $availableSeat) {
+        $response["pax"] = $pax;
+        $response["availableSeat"] = $availableSeat;
+        $response["status"] = "error";
+        $response["message"] = "pax is more than available seats";
         echo json_encode($response);
+        exit;
     }
 
+    $sql = "SELECT lastAmount FROM agent_ledger WHERE agentId='$agentId' ORDER BY id DESC";
 
-    
+    /* This code block is checking if the agent has sufficient balance in their ledger to make the
+    group fare booking. */
+    if ($row = $conn->query($sql)->fetch_assoc()) {
 
-    $values="";
-            for($i=0; $i<$pax; $i++)
-            {
-                
-                $paxId ="";
-                $sql = "SELECT * FROM passengers ORDER BY id DESC LIMIT 1";
+        $lastAmount = $row['lastAmount'];
+
+        if ($lastAmount >= $grossCost) {
+            // echo("$lastAmount\n$grossCost\n");
+            $newAmount = $lastAmount - $grossCost;
+            // echo("$newAmount\n");
+            $sql = "INSERT INTO agent_ledger (agentId, purchase, lastAmount, transactionId, details, reference, actionBy, createdAt)
+            VALUES ('$agentId', '$grossCost', '$newAmount', '$gfId', 'Group Fare Booking', '$gfId', '$agentId' ,'$currentDateTime')";
+
+            if ($conn->query($sql)) {
+
+                $bookingId = "";
+                $sql = "SELECT * FROM booking ORDER BY id DESC LIMIT 1";
                 $result = $conn->query($sql);
+
                 if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        
-                        $outputString = preg_replace('/[^0-9]/', '', $row["paxId"]); 
-                        
-                        $number= (int)$outputString + 1;
-                        
-                        $paxId = "STP$number"; 								
+
+                    while ($row = $result->fetch_assoc()) {
+
+                        $outputString = preg_replace('/[^0-9]/', '', $row["bookingId"]);
+                        $number = (int)$outputString + 1;
+                        $bookingId = "STB$number";
                     }
                 } else {
-                    $paxId ="STP1000";
+                    $bookingId = "STB1000";
                 }
-                $passInd="passport".$i;
-                $visaInd="visa".$i;
-                $passCopy= $_FILES[$passInd]["name"];
-                $visaCopy= $_FILES[$visaInd]["name"];
-                $passenger="travelername".$i;
-                $name=$_POST[$passenger];
 
-                $passCopy=uploadImage($passInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/PassportCopy/", $passCopy, $name);
-                $visaCopy=uploadImage($visaInd, 5000000, "../../asset/Passenger/$agentId/$bookingId/VisaCopy/", $visaCopy, $name);
-                $values=$values."('$name','$paxId','$agentId','$bookingId','$passInd','$visaInd', '$currentDateTime'),";
+                $sql = "INSERT gf_booking
+                (bookingId, agentId, customer_email, customer_phone, customer_name, pax, deptFrom, airlines, arriveTo, segment, `status`, travelDate, 
+                bookedAt,  grossCost, groupFareId)
+                VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Issued', '$deptTime1', '$currentDateTime',
+                 '$grossCost', '$gfId')";
 
+                // echo ($sql); exit;
+                if ($conn->query($sql)) {
+
+                    /* The code is updating the `availableSeat` column in the `groupfare` table by
+                    subtracting the value of `` (number of passengers) from the current value of
+                    `availableSeat`. It is updating the row where the `groupFareId` matches the
+                    value of ``. */
+                    $sql = "UPDATE groupfare SET 
+                    availableSeat=availableSeat-'$pax' 
+                    WHERE groupFareId='$gfId'";
+
+                    if ($conn->query($sql)) {
+                        $response["status"] = "success";
+                        $response["message"] = "Group Fare Booked Successfully";
+                    } else {
+                        $response["status"] = "error";
+                        $response["message"] = "Available Seat Update Failed";
+                    }
+                } else {
+                    $response["status"] = "error";
+                    $response["message"] = "Booking Failed";
+                }
+            } else {
+                $response["status"] = "error";
+                $response["message"] = "Insert Ledger Failed";
             }
+        } else {
 
-            $newValues=substr($values,0,-1);
+            $response["status"] = "error";
+            $response["message"] = "Insufficient Balance";
+        }
+    } else {
 
-            $sql="INSERT INTO passengers 
-            (fName,paxId,agentId, bookingId, passportCopy, visaCopy, created)
-            VALUES".$newValues;
-            
-            if($conn->query($sql))
-            {
-                if($book)
-                {
-                    $response["status"] = "Success";
-                    $response["message"] = "Booking and Passenger Added Successfully";
-                    $response["bookingId"]=$bookingId;
-                    
-                    
-                }
-                else
-                {
-                    $response["status"] = "Failed";
-                    $response["message"] = "Passenger Add Done But Boooking Failed";
-                }
-                
-            }
-            else
-            {
-                if($book)
-                {
-                    $response["status"] = "Failed";
-                    $response["message"] = "Booking Done But Passenger Add Failed";
-                }
-                else
-                {
-                    $response["status"] = "Failed";
-                    $response["message"] = "Booking and Passenger Add Failed";
-                }
-            }        
+        $response["status"] = "error";
+        $response["message"] = "Ledger not found";
+    }
+} else {
 
-            echo json_encode($response);
-            
-}
-else
-{
-    $response["status"] = "Failed";
+    $response["status"] = "error";
     $response["message"] = "Wrong Request Method";
-        
-    echo json_encode($response);
 }
 
-
-?>
+echo json_encode($response);

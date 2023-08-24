@@ -44,6 +44,7 @@ if (array_key_exists("bookingId", $_GET)) {
         $bookingId = $_POST['bookingId'];
         $agentId = $_POST['agentId'];
         $actionBy = $_POST['actionBy'];
+        $voidId = $_POST['voidId'];
 
 
         $createdTime = date("Y-m-d H:i:s");
@@ -54,7 +55,6 @@ if (array_key_exists("bookingId", $_GET)) {
             $rowTravelDate = mysqli_fetch_array($sqlTravelDate, MYSQLI_ASSOC);
 
             if (!empty($rowTravelDate)) {
-                $voidId = $rowTravelDate['voidId'];
                 $travelDate = $rowTravelDate['travelDate'];
                 $staffId = $rowTravelDate['staffId'];
                 $subagentId = $rowTravelDate["subagentId"];
@@ -74,7 +74,7 @@ if (array_key_exists("bookingId", $_GET)) {
         }
 
         if ($status == 'Void In Processing') {
-
+          
             if (isset($agentId)) {
                 $sql1 = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
                 $row1 = mysqli_fetch_array($sql1, MYSQLI_ASSOC);

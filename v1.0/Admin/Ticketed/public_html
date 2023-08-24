@@ -69,3 +69,40 @@ Stack trace:
 [21-Aug-2023 15:50:14 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
 [21-Aug-2023 15:50:31 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
 [21-Aug-2023 15:51:36 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:57:43 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:59:16 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 15:59:29 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 16:01:07 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 16:07:50 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 16:07:53 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 16:09:37 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 16:18:36 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 16:24:25 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 16:39:45 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[21-Aug-2023 17:13:01 Asia/Dhaka] PHP Warning:  Undefined array key "bookingId" in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/refund.php on line 44
+[21-Aug-2023 17:13:01 Asia/Dhaka] PHP Warning:  Undefined variable $status in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/refund.php on line 73
+[21-Aug-2023 17:13:13 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 08:41:24 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 08:51:46 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 08:51:52 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 08:57:14 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 08:58:05 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 08:59:28 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 08:59:31 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:01:23 Asia/Dhaka] PHP Warning:  Undefined array key "bookingId" in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/refund.php on line 44
+[22-Aug-2023 09:01:23 Asia/Dhaka] PHP Warning:  Undefined variable $status in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/refund.php on line 73
+[22-Aug-2023 09:01:42 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:04:27 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:08:37 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:09:16 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:10:57 Asia/Dhaka] PHP Warning:  Undefined array key "bookingId" in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/refund.php on line 44
+[22-Aug-2023 09:10:57 Asia/Dhaka] PHP Warning:  Undefined variable $status in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/refund.php on line 73
+[22-Aug-2023 09:11:01 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:11:28 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:12:12 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:12:38 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:13:06 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:35:01 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:39:11 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:56:49 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
+[22-Aug-2023 09:58:27 Asia/Dhaka] PHP Warning:  Trying to access array offset on value of type null in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Ticketed/reissue.php on line 519
