@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = $jsonData["phone"];
     $email = $jsonData["email"];
     $pax = $jsonData["pax"];
-    $netCost = $jsonData["netCost"];
+    $grossCost = $jsonData["grossCost"];
     $platform = "B2B";
 
     // echo json_encode($jsonData);
@@ -53,12 +53,13 @@ function is then used to retrieve all the rows returned by the query as an array
     $transitTime = $flightData["transitTime"];
     $availableSeat = $flightData["availableSeat"];
     $segment = $flightData["segment"];
-
+    $deptTime1=$flightData["deptTime1"];
+    $deptTime2=$flightData["deptTime2"];
     $currentDateTime = date('Y-m-d H:i:s');
 
-    $arrival = (isset($dept2)) ? $dept2 : $dept1;
+    $arrival = (empty($dept2)) ? $arrive1 : $arrive2;
     $airlines = $carrierName1 . "," . $carrierName2;
-
+   
     /* This code block is checking if the number of groupfare passengers is greater than the available
     seats left in the group fare, which can be found in database. 
     This is a validation check to ensure that the number of passengers does not exceed the available
@@ -74,7 +75,7 @@ function is then used to retrieve all the rows returned by the query as an array
         exit;
     }
 
-    $sql = "SELECT lastAmount FROM agent_ledger WHERE agentId='$agentId'";
+    $sql = "SELECT lastAmount FROM agent_ledger WHERE agentId='$agentId' ORDER BY id DESC";
 
     /* This code block is checking if the agent has sufficient balance in their ledger to make the
     group fare booking. */
@@ -82,11 +83,12 @@ function is then used to retrieve all the rows returned by the query as an array
 
         $lastAmount = $row['lastAmount'];
 
-        if ($lastAmount >= $netCost) {
-
-            $newAmount = $lastAmount - $netCost;
-            $sql = "INSERT INTO agent_ledger (agentId, lastAmount, transactionId, details, reference, actionBy, createdAt)
-            VALUES ('$agentId', '$newAmount', '$gfId', 'Group Fare Booking', '$gfId-$agentId-$email', '$agentId' ,'$currentDateTime')";
+        if ($lastAmount >= $grossCost) {
+            // echo("$lastAmount\n$grossCost\n");
+            $newAmount = $lastAmount - $grossCost;
+            // echo("$newAmount\n");
+            $sql = "INSERT INTO agent_ledger (agentId, purchase, lastAmount, transactionId, details, reference, actionBy, createdAt)
+            VALUES ('$agentId', '$grossCost', '$newAmount', '$gfId', 'Group Fare Booking', '$gfId', '$agentId' ,'$currentDateTime')";
 
             if ($conn->query($sql)) {
 
@@ -106,13 +108,13 @@ function is then used to retrieve all the rows returned by the query as an array
                     $bookingId = "STB1000";
                 }
 
-                $sql = "INSERT booking
-                (bookingId, agentId, email, phone, `name`, pax, deptFrom, airlines, arriveTo, gds_segment, `status`, travelDate, 
-                bookedAt, platform, netCost, bookingType, groupFareId)
-                VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Hold', '$travelTime1', '$currentDateTime',
-                '$platform', '$netCost', 'groupfare', '$gfId')";
+                $sql = "INSERT gf_booking
+                (bookingId, agentId, customer_email, customer_phone, customer_name, pax, deptFrom, airlines, arriveTo, segment, `status`, travelDate, 
+                bookedAt,  grossCost, groupFareId)
+                VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Issued', '$deptTime1', '$currentDateTime',
+                 '$grossCost', '$gfId')";
 
-
+                // echo ($sql); exit;
                 if ($conn->query($sql)) {
 
                     /* The code is updating the `availableSeat` column in the `groupfare` table by
