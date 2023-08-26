@@ -36,8 +36,6 @@ function is then used to retrieve all the rows returned by the query as an array
     $arrive1 = $flightData["arrive1"];
     $dept2 = $flightData["dept2"];
     $arrive2 = $flightData["arrive2"];
-    $carrierName1 = $flightData["carrierName1"];
-    $carrierName2 = $flightData["carrierName2"];
     $flightNum1 = $flightData["flightNum1"];
     $flightNum2 = $flightData["flightNum2"];
     $flightCode1 = $flightData["flightCode1"];
@@ -56,9 +54,12 @@ function is then used to retrieve all the rows returned by the query as an array
     $deptTime1=$flightData["deptTime1"];
     $deptTime2=$flightData["deptTime2"];
     $currentDateTime = date('Y-m-d H:i:s');
+    $carrierName1 = json_decode($flightData["carrierName1"],true);
+    $carrierName2 = json_decode($flightData["carrierName2"],true);
+
 
     $arrival = (empty($dept2)) ? $arrive1 : $arrive2;
-    $airlines = $carrierName1 . "," . $carrierName2;
+    $airlines = $carrierName1["name"] . "," . $carrierName2["name"];
    
     /* This code block is checking if the number of groupfare passengers is greater than the available
     seats left in the group fare, which can be found in database. 
@@ -75,7 +76,7 @@ function is then used to retrieve all the rows returned by the query as an array
         exit;
     }
 
-    $sql = "SELECT lastAmount FROM agent_ledger WHERE agentId='$agentId' ORDER BY id DESC";
+    $sql = "SELECT lastAmount FROM agent_ledger WHERE agentId='$agentId' ORDER BY id DESC LIMIT 1";
 
     /* This code block is checking if the agent has sufficient balance in their ledger to make the
     group fare booking. */
@@ -87,13 +88,15 @@ function is then used to retrieve all the rows returned by the query as an array
             // echo("$lastAmount\n$grossCost\n");
             $newAmount = $lastAmount - $grossCost;
             // echo("$newAmount\n");
+            $details="GFBOOKING-$gfId"."_PAX-$pax";
+            
             $sql = "INSERT INTO agent_ledger (agentId, purchase, lastAmount, transactionId, details, reference, actionBy, createdAt)
-            VALUES ('$agentId', '$grossCost', '$newAmount', '$gfId', 'Group Fare Booking', '$gfId', '$agentId' ,'$currentDateTime')";
+            VALUES ('$agentId', '$grossCost', '$newAmount', '$gfId', '$details', '$gfId', '$agentId' ,'$currentDateTime')";
 
             if ($conn->query($sql)) {
 
                 $bookingId = "";
-                $sql = "SELECT * FROM booking ORDER BY id DESC LIMIT 1";
+                $sql = "SELECT * FROM gf_booking ORDER BY id DESC LIMIT 1";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -102,10 +105,10 @@ function is then used to retrieve all the rows returned by the query as an array
 
                         $outputString = preg_replace('/[^0-9]/', '', $row["bookingId"]);
                         $number = (int)$outputString + 1;
-                        $bookingId = "STB$number";
+                        $bookingId = "STGFB$number";
                     }
                 } else {
-                    $bookingId = "STB1000";
+                    $bookingId = "STGFB1000";
                 }
 
                 $sql = "INSERT gf_booking

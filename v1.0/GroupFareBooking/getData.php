@@ -28,16 +28,22 @@ if(array_key_exists("all", $_GET))
         echo json_encode($response);
     }
 
-}else if(array_key_exists("bookingId", $_GET) ){
+}else if(array_key_exists("bookingId", $_GET) && array_key_exists("gfId", $_GET) ){
        
     $bookingId = $_GET["bookingId"];
+    $gfId= $_GET["gfId"];
+
+       $sql0="SELECT * FROM gf_booking WHERE bookingId = '$bookingId' AND groupFareId = '$gfId'";
+       $sql1="SELECT * FROM groupfare WHERE groupFareId = '$gfId'";
+      
+       $bookingInfo=$conn->query($sql0)->fetch_assoc();
+       $groupFareInfo=$conn->query($sql1)->fetch_assoc();
        
-       $sql1="SELECT * FROM gf_booking WHERE bookingId = '$bookingId'";
-       
-       $response=$conn->query($sql1)->fetch_all(MYSQLI_ASSOC);
-       
-       if(!empty($response))
-        {
+       if(!empty($bookingInfo) && !empty($groupFareInfo))
+        {   
+            $response["bookingInfo"]=$bookingInfo;
+            $response["groupFareInfo"]=$groupFareInfo;
+
            echo json_encode($response);
         }
         else
@@ -51,7 +57,7 @@ if(array_key_exists("all", $_GET))
 }
 else if(array_key_exists("gfId", $_GET) ){
        
-    $bookingId = $_GET["gfId"];
+    $gfId = $_GET["gfId"];
        
        $sql1="SELECT * FROM gf_booking WHERE groupFareId = '$gfId'";
        

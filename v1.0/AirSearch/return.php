@@ -27,12 +27,13 @@ $Airportsql =  "SELECT name, cityName,countryCode FROM airports WHERE";
 $Gallpax= array();
 		
 if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) && array_key_exists("departuredate",$_GET) &&
- 	array_key_exists("returndate",$_GET) && array_key_exists("adult",$_GET) && (array_key_exists("child",$_GET) && array_key_exists("infant",$_GET))){
+ 	array_key_exists("returndate",$_GET) && array_key_exists("adult",$_GET) && (array_key_exists("child",$_GET) && array_key_exists("infant",$_GET)&& array_key_exists("agentId", $_GET))){
 				
 	$From = $_GET['journeyfrom'];
 	$To = $_GET['journeyto'];
 	$dDate = $_GET['departuredate'];
 	$rDate = $_GET['returndate'];
+	$agentId = $_GET['agentId'];
 	$DepartureDate = $dDate."T00:00:00";
 	$ReturnDate = $rDate."T00:00:00";
 
@@ -490,7 +491,61 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 				}
 
 
-					
+				//Agent MarkUP
+				$agentMarksql = mysqli_query($conn,"SELECT dMarkup,iMarkup, dMarkupType,iMarkupType, alliMarkup,alldMarkup,alliMarkupType,alldMarkupType FROM agent WHERE agentId='$agentId' ");
+				$agentmarkrow = mysqli_fetch_array($agentMarksql,MYSQLI_ASSOC);
+
+			   //Individual Markup
+			    if(!empty($agentmarkrow) && (empty($agentmarkrow['alliMarkup']) && empty($agentmarkrow['alldMarkup']) )){
+			   	 $imarkuptype = $agentmarkrow['iMarkupType'];
+			   	 $dmarkuptype = $agentmarkrow['dMarkupType'];
+			   	 if($imarkuptype == 'amount' || $dmarkuptype == 'amount'){
+			   		 if($TripType == 'Inbound'){
+			   			  $markup = $agentmarkrow['dMarkup'];
+			   		 }else{
+			   			  $markup = $agentmarkrow['iMarkup'];
+			   		 }
+			   		 $MarkupPrice = $AgentPrice + $markup; 
+					   
+						 
+			   	 }else if($imarkuptype == 'percentage' || $dmarkuptype == 'percentage'){
+			   		 if($TripType == 'Inbound'){
+			   			  $markup = $agentmarkrow['dMarkup'];
+			   		 }else{
+			   			  $markup = $agentmarkrow['iMarkup'];
+			   		 }
+			   		$MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup/100))); 
+						
+			   	 }else{
+			   		 $MarkupPrice = $AgentPrice;
+			   	 }                          					
+			    }else if(!empty($agentmarkrow) && (empty($agentmarkrow['dMarkup']) && empty($agentmarkrow['iMarkup']))){ // All Markup
+				   $imarkuptype = $agentmarkrow['alliMarkupType'];
+				   $dmarkuptype = $agentmarkrow['alldMarkupType'];
+				   if($imarkuptype == 'amount' || $dmarkuptype == 'amount'){
+					   if($TripType == 'Inbound'){
+							$markup = $agentmarkrow['alldMarkup'];
+					   }else{
+							$markup = $agentmarkrow['alliMarkup'];
+					   }
+					   $MarkupPrice = $AgentPrice + $markup;
+					  
+				   }else if($imarkuptype == 'percentage' || $dmarkuptype == 'percentage'){
+					   if($TripType == 'Inbound'){
+							$markup = $agentmarkrow['alldMarkup'];
+					   }else{
+							$markup = $agentmarkrow['alliMarkup'];
+					   }
+					  $MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup/100))); 
+					   
+				   }else{
+					   $MarkupPrice = $AgentPrice;
+				   }                          					
+			   }else{
+				   $MarkupPrice = $AgentPrice; 
+				   
+			   }
+			   
 				//Go
 				$ref1 = $var['legs'][0]['ref'];
 				$id1 = $ref1 - 1;
@@ -737,7 +792,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 									"lastTicketTime"=> "$timelimit",
 									"basePrice" => $baseFareAmount ,
 									"taxes" => $totalTaxAmount,
-									"price" => "$AgentPrice",
+									"price" => "$MarkupPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
 									"comissiontype"=> $ComissionType,
@@ -1240,7 +1295,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 									"lastTicketTime"=> "$timelimit",
 									"basePrice" => $baseFareAmount ,
 									"taxes" => $totalTaxAmount,
-									"price" => "$AgentPrice",
+									"price" => "$MarkupPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
 									"comissiontype"=> $ComissionType,
@@ -1939,7 +1994,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 									"lastTicketTime"=> "$timelimit",
 									"basePrice" => $baseFareAmount ,
 									"taxes" => $totalTaxAmount,
-									"price" => "$AgentPrice",
+									"price" => "$MarkupPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
 									"comissiontype"=> $ComissionType,
@@ -2303,7 +2358,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 									"lastTicketTime"=> "$timelimit",
 									"basePrice" => $baseFareAmount ,
 									"taxes" => $totalTaxAmount,
-									"price" => "$AgentPrice",
+									"price" => "$MarkupPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
 									"comissiontype"=> $ComissionType,
@@ -2663,7 +2718,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 									"lastTicketTime"=> "$timelimit",
 									"basePrice" => $baseFareAmount ,
 									"taxes" => $totalTaxAmount,
-									"price" => "$AgentPrice",
+									"price" => "$MarkupPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
 									"comissiontype"=> $ComissionType,
@@ -9033,5 +9088,3 @@ function TimeConvert($startDate, $endDate){
 	$minutes = $interval->format('%i');
 	return  $hours."H ".$minutes."M";
 }
-
-?>

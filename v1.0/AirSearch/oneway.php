@@ -29,7 +29,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
     $adult = $_GET['adult'];
     $child = $_GET['child'];
     $infants = $_GET['infant'];
-	$agentId = $_GET['agentId'];
+    $agentId = $_GET['agentId'];
 
     // Trip Type
     $fromsql = mysqli_query($conn, "SELECT name, cityName, countryCode FROM airports WHERE code='$From' ");
@@ -78,7 +78,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 				"Code": "INF",
 				"Quantity": ' . $infants . '
 			}';
-
     } else if ($adult > 0 && $child > 0) {
 
         $SabreRequest = '{
@@ -89,7 +88,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 					"Code": "C09",
 					"Quantity": ' . $child . '
 				}';
-
     } else if ($adult > 0 && $infants > 0) {
         $SabreRequest = '{
 				"Code": "ADT",
@@ -99,7 +97,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 					"Code": "INF",
 					"Quantity": ' . $infants . '
 				}';
-
     } else {
         $SabreRequest = '{
 					"Code": "ADT",
@@ -173,7 +170,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
         $headers = array(
             'Authorization: Basic ' . $token,
             'Accept: /',
-            'Content-Type: application/x-www-form-urlencoded');
+            'Content-Type: application/x-www-form-urlencoded'
+        );
 
         $ch = curl_init();
         //curl_setopt($ch,CURLOPT_URL,"https://api-crt.cert.havail.sabre.com/v2/auth/token");
@@ -292,31 +290,36 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $infantBasePrice = $PriceInfo[2]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $infantTaxAmount = $PriceInfo[2]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
 
-                    $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
-                        "Tax" => "$adultTaxAmount",
-                        "PaxCount" => $adult,
-                        "PaxType" => "ADT",
-                        "Discount" => "0",
-                        "OtherCharges" => "$OtherCharges",
-                        "ServiceFee" => "0")
-                        ,
-                        "1" => array("BaseFare" => "$childBasePrice",
+                    $PriceBreakDown = array(
+                        "0" => array(
+                            "BaseFare" => "$adultBasePrice",
+                            "Tax" => "$adultTaxAmount",
+                            "PaxCount" => $adult,
+                            "PaxType" => "ADT",
+                            "Discount" => "0",
+                            "OtherCharges" => "$OtherCharges",
+                            "ServiceFee" => "0"
+                        ),
+                        "1" => array(
+                            "BaseFare" => "$childBasePrice",
                             "Tax" => "$childTaxAmount",
                             "PaxCount" => $child,
                             "PaxType" => "CNN",
                             "Discount" => "0",
                             "OtherCharges" => "$OtherCharges",
-                            "ServiceFee" => "0"),
-                        "2" => array("BaseFare" => "$infantBasePrice",
+                            "ServiceFee" => "0"
+                        ),
+                        "2" => array(
+                            "BaseFare" => "$infantBasePrice",
                             "Tax" => "$infantTaxAmount",
                             "PaxCount" => $infants,
                             "PaxType" => "INF",
                             "Discount" => "0",
                             "OtherCharges" => "$OtherCharges",
-                            "ServiceFee" => "0"),
+                            "ServiceFee" => "0"
+                        ),
 
                     );
-
                 } else if ($adult > 0 && $child > 0) {
                     $adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
@@ -324,24 +327,27 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $childBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $childTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
 
-                    $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
-                        "Tax" => "$adultTaxAmount",
-                        "PaxCount" => $adult,
-                        "PaxType" => "ADT",
-                        "Discount" => "0",
-                        "OtherCharges" => "$OtherCharges",
-                        "ServiceFee" => "0")
-                        ,
-                        "1" => array("BaseFare" => "$childBasePrice",
+                    $PriceBreakDown = array(
+                        "0" => array(
+                            "BaseFare" => "$adultBasePrice",
+                            "Tax" => "$adultTaxAmount",
+                            "PaxCount" => $adult,
+                            "PaxType" => "ADT",
+                            "Discount" => "0",
+                            "OtherCharges" => "$OtherCharges",
+                            "ServiceFee" => "0"
+                        ),
+                        "1" => array(
+                            "BaseFare" => "$childBasePrice",
                             "Tax" => "$childTaxAmount",
                             "PaxCount" => $child,
                             "PaxType" => "CNN",
                             "Discount" => "0",
                             "OtherCharges" => "$OtherCharges",
-                            "ServiceFee" => "0"),
+                            "ServiceFee" => "0"
+                        ),
 
                     );
-
                 } else if ($adult > 0 && $infants > 0) {
                     $adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
@@ -349,36 +355,42 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $infantBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $infantTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
 
-                    $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
-                        "Tax" => "$adultTaxAmount",
-                        "PaxCount" => $adult,
-                        "PaxType" => "ADT",
-                        "Discount" => "0",
-                        "OtherCharges" => "$OtherCharges",
-                        "ServiceFee" => "0")
-                        ,
-                        "1" => array("BaseFare" => "$infantBasePrice",
+                    $PriceBreakDown = array(
+                        "0" => array(
+                            "BaseFare" => "$adultBasePrice",
+                            "Tax" => "$adultTaxAmount",
+                            "PaxCount" => $adult,
+                            "PaxType" => "ADT",
+                            "Discount" => "0",
+                            "OtherCharges" => "$OtherCharges",
+                            "ServiceFee" => "0"
+                        ),
+                        "1" => array(
+                            "BaseFare" => "$infantBasePrice",
                             "Tax" => "$infantTaxAmount",
                             "PaxCount" => $infants,
                             "PaxType" => "INF",
                             "Discount" => "0",
                             "OtherCharges" => "$OtherCharges",
-                            "ServiceFee" => "0"),
+                            "ServiceFee" => "0"
+                        ),
 
                     );
-
                 } else if ($adult > 0) {
 
                     $adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
 
-                    $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
-                        "Tax" => "$adultTaxAmount",
-                        "PaxCount" => $adult,
-                        "PaxType" => "ADT",
-                        "Discount" => "0",
-                        "OtherCharges" => "$OtherCharges",
-                        "ServiceFee" => "0"),
+                    $PriceBreakDown = array(
+                        "0" => array(
+                            "BaseFare" => "$adultBasePrice",
+                            "Tax" => "$adultTaxAmount",
+                            "PaxCount" => $adult,
+                            "PaxType" => "ADT",
+                            "Discount" => "0",
+                            "OtherCharges" => "$OtherCharges",
+                            "ServiceFee" => "0"
+                        ),
 
                     );
                 }
@@ -411,65 +423,58 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $nonRefundable = $passengerInfo['nonRefundable'];
                 if ($nonRefundable == 1) {
                     $nonRef = "Nonrefundable";
-
                 } else {
                     $nonRef = "Refundable";
                 }
 
                 //Agent MarkUP
-				$agentMarksql = mysqli_query($conn,"SELECT dMarkup,iMarkup, dMarkupType,iMarkupType, alliMarkup,alldMarkup,alliMarkupType,alldMarkupType FROM agent WHERE agentId='$agentId' ");
-				$agentmarkrow = mysqli_fetch_array($agentMarksql,MYSQLI_ASSOC);
+                $agentMarksql = mysqli_query($conn, "SELECT dMarkup,iMarkup, dMarkupType,iMarkupType, alliMarkup,alldMarkup,alliMarkupType,alldMarkupType FROM agent WHERE agentId='$agentId' ");
+                $agentmarkrow = mysqli_fetch_array($agentMarksql, MYSQLI_ASSOC);
 
-			   //Individual Markup
-			    if(!empty($agentmarkrow) && (empty($agentmarkrow['alliMarkup']) && empty($agentmarkrow['alldMarkup']) )){
-			   	 $imarkuptype = $agentmarkrow['iMarkupType'];
-			   	 $dmarkuptype = $agentmarkrow['dMarkupType'];
-			   	 if($imarkuptype == 'amount' || $dmarkuptype == 'amount'){
-			   		 if($TripType == 'Inbound'){
-			   			  $markup = $agentmarkrow['dMarkup'];
-			   		 }else{
-			   			  $markup = $agentmarkrow['iMarkup'];
-			   		 }
-			   		 $MarkupPrice = $AgentPrice + $markup; 
-					   
-						 
-			   	 }else if($imarkuptype == 'percentage' || $dmarkuptype == 'percentage'){
-			   		 if($TripType == 'Inbound'){
-			   			  $markup = $agentmarkrow['dMarkup'];
-			   		 }else{
-			   			  $markup = $agentmarkrow['iMarkup'];
-			   		 }
-			   		$MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup/100))); 
-						
-			   	 }else{
-			   		 $MarkupPrice = $AgentPrice;
-			   	 }                          					
-			    }else if(!empty($agentmarkrow) && (empty($agentmarkrow['dMarkup']) && empty($agentmarkrow['iMarkup']))){ // All Markup
-				   $imarkuptype = $agentmarkrow['alliMarkupType'];
-				   $dmarkuptype = $agentmarkrow['alldMarkupType'];
-				   if($imarkuptype == 'amount' || $dmarkuptype == 'amount'){
-					   if($TripType == 'Inbound'){
-							$markup = $agentmarkrow['alldMarkup'];
-					   }else{
-							$markup = $agentmarkrow['alliMarkup'];
-					   }
-					   $MarkupPrice = $AgentPrice + $markup;
-					  
-				   }else if($imarkuptype == 'percentage' || $dmarkuptype == 'percentage'){
-					   if($TripType == 'Inbound'){
-							$markup = $agentmarkrow['alldMarkup'];
-					   }else{
-							$markup = $agentmarkrow['alliMarkup'];
-					   }
-					  $MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup/100))); 
-					   
-				   }else{
-					   $MarkupPrice = $AgentPrice;
-				   }                          					
-			   }else{
-				   $MarkupPrice = $AgentPrice; 
-				   
-			   }
+                //Individual Markup
+                if (!empty($agentmarkrow) && (empty($agentmarkrow['alliMarkup']) && empty($agentmarkrow['alldMarkup']))) {
+                    $imarkuptype = $agentmarkrow['iMarkupType'];
+                    $dmarkuptype = $agentmarkrow['dMarkupType'];
+                    if ($imarkuptype == 'amount' || $dmarkuptype == 'amount') {
+                        if ($TripType == 'Inbound') {
+                            $markup = $agentmarkrow['dMarkup'];
+                        } else {
+                            $markup = $agentmarkrow['iMarkup'];
+                        }
+                        $MarkupPrice = $AgentPrice + $markup;
+                    } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
+                        if ($TripType == 'Inbound') {
+                            $markup = $agentmarkrow['dMarkup'];
+                        } else {
+                            $markup = $agentmarkrow['iMarkup'];
+                        }
+                        $MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup / 100)));
+                    } else {
+                        $MarkupPrice = $AgentPrice;
+                    }
+                } else if (!empty($agentmarkrow) && (empty($agentmarkrow['dMarkup']) && empty($agentmarkrow['iMarkup']))) { // All Markup
+                    $imarkuptype = $agentmarkrow['alliMarkupType'];
+                    $dmarkuptype = $agentmarkrow['alldMarkupType'];
+                    if ($imarkuptype == 'amount' || $dmarkuptype == 'amount') {
+                        if ($TripType == 'Inbound') {
+                            $markup = $agentmarkrow['alldMarkup'];
+                        } else {
+                            $markup = $agentmarkrow['alliMarkup'];
+                        }
+                        $MarkupPrice = $AgentPrice + $markup;
+                    } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
+                        if ($TripType == 'Inbound') {
+                            $markup = $agentmarkrow['alldMarkup'];
+                        } else {
+                            $markup = $agentmarkrow['alliMarkup'];
+                        }
+                        $MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup / 100)));
+                    } else {
+                        $MarkupPrice = $AgentPrice;
+                    }
+                } else {
+                    $MarkupPrice = $AgentPrice;
+                }
 
 
                 $ref = $var['legs'][0]['ref'];
@@ -545,7 +550,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aAirport = $row2['name'];
                         $aCity = $row2['cityName'];
                         $aCountry = $row2['countryCode'];
-
                     }
 
                     $markettingFN = $scheduleDescs[$legref]['carrier']['marketingFlightNumber'];
@@ -593,35 +597,41 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             $airpot = $hidestop['airport'];
                             $duration = $hidestop['elapsedLayoverTime'];
                             $time = date('H:i', mktime(0, $duration));
-                            $stopoverdetails = array("airport" => $airpot,
-                                "time" => $time);
+                            $stopoverdetails = array(
+                                "airport" => $airpot,
+                                "time" => $time
+                            );
                             array_push($stopOverDetails, $stopoverdetails);
                         }
                     }
 
-                    $segment = array("0" => array("marketingcareer" => "$markettingCarrier",
-                        "marketingcareerName" => "$markettingCarrierName",
-                        "marketingflight" => "$markettingFN",
-                        "operatingcareer" => "$operatingCarrier",
-                        "operatingflight" => "$operatingFN",
-                        "operatingCarrierName" => "$operatingCarrierName",
-                        "departure" => "$DepartureFrom",
-                        "departureAirport" => "$dAirport ",
-                        "departureLocation" => "$dCity , $dCountry",
-                        "departureTime" => "$dpTime",
-                        "arrival" => "$ArrivalTo",
-                        "arrivalTime" => "$arrTime",
-                        "arrivalAirport" => "$aAirport",
-                        "arrivalLocation" => "$aCity , $aCountry",
-                        "flightduration" => "$TravelTime",
-                        "bookingcode" => "$BookingCode",
-                        "seat" => "$Seat"),
+                    $segment = array(
+                        "0" => array(
+                            "marketingcareer" => "$markettingCarrier",
+                            "marketingcareerName" => "$markettingCarrierName",
+                            "marketingflight" => "$markettingFN",
+                            "operatingcareer" => "$operatingCarrier",
+                            "operatingflight" => "$operatingFN",
+                            "operatingCarrierName" => "$operatingCarrierName",
+                            "departure" => "$DepartureFrom",
+                            "departureAirport" => "$dAirport ",
+                            "departureLocation" => "$dCity , $dCountry",
+                            "departureTime" => "$dpTime",
+                            "arrival" => "$ArrivalTo",
+                            "arrivalTime" => "$arrTime",
+                            "arrivalAirport" => "$aAirport",
+                            "arrivalLocation" => "$aCity , $aCountry",
+                            "flightduration" => "$TravelTime",
+                            "bookingcode" => "$BookingCode",
+                            "seat" => "$Seat"
+                        ),
 
                     );
 
                     $transitDetails = array("transit1" => "0");
 
-                    $basic = array("system" => "Sabre",
+                    $basic = array(
+                        "system" => "Sabre",
                         "segment" => "1",
                         "uId" => $uId,
                         "triptype" => $TripType,
@@ -656,7 +666,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     );
 
                     array_push($All, $basic);
-
                 } else if ($sgCount == 2) {
 
                     $lf = $legDescs[$id]['schedules'][0]['ref'];
@@ -705,7 +714,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $dAirport = $row1['name'];
                         $dCity = $row1['cityName'];
                         $dCountry = $row1['countryCode'];
-
                     }
 
                     // Departure Country
@@ -837,7 +845,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aAirport1 = $row4['name'];
                         $aCity1 = $row4['cityName'];
                         $aCountry1 = $row4['countryCode'];
-
                     }
 
                     $markettingFN1 = $scheduleDescs[$legref1]['carrier']['marketingFlightNumber'];
@@ -889,24 +896,28 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                     $transitDetails = array("transit1" => "$Transit");
 
-                    $segment = array("0" => array("marketingcareer" => "$markettingCarrier",
-                        "marketingcareerName" => "$markettingCarrierName",
-                        "marketingflight" => "$markettingFN",
-                        "operatingcareer" => "$operatingCarrier",
-                        "operatingflight" => "$operatingFN",
-                        "operatingCarrierName" => "$operatingCarrierName",
-                        "departure" => "$DepartureFrom",
-                        "departureAirport" => "$dAirport ",
-                        "departureLocation" => "$dCity , $dCountry",
-                        "departureTime" => "$dpTime",
-                        "arrival" => "$ArrivalTo",
-                        "arrivalTime" => "$arrTime",
-                        "arrivalAirport" => "$aAirport",
-                        "arrivalLocation" => "$aCity , $aCountry",
-                        "flightduration" => "$TravelTime1",
-                        "bookingcode" => "$BookingCode",
-                        "seat" => "$Seat1"),
-                        "1" => array("marketingcareer" => "$markettingCarrier1",
+                    $segment = array(
+                        "0" => array(
+                            "marketingcareer" => "$markettingCarrier",
+                            "marketingcareerName" => "$markettingCarrierName",
+                            "marketingflight" => "$markettingFN",
+                            "operatingcareer" => "$operatingCarrier",
+                            "operatingflight" => "$operatingFN",
+                            "operatingCarrierName" => "$operatingCarrierName",
+                            "departure" => "$DepartureFrom",
+                            "departureAirport" => "$dAirport ",
+                            "departureLocation" => "$dCity , $dCountry",
+                            "departureTime" => "$dpTime",
+                            "arrival" => "$ArrivalTo",
+                            "arrivalTime" => "$arrTime",
+                            "arrivalAirport" => "$aAirport",
+                            "arrivalLocation" => "$aCity , $aCountry",
+                            "flightduration" => "$TravelTime1",
+                            "bookingcode" => "$BookingCode",
+                            "seat" => "$Seat1"
+                        ),
+                        "1" => array(
+                            "marketingcareer" => "$markettingCarrier1",
                             "marketingcareerName" => "$markettingCarrierName1",
                             "marketingflight" => "$markettingFN1",
                             "operatingcareer" => "$operatingCarrier1",
@@ -922,11 +933,13 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "arrivalLocation" => "$aCity1 , $aCountry1",
                             "flightduration" => "$TravelTime2",
                             "bookingcode" => "$BookingCode1",
-                            "seat" => "$Seat2"),
+                            "seat" => "$Seat2"
+                        ),
 
                     );
 
-                    $basic = array("system" => "Sabre",
+                    $basic = array(
+                        "system" => "Sabre",
                         "segment" => "2",
                         "uId" => $uId,
                         "triptype" => $TripType,
@@ -960,7 +973,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     );
 
                     array_push($All, $basic);
-
                 } else if ($sgCount == 3) {
 
                     $lf = $legDescs[$id]['schedules'][0]['ref'];
@@ -1017,7 +1029,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $dAirport = $row1['name'];
                         $dCity = $row1['cityName'];
                         $dCountry = $row1['countryCode'];
-
                     }
 
                     // Departure Country
@@ -1028,7 +1039,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aAirport = $row2['name'];
                         $aCity = $row2['cityName'];
                         $aCountry = $row2['countryCode'];
-
                     }
 
                     $markettingFN = $scheduleDescs[$legref]['carrier']['marketingFlightNumber'];
@@ -1123,7 +1133,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                     if (!empty($carrierrow1)) {
                         $markettingCarrierName1 = $carrierrow1['name'];
-
                     }
 
                     // Departure Country
@@ -1134,7 +1143,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $dAirport1 = $row3['name'];
                         $dCity1 = $row3['cityName'];
                         $dCountry1 = $row3['countryCode'];
-
                     }
 
                     // Departure Country
@@ -1145,7 +1153,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aAirport1 = $row4['name'];
                         $aCity1 = $row4['cityName'];
                         $aCountry1 = $row4['countryCode'];
-
                     }
 
                     $markettingFN1 = $scheduleDescs[$legref1]['carrier']['marketingFlightNumber'];
@@ -1259,7 +1266,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $dAirport2 = $drow3['name'];
                         $dCity2 = $drow3['cityName'];
                         $dCountry2 = $drow3['countryCode'];
-
                     }
 
                     // Arrival Country
@@ -1270,7 +1276,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aAirport2 = $arow4['name'];
                         $aCity2 = $arow4['cityName'];
                         $aCountry2 = $arow4['countryCode'];
-
                     }
 
                     $markettingFN2 = $scheduleDescs[$legref2]['carrier']['marketingFlightNumber'];
@@ -1325,24 +1330,28 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $toTime2 = str_split($ArrivalTime2, 8);
                     $arrTime2 = $aDate3 . "T" . $toTime2[0];
 
-                    $segment = array("0" => array("marketingcareer" => "$markettingCarrier",
-                        "marketingcareerName" => "$markettingCarrierName",
-                        "marketingflight" => "$markettingFN",
-                        "operatingcareer" => "$operatingCarrier",
-                        "operatingflight" => "$operatingFN",
-                        "operatingCarrierName" => "$operatingCarrierName",
-                        "departure" => "$DepartureFrom",
-                        "departureAirport" => "$dAirport ",
-                        "departureLocation" => "$dCity , $dCountry",
-                        "departureTime" => "$dpTime",
-                        "arrival" => "$ArrivalTo",
-                        "arrivalTime" => "$arrTime",
-                        "arrivalAirport" => "$aAirport",
-                        "arrivalLocation" => "$aCity , $aCountry",
-                        "flightduration" => "$TravelTime1",
-                        "bookingcode" => "$BookingCode",
-                        "seat" => "$Seat"),
-                        "1" => array("marketingcareer" => "$markettingCarrier1",
+                    $segment = array(
+                        "0" => array(
+                            "marketingcareer" => "$markettingCarrier",
+                            "marketingcareerName" => "$markettingCarrierName",
+                            "marketingflight" => "$markettingFN",
+                            "operatingcareer" => "$operatingCarrier",
+                            "operatingflight" => "$operatingFN",
+                            "operatingCarrierName" => "$operatingCarrierName",
+                            "departure" => "$DepartureFrom",
+                            "departureAirport" => "$dAirport ",
+                            "departureLocation" => "$dCity , $dCountry",
+                            "departureTime" => "$dpTime",
+                            "arrival" => "$ArrivalTo",
+                            "arrivalTime" => "$arrTime",
+                            "arrivalAirport" => "$aAirport",
+                            "arrivalLocation" => "$aCity , $aCountry",
+                            "flightduration" => "$TravelTime1",
+                            "bookingcode" => "$BookingCode",
+                            "seat" => "$Seat"
+                        ),
+                        "1" => array(
+                            "marketingcareer" => "$markettingCarrier1",
                             "marketingcareerName" => "$markettingCarrierName1",
                             "marketingflight" => "$markettingFN1",
                             "operatingcareer" => "$operatingCarrier1",
@@ -1358,8 +1367,10 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "arrivalLocation" => "$aCity1 , $aCountry1",
                             "flightduration" => "$TravelTime2",
                             "bookingcode" => "$BookingCode1",
-                            "seat" => "$Seat1"),
-                        "2" => array("marketingcareer" => "$markettingCarrier2",
+                            "seat" => "$Seat1"
+                        ),
+                        "2" => array(
+                            "marketingcareer" => "$markettingCarrier2",
                             "marketingcareerName" => "$markettingCarrierName2",
                             "marketingflight" => "$markettingFN2",
                             "operatingcareer" => "$operatingCarrier2",
@@ -1375,7 +1386,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "arrivalLocation" => "$aCity2 , $aCountry2",
                             "flightduration" => "$TravelTime3",
                             "bookingcode" => "$BookingCode2",
-                            "seat" => "$Seat2"),
+                            "seat" => "$Seat2"
+                        ),
 
                     );
                     $TransitTime = round(abs(strtotime($dpTime1) - strtotime($arrTime)) / 60, 2);
@@ -1384,10 +1396,13 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $TransitTime1 = round(abs(strtotime($dpTime2) - strtotime($arrTime1)) / 60, 2);
                     $TransitDuration1 = floor($TransitTime1 / 60) . "H " . ($TransitTime1 - ((floor($TransitTime1 / 60)) * 60)) . "Min";
 
-                    $transitDetails = array("transit1" => $TransitDuration,
-                        "transit2" => $TransitDuration1);
+                    $transitDetails = array(
+                        "transit1" => $TransitDuration,
+                        "transit2" => $TransitDuration1
+                    );
 
-                    $basic = array("system" => "Sabre",
+                    $basic = array(
+                        "system" => "Sabre",
                         "segment" => "3",
                         "uId" => $uId,
                         "triptype" => $TripType,
@@ -1396,7 +1411,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         "lastTicketTime" => "$timelimit",
                         "BasePrice" => "$baseFareAmount",
                         "Taxes" => "$totalTaxAmount",
-						"price" => "$MarkupPrice",
+                        "price" => "$MarkupPrice",
                         "clientPrice" => "$totalFare",
                         "comission" => "$Commission",
                         "comissiontype" => $ComissionType,
@@ -1421,7 +1436,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     );
 
                     array_push($All, $basic);
-
                 } else if ($sgCount == 4) {
 
                     // Legs 1
@@ -1724,7 +1738,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aAirport2 = $arrrow2['name'];
                         $aCity2 = $arrrow2['cityName'];
                         $aCountry2 = $arrrow2['countryCode'];
-
                     }
 
                     $markettingFN2 = $scheduleDescs[$legref2]['carrier']['marketingFlightNumber'];
@@ -1848,7 +1861,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aAirport3 = $arow3['name'];
                         $aCity3 = $arow3['cityName'];
                         $aCountry3 = $arow3['countryCode'];
-
                     }
 
                     $markettingFN3 = $scheduleDescs[$legref3]['carrier']['marketingFlightNumber'];
@@ -1905,24 +1917,28 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $toTime3 = str_split($ArrivalTime3, 8);
                     $arrTime3 = $aDate3 . "T" . $toTime3[0];
 
-                    $segment = array("0" => array("marketingcareer" => "$markettingCarrier",
-                        "marketingcareerName" => "$markettingCarrierName",
-                        "marketingflight" => "$markettingFN",
-                        "operatingcareer" => "$operatingCarrier",
-                        "operatingflight" => "$operatingFN",
-                        "operatingCarrierName" => "$operatingCarrierName",
-                        "departure" => "$DepartureFrom",
-                        "departureAirport" => "$dAirport ",
-                        "departureLocation" => "$dCity , $dCountry",
-                        "departureTime" => "$dpTime",
-                        "arrival" => "$ArrivalTo",
-                        "arrivalTime" => "$arrTime",
-                        "arrivalAirport" => "$aAirport",
-                        "arrivalLocation" => "$aCity , $aCountry",
-                        "flightduration" => "$TravelTime1",
-                        "bookingcode" => "$BookingCode",
-                        "seat" => "$Seat"),
-                        "1" => array("marketingcareer" => "$markettingCarrier1",
+                    $segment = array(
+                        "0" => array(
+                            "marketingcareer" => "$markettingCarrier",
+                            "marketingcareerName" => "$markettingCarrierName",
+                            "marketingflight" => "$markettingFN",
+                            "operatingcareer" => "$operatingCarrier",
+                            "operatingflight" => "$operatingFN",
+                            "operatingCarrierName" => "$operatingCarrierName",
+                            "departure" => "$DepartureFrom",
+                            "departureAirport" => "$dAirport ",
+                            "departureLocation" => "$dCity , $dCountry",
+                            "departureTime" => "$dpTime",
+                            "arrival" => "$ArrivalTo",
+                            "arrivalTime" => "$arrTime",
+                            "arrivalAirport" => "$aAirport",
+                            "arrivalLocation" => "$aCity , $aCountry",
+                            "flightduration" => "$TravelTime1",
+                            "bookingcode" => "$BookingCode",
+                            "seat" => "$Seat"
+                        ),
+                        "1" => array(
+                            "marketingcareer" => "$markettingCarrier1",
                             "marketingcareerName" => "$markettingCarrierName1",
                             "marketingflight" => "$markettingFN1",
                             "operatingcareer" => "$operatingCarrier1",
@@ -1938,8 +1954,10 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "arrivalLocation" => "$aCity1 , $aCountry1",
                             "flightduration" => "$TravelTime2",
                             "bookingcode" => "$BookingCode1",
-                            "seat" => "$Seat1"),
-                        "2" => array("marketingcareer" => "$markettingCarrier2",
+                            "seat" => "$Seat1"
+                        ),
+                        "2" => array(
+                            "marketingcareer" => "$markettingCarrier2",
                             "marketingcareerName" => "$markettingCarrierName2",
                             "marketingflight" => "$markettingFN2",
                             "operatingcareer" => "$operatingCarrier2",
@@ -1955,8 +1973,10 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "arrivalLocation" => "$aCity1 , $aCountry2",
                             "flightduration" => "$TravelTime3",
                             "bookingcode" => "$BookingCode2",
-                            "seat" => "$Seat2"),
-                        "3" => array("marketingcareer" => "$markettingCarrier3",
+                            "seat" => "$Seat2"
+                        ),
+                        "3" => array(
+                            "marketingcareer" => "$markettingCarrier3",
                             "marketingcareerName" => "$markettingCarrierName3",
                             "marketingflight" => "$markettingFN3",
                             "operatingcareer" => "$operatingCarrier3",
@@ -1972,7 +1992,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "arrivalLocation" => "$aCity3 , $aCountry3",
                             "flightduration" => "$TravelTime3",
                             "bookingcode" => "$BookingCode3",
-                            "seat" => "$Seat3"),
+                            "seat" => "$Seat3"
+                        ),
 
                     );
                     $TransitTime = round(abs(strtotime($dpTime1) - strtotime($arrTime)) / 60, 2);
@@ -1984,18 +2005,21 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $TransitTime2 = round(abs(strtotime($dpTime3) - strtotime($arrTime2)) / 60, 2);
                     $TransitDuration2 = floor($TransitTime2 / 60) . "H " . ($TransitTime2 - ((floor($TransitTime2 / 60)) * 60)) . "Min";
 
-                    $transitDetails = array("transit1" => $TransitDuration,
+                    $transitDetails = array(
+                        "transit1" => $TransitDuration,
                         "transit2" => $TransitDuration1,
-                        "transit3" => $TransitDuration2);
+                        "transit3" => $TransitDuration2
+                    );
 
-                    $basic = array("system" => "Sabre",
+                    $basic = array(
+                        "system" => "Sabre",
                         "segment" => "4",
                         "uId" => $uId,
                         "career" => "$vCarCode",
                         "careerName" => "$CarrieerName",
                         "BasePrice" => "$baseFareAmount",
                         "Taxes" => "$totalTaxAmount",
-						"price" => "$MarkupPrice",
+                        "price" => "$MarkupPrice",
                         "clientPrice" => "$totalFare",
                         "comission" => "$Commission",
                         "comissiontype" => $ComissionType,
@@ -2020,11 +2044,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     );
 
                     array_push($All, $basic);
-
                 }
-
             }
-
         }
     }
 
@@ -2045,9 +2066,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
             for ($i = 1; $i <= $infants; $i++) {
                 $infantscount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="INF" Age="1" DOB="2021-06-04" BookingTravelerRef="3' . $i . '" />';
                 array_push($Gallpax, $infantscount);
-
             }
-
         } else if ($adult > 0 && $child > 0) {
 
             for ($i = 1; $i <= $adult; $i++) {
@@ -2058,7 +2077,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $childcount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="CNN" Age="07" BookingTravelerRef="2' . $i . '" />';
                 array_push($Gallpax, $childcount);
             }
-
         } else if ($adult > 0 && $infants > 0) {
 
             for ($i = 1; $i <= $adult; $i++) {
@@ -2068,9 +2086,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
             for ($i = 1; $i <= $infants; $i++) {
                 $infantscount = '<SearchPassenger xmlns="http://www.travelport.com/schema/common_v42_0" Code="INF" Age="1" BookingTravelerRef="3' . $i . '" />';
                 array_push($Gallpax, $infantscount);
-
             }
-
         } else {
 
             for ($i = 1; $i <= $adult; $i++) {
@@ -2168,17 +2184,21 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $key = $airFlightDetails['@attributes']['Key'];
                         $TravelTime = $airFlightDetails['@attributes']['TravelTime'];
                         $Equipment = $airFlightDetails['@attributes']['Equipment'];
-                        $flightList[$key] = array('key' => "$key",
+                        $flightList[$key] = array(
+                            'key' => "$key",
                             'TravelTime' => $TravelTime,
-                            'Equipment' => $Equipment);
+                            'Equipment' => $Equipment
+                        );
                     }
                 } else {
                     $key = $airFlightDetailsList['@attributes']['Key'];
                     $TravelTime = $airFlightDetailsList['@attributes']['TravelTime'];
                     $Equipment = $airFlightDetailsList['@attributes']['Equipment'];
-                    $flightList[$key] = array('key' => "$key",
+                    $flightList[$key] = array(
+                        'key' => "$key",
                         'TravelTime' => $TravelTime,
-                        'Equipment' => $Equipment);
+                        'Equipment' => $Equipment
+                    );
                 }
 
                 if (isset($airFareInfoList[0])) {
@@ -2196,11 +2216,12 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             $Baggage = "No Baggagge";
                         }
 
-                        $airFareInfo[$key] = array('key' => $key,
+                        $airFareInfo[$key] = array(
+                            'key' => $key,
                             'Bags' => $Baggage,
-                            'FareBasisCode' => $FareBasis);
+                            'FareBasisCode' => $FareBasis
+                        );
                     }
-
                 } else {
                     $key = $airFareInfoList['@attributes']['Key'];
                     $FareBasis = $airFareInfoList['@attributes']['FareBasis'];
@@ -2215,10 +2236,11 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $Baggage = "No Baggagge";
                     }
 
-                    $airFareInfo[$key] = array('key' => $key,
+                    $airFareInfo[$key] = array(
+                        'key' => $key,
                         'Bags' => $Baggage,
-                        'FareBasisCode' => $FareBasis);
-
+                        'FareBasisCode' => $FareBasis
+                    );
                 }
 
                 if (isset($airAirSegmentList[0])) {
@@ -2264,7 +2286,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             'PolledAvailabilityOption' => $PolledAvailabilityOption,
                             'ChangeOfPlane' => $ChangeOfPlane,
                             'Group' => $Group,
-                            'AvailabilityDisplayType' => $AvailabilityDisplayType);
+                            'AvailabilityDisplayType' => $AvailabilityDisplayType
+                        );
                     }
                 } else {
                     $key = $airAirSegmentList['@attributes']['Key'];
@@ -2311,7 +2334,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         'AvailabilityDisplayType' => $AvailabilityDisplayType,
 
                     );
-
                 }
 
                 foreach ($airAirPricePointList as $airAirPricePoint) {
@@ -2384,12 +2406,13 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aEquivalentBasePrice = $adultPrice['@attributes']['EquivalentBasePrice'];
                         $aPassengerTaxes = $adultPrice['@attributes']['Taxes'];
                         $aPaxType = isset($adultPrice['airPassengerType'][0]['@attributes']['Code']) ?
-                        $adultPrice['airPassengerType'][0]['@attributes']['Code'] :
-                        $adultPrice['airPassengerType']['@attributes']['Code'];
+                            $adultPrice['airPassengerType'][0]['@attributes']['Code'] :
+                            $adultPrice['airPassengerType']['@attributes']['Code'];
                         $aAirFareInfoKey = $adultPrice['@attributes']['Key'];
                         $aFareInfoRef = isset($adultPrice['airFareInfoRef']['@attributes']['Key']) ?
-                        $adultPrice['airFareInfoRef']['@attributes']['Key'] : $adultPrice['airFareInfoRef'][0]['@attributes']['Key'];
-                        $adultBreakDown = array("BaseFare" => "$aEquivalentBasePrice",
+                            $adultPrice['airFareInfoRef']['@attributes']['Key'] : $adultPrice['airFareInfoRef'][0]['@attributes']['Key'];
+                        $adultBreakDown = array(
+                            "BaseFare" => "$aEquivalentBasePrice",
                             "Tax" => "$aPassengerTaxes",
                             "PaxCount" => $adult,
                             "PaxType" => "$aPaxType",
@@ -2397,7 +2420,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "OtherCharges" => "$OtherCharges",
                             "ServiceFee" => "0",
                             "AirFareInfo" => $aAirFareInfoKey,
-                            "FareInfoRef" => $aFareInfoRef);
+                            "FareInfoRef" => $aFareInfoRef
+                        );
 
                         array_push($PriceBreakDown, $adultBreakDown);
 
@@ -2405,13 +2429,14 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $cEquivalentBasePrice = $childPrice['@attributes']['EquivalentBasePrice'];
                         $cPassengerTaxes = $childPrice['@attributes']['Taxes'];
                         $cPaxType = isset($childPrice['airPassengerType'][0]['@attributes']['Code']) ?
-                        $childPrice['airPassengerType'][0]['@attributes']['Code'] :
-                        $childPrice['airPassengerType']['@attributes']['Code'];
+                            $childPrice['airPassengerType'][0]['@attributes']['Code'] :
+                            $childPrice['airPassengerType']['@attributes']['Code'];
                         $cAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][2]['@attributes']['Key'];
                         $cFareInfoRef = isset($childPrice['airFareInfoRef']['@attributes']['Key']) ?
-                        $childPrice['airFareInfoRef']['@attributes']['Key'] : $childPrice['airFareInfoRef'][0]['@attributes']['Key'];
+                            $childPrice['airFareInfoRef']['@attributes']['Key'] : $childPrice['airFareInfoRef'][0]['@attributes']['Key'];
 
-                        $childBreakDown = array("BaseFare" => "$cEquivalentBasePrice",
+                        $childBreakDown = array(
+                            "BaseFare" => "$cEquivalentBasePrice",
                             "Tax" => "$cPassengerTaxes",
                             "PaxCount" => $child,
                             "PaxType" => "$cPaxType",
@@ -2419,7 +2444,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "OtherCharges" => "$OtherCharges",
                             "ServiceFee" => "0",
                             "AirFareInfo" => $cAirFareInfoKey,
-                            "FareInfoRef" => $cFareInfoRef);
+                            "FareInfoRef" => $cFareInfoRef
+                        );
 
                         array_push($PriceBreakDown, $childBreakDown);
 
@@ -2427,13 +2453,14 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $iEquivalentBasePrice = $infantsPrice['@attributes']['EquivalentBasePrice'];
                         $iPassengerTaxes = $infantsPrice['@attributes']['Taxes'];
                         $iPaxType = isset($infantsPrice['airPassengerType'][0]['@attributes']['Code']) ?
-                        $infantsPrice['airPassengerType'][0]['@attributes']['Code'] :
-                        $infantsPrice['airPassengerType']['@attributes']['Code'];
+                            $infantsPrice['airPassengerType'][0]['@attributes']['Code'] :
+                            $infantsPrice['airPassengerType']['@attributes']['Code'];
                         $iAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][1]['@attributes']['Key'];
                         $iFareInfoRef = isset($infantsPrice['airFareInfoRef']['@attributes']['Key']) ?
-                        $infantsPrice['airFareInfoRef']['@attributes']['Key'] : $infantsPrice['airFareInfoRef'][0]['@attributes']['Key'];
+                            $infantsPrice['airFareInfoRef']['@attributes']['Key'] : $infantsPrice['airFareInfoRef'][0]['@attributes']['Key'];
 
-                        $infantBreakDown = array("BaseFare" => "$iEquivalentBasePrice",
+                        $infantBreakDown = array(
+                            "BaseFare" => "$iEquivalentBasePrice",
                             "Tax" => "$iPassengerTaxes",
                             "PaxCount" => $infants,
                             "PaxType" => "$iPaxType",
@@ -2441,10 +2468,10 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "OtherCharges" => "$OtherCharges",
                             "ServiceFee" => "0",
                             "AirFareInfo" => $iAirFareInfoKey,
-                            "FareInfoRef" => $iFareInfoRef);
+                            "FareInfoRef" => $iFareInfoRef
+                        );
 
                         array_push($PriceBreakDown, $infantBreakDown);
-
                     } else if ($adult > 0 && $child > 0) {
                         $airPricePointOptions = $airAirPricePoint['airAirPricingInfo'][0];
                         $airPricePoint = $airPricePointOptions['airFlightOptionsList']['airFlightOption'];
@@ -2453,11 +2480,12 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aEquivalentBasePrice = $adultPrice['@attributes']['EquivalentBasePrice'];
                         $aPassengerTaxes = $adultPrice['@attributes']['Taxes'];
                         $aPaxType = isset($adultPrice['airPassengerType'][0]['@attributes']['Code']) ?
-                        $adultPrice['airPassengerType'][0]['@attributes']['Code'] :
-                        $adultPrice['airPassengerType']['@attributes']['Code'];
+                            $adultPrice['airPassengerType'][0]['@attributes']['Code'] :
+                            $adultPrice['airPassengerType']['@attributes']['Code'];
                         $aAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][0]['@attributes']['Key'];
                         $aFareInfoRef = $airAirPricePoint['airAirPricingInfo'][0]['airFareInfoRef']['@attributes']['Key'];
-                        $adultBreakDown = array("BaseFare" => "$aEquivalentBasePrice",
+                        $adultBreakDown = array(
+                            "BaseFare" => "$aEquivalentBasePrice",
                             "Tax" => "$aPassengerTaxes",
                             "PaxCount" => $adult,
                             "PaxType" => "$aPaxType",
@@ -2465,7 +2493,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "OtherCharges" => "$OtherCharges",
                             "ServiceFee" => "0",
                             "AirFareInfo" => $aAirFareInfoKey,
-                            "FareInfoRef" => $aFareInfoRef);
+                            "FareInfoRef" => $aFareInfoRef
+                        );
 
                         array_push($PriceBreakDown, $adultBreakDown);
 
@@ -2473,12 +2502,13 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $cEquivalentBasePrice = $childPrice['@attributes']['EquivalentBasePrice'];
                         $cPassengerTaxes = $childPrice['@attributes']['Taxes'];
                         $cPaxType = isset($childPrice['airPassengerType'][0]['@attributes']['Code']) ?
-                        $childPrice['airPassengerType'][0]['@attributes']['Code'] :
-                        $childPrice['airPassengerType']['@attributes']['Code'];
+                            $childPrice['airPassengerType'][0]['@attributes']['Code'] :
+                            $childPrice['airPassengerType']['@attributes']['Code'];
                         $cAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][1]['@attributes']['Key'];
                         $cFareInfoRef = $airAirPricePoint['airAirPricingInfo'][1]['airFareInfoRef']['@attributes']['Key'];
 
-                        $childBreakDown = array("BaseFare" => "$cEquivalentBasePrice",
+                        $childBreakDown = array(
+                            "BaseFare" => "$cEquivalentBasePrice",
                             "Tax" => "$cPassengerTaxes",
                             "PaxCount" => $child,
                             "PaxType" => "$cPaxType",
@@ -2486,7 +2516,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "OtherCharges" => "$OtherCharges",
                             "ServiceFee" => "0",
                             "AirFareInfo" => $cAirFareInfoKey,
-                            "FareInfoRef" => $cFareInfoRef);
+                            "FareInfoRef" => $cFareInfoRef
+                        );
 
                         array_push($PriceBreakDown, $childBreakDown);
                     } else if ($adult > 0 && $infants > 0) {
@@ -2497,12 +2528,13 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aEquivalentBasePrice = $adultPrice['@attributes']['EquivalentBasePrice'];
                         $aPassengerTaxes = $adultPrice['@attributes']['Taxes'];
                         $aPaxType = isset($adultPrice['airPassengerType'][0]['@attributes']['Code']) ?
-                        $adultPrice['airPassengerType'][0]['@attributes']['Code'] :
-                        $adultPrice['airPassengerType']['@attributes']['Code'];
+                            $adultPrice['airPassengerType'][0]['@attributes']['Code'] :
+                            $adultPrice['airPassengerType']['@attributes']['Code'];
                         $aAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][0]['@attributes']['Key'];
                         $aFareInfoRef = isset($adultPrice['airFareInfoRef']['@attributes']['Key']) ?
-                        $adultPrice['airFareInfoRef']['@attributes']['Key'] : $adultPrice['airFareInfoRef'][0]['@attributes']['Key'];
-                        $adultBreakDown = array("BaseFare" => "$aEquivalentBasePrice",
+                            $adultPrice['airFareInfoRef']['@attributes']['Key'] : $adultPrice['airFareInfoRef'][0]['@attributes']['Key'];
+                        $adultBreakDown = array(
+                            "BaseFare" => "$aEquivalentBasePrice",
                             "Tax" => "$aPassengerTaxes",
                             "PaxCount" => $adult,
                             "PaxType" => "$aPaxType",
@@ -2510,7 +2542,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "OtherCharges" => "$OtherCharges",
                             "ServiceFee" => "0",
                             "AirFareInfo" => $aAirFareInfoKey,
-                            "FareInfoRef" => $aFareInfoRef);
+                            "FareInfoRef" => $aFareInfoRef
+                        );
 
                         array_push($PriceBreakDown, $adultBreakDown);
 
@@ -2518,13 +2551,14 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $iEquivalentBasePrice = $infantsPrice['@attributes']['EquivalentBasePrice'];
                         $iPassengerTaxes = $infantsPrice['@attributes']['Taxes'];
                         $iPaxType = isset($infantsPrice['airPassengerType'][0]['@attributes']['Code']) ?
-                        $infantsPrice['airPassengerType'][0]['@attributes']['Code'] :
-                        $infantsPrice['airPassengerType']['@attributes']['Code'];
+                            $infantsPrice['airPassengerType'][0]['@attributes']['Code'] :
+                            $infantsPrice['airPassengerType']['@attributes']['Code'];
                         $iAirFareInfoKey = $airAirPricePoint['airAirPricingInfo'][1]['@attributes']['Key'];
                         $iFareInfoRef = isset($infantsPrice['airFareInfoRef']['@attributes']['Key']) ?
-                        $infantsPrice['airFareInfoRef']['@attributes']['Key'] :
-                        $infantsPrice['airFareInfoRef'][0]['@attributes']['Key'];
-                        $infantBreakDown = array("BaseFare" => "$iEquivalentBasePrice",
+                            $infantsPrice['airFareInfoRef']['@attributes']['Key'] :
+                            $infantsPrice['airFareInfoRef'][0]['@attributes']['Key'];
+                        $infantBreakDown = array(
+                            "BaseFare" => "$iEquivalentBasePrice",
                             "Tax" => "$iPassengerTaxes",
                             "PaxCount" => $infants,
                             "PaxType" => "$iPaxType",
@@ -2532,7 +2566,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "OtherCharges" => "$OtherCharges",
                             "ServiceFee" => "0",
                             "AirFareInfo" => $iAirFareInfoKey,
-                            "FareInfoRef" => $iFareInfoRef);
+                            "FareInfoRef" => $iFareInfoRef
+                        );
                         array_push($PriceBreakDown, $infantBreakDown);
                     } else if ($adult > 0) {
 
@@ -2543,13 +2578,14 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $aEquivalentBasePrice = $airPricePointOptions['@attributes']['EquivalentBasePrice'];
                         $aPassengerTaxes = $airPricePointOptions['@attributes']['Taxes'];
                         $aPaxType = isset($adultPrice['airPassengerType'][0]['@attributes']['Code']) ?
-                        $adultPrice['airPassengerType'][0]['@attributes']['Code'] :
-                        $adultPrice['airPassengerType']['@attributes']['Code'];
+                            $adultPrice['airPassengerType'][0]['@attributes']['Code'] :
+                            $adultPrice['airPassengerType']['@attributes']['Code'];
                         $aAirFareInfoKey = $airPricePointOptions['@attributes']['Key'];
                         $aFareInfoRef = isset($airPricePointOptions['airFareInfoRef']['@attributes']['Key']) ?
-                        $airPricePointOptions['airFareInfoRef']['@attributes']['Key'] : $airPricePointOptions['airFareInfoRef'][0]['@attributes']['Key'];
+                            $airPricePointOptions['airFareInfoRef']['@attributes']['Key'] : $airPricePointOptions['airFareInfoRef'][0]['@attributes']['Key'];
 
-                        $adultBreakDown = array("BaseFare" => "$aEquivalentBasePrice",
+                        $adultBreakDown = array(
+                            "BaseFare" => "$aEquivalentBasePrice",
                             "Tax" => "$aPassengerTaxes",
                             "PaxCount" => $adult,
                             "PaxType" => "$aPaxType",
@@ -2557,7 +2593,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             "OtherCharges" => "$OtherCharges",
                             "ServiceFee" => "0",
                             "AirFareInfo" => $aAirFareInfoKey,
-                            "FareInfoRef" => $aFareInfoRef);
+                            "FareInfoRef" => $aFareInfoRef
+                        );
 
                         array_push($PriceBreakDown, $adultBreakDown);
                     }
@@ -2588,7 +2625,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $Refundable = "Refundable";
                     } else {
                         $Refundable = "Nonrefundable";
-
                     }
 
                     $From = $result['airRouteList']['airRoute']['airLeg']['@attributes']['Origin'];
@@ -2656,7 +2692,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             $CabinClass = $airPricePoint['airOption'][$op]['airBookingInfo']['@attributes']['CabinClass'];
 
                             $segment = array(
-                                array("marketingcareer" => "$markettingCarrier",
+                                array(
+                                    "marketingcareer" => "$markettingCarrier",
                                     "marketingcareerName" => $markettingCarrierName,
                                     "marketingflight" => "$markettingFN",
                                     "operatingcareer" => "$markettingCarrier",
@@ -2679,7 +2716,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                                 ),
                             );
-                            $basic = array("system" => "Galileo",
+                            $basic = array(
+                                "system" => "Galileo",
                                 "segment" => "$sgcount",
                                 "triptype" => $TripType,
                                 "career" => $vCarCode,
@@ -2714,7 +2752,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                 "segments" => $segment,
                                 "traceid" => $TraceId,
                             );
-
                         } else if ($sgcount == 2) {
                             //Leg1
 
@@ -2834,7 +2871,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             $Transit = array("transit1" => $TransitHm);
 
                             $segment = array(
-                                array("marketingcareer" => "$markettingCarrier",
+                                array(
+                                    "marketingcareer" => "$markettingCarrier",
                                     "marketingcareerName" => $markettingCarrierName,
                                     "marketingflight" => "$markettingFN",
                                     "operatingcareer" => "$markettingCarrier",
@@ -2855,7 +2893,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                     'SegmentRef' => $SegmentRef,
                                     'SegmentDetails' => $airAirSegment[$SegmentRef],
 
-                                ), array("marketingcareer" => "$markettingCarrier1",
+                                ), array(
+                                    "marketingcareer" => "$markettingCarrier1",
                                     "marketingcareerName" => $markettingCarrierName1,
                                     "marketingflight" => "$markettingFN1",
                                     "operatingcareer" => "$markettingCarrier1",
@@ -2878,7 +2917,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                                 ),
                             );
-                            $basic = array("system" => "Galileo",
+                            $basic = array(
+                                "system" => "Galileo",
                                 "segment" => "2",
                                 "triptype" => $TripType,
                                 "career" => $vCarCode,
@@ -2914,7 +2954,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                 "transit" => $Transit,
                                 "traceid" => $TraceId,
                             );
-
                         } else if ($sgcount == 3) {
 
                             //Leg1
@@ -3087,11 +3126,14 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             $since_start1 = (new DateTime($DepartureTime1))->diff(new DateTime($ArrivalTime));
                             $since_start2 = (new DateTime($DepartureTime2))->diff(new DateTime($ArrivalTime1));
 
-                            $Transit = array("transit1" => "$since_start1->h H $since_start1->m Min",
-                                "transit2" => "$since_start2->h H $since_start2->m Min");
+                            $Transit = array(
+                                "transit1" => "$since_start1->h H $since_start1->m Min",
+                                "transit2" => "$since_start2->h H $since_start2->m Min"
+                            );
 
                             $segment = array(
-                                array("marketingcareer" => "$markettingCarrier",
+                                array(
+                                    "marketingcareer" => "$markettingCarrier",
                                     "marketingcareerName" => $markettingCarrierName,
                                     "marketingflight" => "$markettingFN",
                                     "operatingcareer" => "$markettingCarrier",
@@ -3112,7 +3154,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                     'SegmentRef' => $SegmentRef,
                                     'SegmentDetails' => $airAirSegment[$SegmentRef],
 
-                                ), array("marketingcareer" => "$markettingCarrier1",
+                                ), array(
+                                    "marketingcareer" => "$markettingCarrier1",
                                     "marketingcareerName" => $markettingCarrierName1,
                                     "marketingflight" => "$markettingFN1",
                                     "operatingcareer" => "$markettingCarrier1",
@@ -3134,7 +3177,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                     'SegmentDetails' => $airAirSegment[$SegmentRef1],
 
                                 ),
-                                array("marketingcareer" => "$markettingCarrier2",
+                                array(
+                                    "marketingcareer" => "$markettingCarrier2",
                                     "marketingcareerName" => $markettingCarrierName2,
                                     "marketingflight" => "$markettingFN2",
                                     "operatingcareer" => "$markettingCarrier2",
@@ -3157,7 +3201,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                                 ),
                             );
-                            $basic = array("system" => "Galileo",
+                            $basic = array(
+                                "system" => "Galileo",
                                 "segment" => "3",
                                 "triptype" => $TripType,
                                 "career" => $vCarCode,
@@ -3193,11 +3238,9 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                 "transit" => $Transit,
                                 "traceid" => $TraceId,
                             );
-
                         }
 
                         array_push($All, $basic);
-
                     } else if (isset($airPricePoint['airOption']['airBookingInfo']) == true) {
                         if (isset($airPricePoint['airOption']['airBookingInfo'][0]) == true) {
                             $sgcount = count($airPricePoint['airOption']['airBookingInfo']);
@@ -3320,7 +3363,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                 $Transit = array("transit1" => $TransitHm);
 
                                 $segment = array(
-                                    array("marketingcareer" => "$markettingCarrier",
+                                    array(
+                                        "marketingcareer" => "$markettingCarrier",
                                         "marketingcareerName" => $markettingCarrierName,
                                         "marketingflight" => "$markettingFN",
                                         "operatingcareer" => "$markettingCarrier",
@@ -3341,7 +3385,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                         'SegmentRef' => $SegmentRef,
                                         'SegmentDetails' => $airAirSegment[$SegmentRef],
 
-                                    ), array("marketingcareer" => "$markettingCarrier1",
+                                    ), array(
+                                        "marketingcareer" => "$markettingCarrier1",
                                         "marketingcareerName" => $markettingCarrierName1,
                                         "marketingflight" => "$markettingFN1",
                                         "operatingcareer" => "$markettingCarrier1",
@@ -3364,7 +3409,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                                     ),
                                 );
-                                $basic = array("system" => "Galileo",
+                                $basic = array(
+                                    "system" => "Galileo",
                                     "segment" => "2",
                                     "triptype" => $TripType,
                                     "career" => $vCarCode,
@@ -3400,7 +3446,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                     "transit" => $Transit,
                                     "traceid" => $TraceId,
                                 );
-
                             } else if ($sgcount == 3) {
 
                                 //Leg1
@@ -3573,11 +3618,14 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                 $since_start1 = (new DateTime($DepartureTime1))->diff(new DateTime($ArrivalTime));
                                 $since_start2 = (new DateTime($DepartureTime2))->diff(new DateTime($ArrivalTime1));
 
-                                $Transit = array("transit1" => "$since_start1->h H $since_start1->m Min",
-                                    "transit2" => "$since_start2->h H $since_start2->m Min");
+                                $Transit = array(
+                                    "transit1" => "$since_start1->h H $since_start1->m Min",
+                                    "transit2" => "$since_start2->h H $since_start2->m Min"
+                                );
 
                                 $segment = array(
-                                    array("marketingcareer" => "$markettingCarrier",
+                                    array(
+                                        "marketingcareer" => "$markettingCarrier",
                                         "marketingcareerName" => $markettingCarrierName,
                                         "marketingflight" => "$markettingFN",
                                         "operatingcareer" => "$markettingCarrier",
@@ -3598,7 +3646,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                         'SegmentRef' => $SegmentRef,
                                         'SegmentDetails' => $airAirSegment[$SegmentRef],
 
-                                    ), array("marketingcareer" => "$markettingCarrier1",
+                                    ), array(
+                                        "marketingcareer" => "$markettingCarrier1",
                                         "marketingcareerName" => $markettingCarrierName1,
                                         "marketingflight" => "$markettingFN1",
                                         "operatingcareer" => "$markettingCarrier1",
@@ -3620,7 +3669,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                         'SegmentDetails' => $airAirSegment[$SegmentRef1],
 
                                     ),
-                                    array("marketingcareer" => "$markettingCarrier2",
+                                    array(
+                                        "marketingcareer" => "$markettingCarrier2",
                                         "marketingcareerName" => $markettingCarrierName2,
                                         "marketingflight" => "$markettingFN2",
                                         "operatingcareer" => "$markettingCarrier2",
@@ -3643,7 +3693,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                                     ),
                                 );
-                                $basic = array("system" => "Galileo",
+                                $basic = array(
+                                    "system" => "Galileo",
                                     "segment" => "3",
                                     "triptype" => $TripType,
                                     "career" => $vCarCode,
@@ -3679,11 +3730,9 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                     "transit" => $Transit,
                                     "traceid" => $TraceId,
                                 );
-
                             }
 
                             array_push($All, $basic);
-
                         } else if (isset($airPricePoint['airOption']['airBookingInfo']['@attributes']['SegmentRef'])) {
 
                             $FareInfoRef = $airPricePoint['airOption']['airBookingInfo']['@attributes']['FareInfoRef'];
@@ -3738,7 +3787,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             $CabinClass = $airPricePoint['airOption']['airBookingInfo']['@attributes']['CabinClass'];
 
                             $segment = array(
-                                array("marketingcareer" => "$markettingCarrier",
+                                array(
+                                    "marketingcareer" => "$markettingCarrier",
                                     "marketingcareerName" => $markettingCarrierName,
                                     "marketingflight" => "$markettingFN",
                                     "operatingcareer" => "$markettingCarrier",
@@ -3761,7 +3811,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                                 ),
                             );
-                            $basic = array("system" => "Galileo",
+                            $basic = array(
+                                "system" => "Galileo",
                                 "segment" => "1",
                                 "triptype" => $TripType,
                                 "career" => $vCarCode,
@@ -3794,17 +3845,15 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                                 "class" => $CabinClass,
                                 "refundable" => $Refundable,
                                 "segments" => $segment,
-                                "traceid" => $TraceId);
+                                "traceid" => $TraceId
+                            );
 
                             array_push($All, $basic);
-
                         }
-
                     }
                 }
             }
         }
-
     }
 
     if ($FlyHub == 1) {
@@ -3912,33 +3961,38 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $infantOtherCharge = $flight['Fares'][2]['OtherCharges'];
                 $infantServiceCharge = $flight['Fares'][2]['ServiceFee'];
 
-                $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
-                    "Tax" => "$adultTaxAmount",
-                    "PaxCount" => $adult,
-                    "PaxType" => "ADT",
-                    "Discount" => "0",
-                    "OtherCharges" => "$adultOtherCharge",
-                    "ServiceFee" => "$adultServiceCharge")
-                    ,
-                    "1" => array("BaseFare" => "$childBasePrice",
+                $PriceBreakDown = array(
+                    "0" => array(
+                        "BaseFare" => "$adultBasePrice",
+                        "Tax" => "$adultTaxAmount",
+                        "PaxCount" => $adult,
+                        "PaxType" => "ADT",
+                        "Discount" => "0",
+                        "OtherCharges" => "$adultOtherCharge",
+                        "ServiceFee" => "$adultServiceCharge"
+                    ),
+                    "1" => array(
+                        "BaseFare" => "$childBasePrice",
                         "Tax" => "$childTaxAmount",
                         "PaxCount" => $child,
                         "PaxType" => "CNN",
                         "Discount" => "0",
                         "OtherCharges" => "$childOtherCharge",
-                        "ServiceFee" => "$childServiceCharge"),
-                    "2" => array("BaseFare" => "$infantBasePrice",
+                        "ServiceFee" => "$childServiceCharge"
+                    ),
+                    "2" => array(
+                        "BaseFare" => "$infantBasePrice",
                         "Tax" => "$infantTaxAmount",
                         "PaxCount" => $infants,
                         "PaxType" => "INF",
                         "Discount" => "0",
                         "OtherCharges" => "$infantOtherCharge",
-                        "ServiceFee" => "$infantServiceCharge"),
+                        "ServiceFee" => "$infantServiceCharge"
+                    ),
                 );
 
                 $RawBasePrice = $adultBasePrice + $childBasePrice + $infantBasePrice;
                 $RawTaxPrice = $adultTaxAmount + $childTaxAmount + $infantTaxAmount;
-
             } else if ($adult > 0 && $child > 0) {
                 $BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare'] * $child;
                 $Taxes = $flight['Fares'][0]['Tax'] * $adult + $flight['Fares'][1]['Tax'] * $child;
@@ -3955,25 +4009,29 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $childOtherCharge = $flight['Fares'][1]['OtherCharges'];
                 $childServiceCharge = $flight['Fares'][1]['ServiceFee'];
 
-                $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
-                    "Tax" => "$adultTaxAmount",
-                    "PaxCount" => $adult,
-                    "PaxType" => "ADT",
-                    "Discount" => "0",
-                    "OtherCharges" => "$adultOtherCharge",
-                    "ServiceFee" => "$adultServiceCharge"),
-                    "1" => array("BaseFare" => "$childBasePrice",
+                $PriceBreakDown = array(
+                    "0" => array(
+                        "BaseFare" => "$adultBasePrice",
+                        "Tax" => "$adultTaxAmount",
+                        "PaxCount" => $adult,
+                        "PaxType" => "ADT",
+                        "Discount" => "0",
+                        "OtherCharges" => "$adultOtherCharge",
+                        "ServiceFee" => "$adultServiceCharge"
+                    ),
+                    "1" => array(
+                        "BaseFare" => "$childBasePrice",
                         "Tax" => "$childTaxAmount",
                         "PaxCount" => $child,
                         "PaxType" => "CNN",
                         "Discount" => "0",
                         "OtherCharges" => "$childOtherCharge",
-                        "ServiceFee" => "$childServiceCharge"),
+                        "ServiceFee" => "$childServiceCharge"
+                    ),
                 );
 
                 $RawBasePrice = $adultBasePrice + $childBasePrice;
                 $RawTaxPrice = $adultTaxAmount + $childTaxAmount;
-
             } else if ($adult > 0 && $infants > 0) {
                 $BasePrice = $flight['Fares'][0]['BaseFare'] * $adult + $flight['Fares'][1]['BaseFare'] * $infants;
                 $Taxes = $flight['Fares'][0]['Tax'] * $adult + $flight['Fares'][1]['Tax'] * $infants;
@@ -3990,25 +4048,29 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $infantOtherCharge = $flight['Fares'][1]['OtherCharges'];
                 $infantServiceCharge = $flight['Fares'][1]['ServiceFee'];
 
-                $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
-                    "Tax" => "$adultTaxAmount",
-                    "PaxCount" => $adult,
-                    "PaxType" => "ADT",
-                    "Discount" => "0",
-                    "OtherCharges" => "$adultOtherCharge",
-                    "ServiceFee" => "$adultServiceCharge"),
-                    "1" => array("BaseFare" => "$infantBasePrice",
+                $PriceBreakDown = array(
+                    "0" => array(
+                        "BaseFare" => "$adultBasePrice",
+                        "Tax" => "$adultTaxAmount",
+                        "PaxCount" => $adult,
+                        "PaxType" => "ADT",
+                        "Discount" => "0",
+                        "OtherCharges" => "$adultOtherCharge",
+                        "ServiceFee" => "$adultServiceCharge"
+                    ),
+                    "1" => array(
+                        "BaseFare" => "$infantBasePrice",
                         "Tax" => "$infantTaxAmount",
                         "PaxCount" => $infants,
                         "PaxType" => "INF",
                         "Discount" => "0",
                         "OtherCharges" => "$infantOtherCharge",
-                        "ServiceFee" => "$infantServiceCharge"),
+                        "ServiceFee" => "$infantServiceCharge"
+                    ),
                 );
 
                 $RawBasePrice = $adultBasePrice + $infantBasePrice;
                 $RawTaxPrice = $adultTaxAmount + $infantTaxAmount;
-
             } else if (isset($flight['Fares'][0])) {
                 $BasePrice = $flight['Fares'][0]['BaseFare'] * $adult;
                 $Taxes = $flight['Fares'][0]['Tax'] * $adult;
@@ -4021,18 +4083,20 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $adultOtherCharge = $flight['Fares'][0]['OtherCharges'];
                 $adultServiceCharge = $flight['Fares'][0]['ServiceFee'];
 
-                $PriceBreakDown = array("0" => array("BaseFare" => "$adultBasePrice",
-                    "Tax" => "$adultTaxAmount",
-                    "PaxCount" => $adult,
-                    "PaxType" => "ADT",
-                    "Discount" => "0",
-                    "OtherCharges" => "$adultOtherCharge",
-                    "ServiceFee" => "$adultServiceCharge"),
+                $PriceBreakDown = array(
+                    "0" => array(
+                        "BaseFare" => "$adultBasePrice",
+                        "Tax" => "$adultTaxAmount",
+                        "PaxCount" => $adult,
+                        "PaxType" => "ADT",
+                        "Discount" => "0",
+                        "OtherCharges" => "$adultOtherCharge",
+                        "ServiceFee" => "$adultServiceCharge"
+                    ),
                 );
 
                 $RawBasePrice = $adultBasePrice;
                 $RawTaxPrice = $adultTaxAmount;
-
             }
 
             $markup = 0;
@@ -4117,25 +4181,29 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                 $transitDetails = array("transit1" => "0");
 
-                $segment = array("0" => array("marketingcareer" => "$AirlineCode",
-                    "marketingcareerName" => "$AirlineName",
-                    "marketingflight" => "$FlightNumber",
-                    "operatingcareer" => "$OperatingCarrier",
-                    "operatingflight" => "$FlightNumber",
-                    "departure" => "$dAirportCode",
-                    "departureAirport" => "$dAirportName ",
-                    "departureLocation" => "$dCityName , $dCountryCode",
-                    "departureTime" => "$DepTime",
-                    "arrival" => "$aAirportCode",
-                    "arrivalTime" => "$ArrTime",
-                    "arrivalAirport" => "$aAirportName",
-                    "arrivalLocation" => "$aCityName , $aCountryCode",
-                    "flightduration" => "$Duration",
-                    "bookingcode" => "$BookingClass",
-                    "seat" => "$Availabilty"),
+                $segment = array(
+                    "0" => array(
+                        "marketingcareer" => "$AirlineCode",
+                        "marketingcareerName" => "$AirlineName",
+                        "marketingflight" => "$FlightNumber",
+                        "operatingcareer" => "$OperatingCarrier",
+                        "operatingflight" => "$FlightNumber",
+                        "departure" => "$dAirportCode",
+                        "departureAirport" => "$dAirportName ",
+                        "departureLocation" => "$dCityName , $dCountryCode",
+                        "departureTime" => "$DepTime",
+                        "arrival" => "$aAirportCode",
+                        "arrivalTime" => "$ArrTime",
+                        "arrivalAirport" => "$aAirportName",
+                        "arrivalLocation" => "$aCityName , $aCountryCode",
+                        "flightduration" => "$Duration",
+                        "bookingcode" => "$BookingClass",
+                        "seat" => "$Availabilty"
+                    ),
                 );
 
-                $basic = array("system" => "FlyHub",
+                $basic = array(
+                    "system" => "FlyHub",
                     "segment" => "1",
                     "uId" => $uId,
                     "triptype" => $TripType,
@@ -4172,7 +4240,6 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                 );
                 array_push($FlyHubResponse, $basic);
-
             } else if ($segments == 2) {
 
                 ///Leg 1
@@ -4228,23 +4295,27 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $JourneyDuration1 = $flight['segments'][1]['JourneyDuration'];
                 $Duration1 = floor($JourneyDuration1 / 60) . "H " . ($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60)) . "Min";
 
-                $segment = array("0" => array("marketingcareer" => "$AirlineCode",
-                    "marketingcareerName" => "$AirlineName",
-                    "marketingflight" => "$FlightNumber",
-                    "operatingcareer" => "$OperatingCarrier",
-                    "operatingflight" => "$FlightNumber",
-                    "departure" => "$dAirportCode",
-                    "departureAirport" => "$dAirportName ",
-                    "departureLocation" => "$dCityName , $dCountryCode",
-                    "departureTime" => "$DepTime",
-                    "arrival" => "$aAirportCode",
-                    "arrivalTime" => "$ArrTime",
-                    "arrivalAirport" => "$aAirportName",
-                    "arrivalLocation" => "$aCityName , $aCountryCode",
-                    "flightduration" => "$Duration",
-                    "bookingcode" => "$BookingClass",
-                    "seat" => "$Availabilty"),
-                    "1" => array("marketingcareer" => "$AirlineCode1",
+                $segment = array(
+                    "0" => array(
+                        "marketingcareer" => "$AirlineCode",
+                        "marketingcareerName" => "$AirlineName",
+                        "marketingflight" => "$FlightNumber",
+                        "operatingcareer" => "$OperatingCarrier",
+                        "operatingflight" => "$FlightNumber",
+                        "departure" => "$dAirportCode",
+                        "departureAirport" => "$dAirportName ",
+                        "departureLocation" => "$dCityName , $dCountryCode",
+                        "departureTime" => "$DepTime",
+                        "arrival" => "$aAirportCode",
+                        "arrivalTime" => "$ArrTime",
+                        "arrivalAirport" => "$aAirportName",
+                        "arrivalLocation" => "$aCityName , $aCountryCode",
+                        "flightduration" => "$Duration",
+                        "bookingcode" => "$BookingClass",
+                        "seat" => "$Availabilty"
+                    ),
+                    "1" => array(
+                        "marketingcareer" => "$AirlineCode1",
                         "marketingcareerName" => "$AirlineName1",
                         "marketingflight" => "$FlightNumber1",
                         "operatingcareer" => "$OperatingCarrier1",
@@ -4259,7 +4330,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         "arrivalLocation" => "$aCityName1 , $aCountryCode1",
                         "flightduration" => "$Duration1",
                         "bookingcode" => "$BookingClass1",
-                        "seat" => "$Availabilty"),
+                        "seat" => "$Availabilty"
+                    ),
                 );
 
                 $TransitTime = round(abs(strtotime($DepTime1) - strtotime($ArrTime)) / 60, 2);
@@ -4270,7 +4342,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                 $transitDetails = array("transit1" => $TransitDuration);
 
-                $basic = array("system" => "FlyHub",
+                $basic = array(
+                    "system" => "FlyHub",
                     "segment" => "2",
                     "uId" => $uId,
                     "triptype" => $TripType,
@@ -4303,10 +4376,10 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     "segments" => $segment,
                     "hold" => "$Hold",
                     "SearchID" => $SearchID,
-                    "ResultID" => $ResultID);
+                    "ResultID" => $ResultID
+                );
 
                 array_push($FlyHubResponse, $basic);
-
             } else if ($segments == 3) {
 
                 ///Leg 1
@@ -4389,23 +4462,27 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $JourneyDuration2 = $flight['segments'][2]['JourneyDuration'];
                 $Duration2 = floor($JourneyDuration1 / 60) . "H " . ($JourneyDuration1 - ((floor($JourneyDuration1 / 60)) * 60)) . "Min";
 
-                $segment = array("0" => array("marketingcareer" => "$OperatingCarrier",
-                    "marketingcareerName" => "$AirlineName",
-                    "marketingflight" => "$FlightNumber",
-                    "operatingcareer" => "$OperatingCarrier",
-                    "operatingflight" => "$FlightNumber",
-                    "departure" => "$dAirportCode",
-                    "departureAirport" => "$dAirportName ",
-                    "departureLocation" => "$dCityName , $dCountryCode",
-                    "departureTime" => "$DepTime",
-                    "arrival" => "$aAirportCode",
-                    "arrivalTime" => "$ArrTime",
-                    "arrivalAirport" => "$aAirportName",
-                    "arrivalLocation" => "$aCityName , $aCountryCode",
-                    "flightduration" => "$Duration",
-                    "bookingcode" => "$BookingClass",
-                    "seat" => "$Availabilty"),
-                    "1" => array("marketingcareer" => "$OperatingCarrier1",
+                $segment = array(
+                    "0" => array(
+                        "marketingcareer" => "$OperatingCarrier",
+                        "marketingcareerName" => "$AirlineName",
+                        "marketingflight" => "$FlightNumber",
+                        "operatingcareer" => "$OperatingCarrier",
+                        "operatingflight" => "$FlightNumber",
+                        "departure" => "$dAirportCode",
+                        "departureAirport" => "$dAirportName ",
+                        "departureLocation" => "$dCityName , $dCountryCode",
+                        "departureTime" => "$DepTime",
+                        "arrival" => "$aAirportCode",
+                        "arrivalTime" => "$ArrTime",
+                        "arrivalAirport" => "$aAirportName",
+                        "arrivalLocation" => "$aCityName , $aCountryCode",
+                        "flightduration" => "$Duration",
+                        "bookingcode" => "$BookingClass",
+                        "seat" => "$Availabilty"
+                    ),
+                    "1" => array(
+                        "marketingcareer" => "$OperatingCarrier1",
                         "marketingcareerName" => "$AirlineName1",
                         "marketingflight" => "$FlightNumber1",
                         "operatingcareer" => "$OperatingCarrier1",
@@ -4420,9 +4497,11 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         "arrivalLocation" => "$aCityName1 , $aCountryCode1",
                         "flightduration" => "$Duration1",
                         "bookingcode" => "$BookingClass1",
-                        "seat" => "$Availabilty"),
+                        "seat" => "$Availabilty"
+                    ),
 
-                    "2" => array("marketingcareer" => "$OperatingCarrier2",
+                    "2" => array(
+                        "marketingcareer" => "$OperatingCarrier2",
                         "marketingcareerName" => "$AirlineName2",
                         "marketingflight" => "$FlightNumber2",
                         "operatingcareer" => "$OperatingCarrier2",
@@ -4437,7 +4516,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         "arrivalLocation" => "$aCityName2 , $aCountryCode2",
                         "flightduration" => "$Duration2",
                         "bookingcode" => "$BookingClass2",
-                        "seat" => "$Availabilty"),
+                        "seat" => "$Availabilty"
+                    ),
                 );
 
                 $TransitTime = round(abs(strtotime($DepTime1) - strtotime($ArrTime)) / 60, 2);
@@ -4449,10 +4529,13 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $JourneyTime = $JourneyDuration + $JourneyDuration1 + $JourneyDuration2 + $TransitTime + $TransitTime1;
                 $TotalDuration = floor($JourneyTime / 60) . "H " . ($JourneyTime - ((floor($JourneyTime / 60)) * 60)) . "Min";
 
-                $transitDetails = array("transit1" => $TransitDuration,
-                    "transit2" => $TransitDuration1);
+                $transitDetails = array(
+                    "transit1" => $TransitDuration,
+                    "transit2" => $TransitDuration1
+                );
 
-                $basic = array("system" => "FlyHub",
+                $basic = array(
+                    "system" => "FlyHub",
                     "segment" => "3",
                     "uId" => $uId,
                     "triptype" => $TripType,
@@ -4489,10 +4572,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                 );
                 array_push($FlyHubResponse, $basic);
-
             }
         }
-
     }
 
     if ($Sabre == 1 && $Galileo == 1 && $FlyHub == 1) {
@@ -4500,12 +4581,10 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
         array_multisort(array_column($AllItenary, 'price'), SORT_ASC, $AllItenary);
         $json_string = json_encode($AllItenary, JSON_PRETTY_PRINT);
         print_r($json_string);
-
     } else if ($Sabre == 1 && $Galileo == 1) {
         array_multisort(array_column($All, 'price'), SORT_ASC, $All);
         $json_string = json_encode($All, JSON_PRETTY_PRINT);
         print_r($json_string);
-
     } else if ($Sabre == 1 && $FlyHub == 1) {
         $AllItenary = array_merge($FlyHubResponse, $All);
         array_multisort(array_column($AllItenary, 'price'), SORT_ASC, $AllItenary);
@@ -4520,16 +4599,13 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
         array_multisort(array_column($All, 'price'), SORT_ASC, $All);
         $json_string = json_encode($All, JSON_PRETTY_PRINT);
         print_r($json_string);
-
     } else if ($FlyHub == true) {
         $json_string = json_encode($FlyHubResponse, JSON_PRETTY_PRINT);
         print_r($json_string);
-
     }
 } else {
     $response['status'] = "success";
     $response['message'] = "Invalid response";
-
 }
 
 function FareRulesPolicy($comissionvalue, $FareCurrency, $Ait, $BaseFare, $Taxes)
@@ -4540,7 +4616,6 @@ function FareRulesPolicy($comissionvalue, $FareCurrency, $Ait, $BaseFare, $Taxes
     $AgentPrice = CurrencyConversation($TotalPrice, $FareCurrency);
 
     return $AgentPrice;
-
 }
 
 function CurrencyConversation($TotalPrice, $FareCurrency)
@@ -4556,10 +4631,8 @@ function CurrencyConversation($TotalPrice, $FareCurrency)
             $Sellingrate = $row['sellingrate'];
 
             return floor(($TotalPrice / $PaymentRate) * $Sellingrate);
-
         }
     } else {
         return $TotalPrice;
     }
-
 }
