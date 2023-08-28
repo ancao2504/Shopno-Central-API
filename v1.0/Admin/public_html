@@ -1,0 +1,36 @@
+[27-Aug-2023 09:19:35 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Incorrect DATE value: '2023-27-08' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php:366
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(366): mysqli->query()
+#1 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(115): getDashBoardData()
+#2 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php on line 366
+[27-Aug-2023 09:19:38 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Incorrect DATE value: '2023-27-08' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php:366
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(366): mysqli->query()
+#1 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(115): getDashBoardData()
+#2 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php on line 366
+[27-Aug-2023 09:19:46 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Incorrect DATE value: '2023-27-08' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php:366
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(366): mysqli->query()
+#1 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(115): getDashBoardData()
+#2 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php on line 366
+[27-Aug-2023 09:19:55 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Incorrect DATE value: '2023-27-08' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php:366
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(366): mysqli->query()
+#1 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(115): getDashBoardData()
+#2 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php on line 366
+[27-Aug-2023 09:19:58 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Incorrect DATE value: '2023-27-08' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php:366
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(366): mysqli->query()
+#1 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(115): getDashBoardData()
+#2 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php on line 366
+[27-Aug-2023 09:20:01 Asia/Dhaka] PHP Fatal error:  Uncaught mysqli_sql_exception: Incorrect DATE value: '2023-08-27' in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php:366
+Stack trace:
+#0 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(366): mysqli->query()
+#1 /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php(115): getDashBoardData()
+#2 {main}
+  thrown in /home/flyfarin/shopno.api.flyfarint.com/v1.0/Admin/Dashboard.php on line 366

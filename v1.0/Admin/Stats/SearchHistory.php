@@ -17,23 +17,23 @@ if (array_key_exists("all", $_GET)) {
     $TotalReturnSearch = $conn->query("SELECT * FROM search_history where searchtype ='return' ORDER BY id DESC")->num_rows;
     $TotalMulticitySearch = $conn->query("SELECT * FROM search_history where searchtype ='multicity' ORDER BY id DESC")->num_rows;
 
-    $TotalAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,search_history.searchtype, COUNT(*) as Search FROM
+    $TotalAgentWiseSearch = $conn->query("SELECT search_history.id, search_history.agentId, agent.company,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId where search_history.searchtype='oneway'  GROUP BY 
             search_history.agentId ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
             
-    array_push($TotalAgentWiseSearch, $conn->query("SELECT search_history.agentId, agent.company,search_history.searchtype, COUNT(*) as Search FROM
+    array_push($TotalAgentWiseSearch, $conn->query("SELECT search_history.id,search_history.agentId, agent.company,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId where search_history.searchtype='return' GROUP BY 
             search_history.agentId ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC));
 
-    $TotalInactiveAgentWiseSearch = $conn->query("SELECT company, phone FROM agent WHERE agentId NOT IN 
+    $TotalInactiveAgentWiseSearch = $conn->query("SELECT id,company, phone FROM agent WHERE agentId NOT IN 
             (SELECT agentId FROM search_history) ORDER BY company ASC")->fetch_all(MYSQLI_ASSOC);
     
             
-    $TotalStaffWiseSearch = $conn->query("SELECT agent.company, search_history.searchBy, search_history.searchtype, COUNT(*) as Search FROM
+    $TotalStaffWiseSearch = $conn->query("SELECT agent.id, agent.company, search_history.searchBy, search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY
              search_history.searchBy ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $TotalDestination = $conn->query("SELECT DepFrom, ArrTo,searchtype, COUNT(*) as Search FROM search_history 
+    $TotalDestination = $conn->query("SELECT id, DepFrom, ArrTo,searchtype, COUNT(*) as Search FROM search_history 
                     GROUP BY DepFrom, ArrTo HAVING COUNT(*) > 0  ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
 
@@ -55,23 +55,23 @@ if (array_key_exists("all", $_GET)) {
     $TodayMulticitySearch = $conn->query("SELECT * FROM search_history where searchtype ='multicity' AND searchTime>= CURRENT_DATE ORDER BY searchTime DESC")->num_rows;
 
     
-    $TodayAgentwise = $conn->query("SELECT search_history.agentId, agent.company,search_history.searchtype, COUNT(*) as Search FROM
+    $TodayAgentwise = $conn->query("SELECT search_history.id, search_history.agentId, agent.company,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId where search_history.searchtype='oneway' AND searchTime>= CURRENT_DATE GROUP BY 
             search_history.agentId ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
             
-    array_push($TodayAgentwise, $conn->query("SELECT search_history.agentId, agent.company,search_history.searchtype, COUNT(*) as Search FROM
-            `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId where search_history.searchtype='return' AND searchTime>= CURRENT_DATE GROUP BY 
-            search_history.agentId ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC));
+//     array_push($TodayAgentwise, $conn->query("SELECT search_history.id, search_history.agentId, agent.company,search_history.searchtype, COUNT(*) as Search FROM
+//             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId where search_history.searchtype='return' AND searchTime>= CURRENT_DATE GROUP BY 
+//             search_history.agentId ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC));
 
 
-    $TodayInactiveAgentWiseSearch = $conn->query("SELECT company, phone FROM agent WHERE agentId NOT IN 
+    $TodayInactiveAgentWiseSearch = $conn->query("SELECT id, company, phone FROM agent WHERE agentId NOT IN 
             (SELECT agentId FROM search_history where searchTime >= CURRENT_DATE)")->fetch_all(MYSQLI_ASSOC);
             
-    $TodayStaffWiseSearch = $conn->query("SELECT agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $TodayStaffWiseSearch = $conn->query("SELECT agent.id, agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId WHERE searchTime>= CURRENT_DATE GROUP BY
              search_history.searchBy ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $TodayDestination = $conn->query("SELECT DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history WHERE searchTime>= CURRENT_DATE
+    $TodayDestination = $conn->query("SELECT id, DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history WHERE searchTime>= CURRENT_DATE
                     GROUP BY DepFrom, ArrTo HAVING COUNT(*) > 0 ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
 
@@ -94,18 +94,18 @@ if (array_key_exists("all", $_GET)) {
     $YestardayReturnSearch = $conn->query("SELECT * FROM search_history where searchtype ='return' AND searchTime>= '$Yestardate' ORDER BY id DESC")->num_rows;
     $YestardayMulticitySearch = $conn->query("SELECT * FROM search_history where searchtype ='multicity' AND searchTime>= '$Yestardate' ORDER BY id DESC")->num_rows;
 
-    $YestardayAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $YestardayAgentWiseSearch = $conn->query("SELECT search_history.id,search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId WHERE searchTime = '$Yestardate%' GROUP BY 
             search_history.agentId HAVING searchTime>= '$Yestardate' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $YestardayInactiveAgentWiseSearch = $conn->query("SELECT company, phone FROM agent WHERE agentId NOT IN 
+    $YestardayInactiveAgentWiseSearch = $conn->query("SELECT id,company, phone FROM agent WHERE agentId NOT IN 
                                 (SELECT agentId FROM search_history where searchTime = '$Yestardate')")->fetch_all(MYSQLI_ASSOC);
             
-    $YestardayStaffWiseSearch = $conn->query("SELECT agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $YestardayStaffWiseSearch = $conn->query("SELECT agent.id, agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId WHERE searchTime = '$Yestardate%' GROUP BY
              search_history.searchBy HAVING searchTime>= '$Yestardate' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $YestardayDestination = $conn->query("SELECT DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history WHERE searchTime = '$Yestardate%'
+    $YestardayDestination = $conn->query("SELECT id, DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history WHERE searchTime = '$Yestardate%'
                     GROUP BY DepFrom, ArrTo HAVING COUNT(*) > 0 AND searchTime>= '$Yestardate' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
 
@@ -126,18 +126,18 @@ if (array_key_exists("all", $_GET)) {
     $Last7DaysReturnSearch = $conn->query("SELECT * FROM search_history where searchtype ='return' AND searchTime>= '$Last7date' ORDER BY id DESC")->num_rows;
     $Last7DaysMulticitySearch = $conn->query("SELECT * FROM search_history where searchtype ='multicity' AND searchTime>= '$Last7date' ORDER BY id DESC")->num_rows;
 
-    $Last7DaysAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last7DaysAgentWiseSearch = $conn->query("SELECT search_history.id, search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId WHERE searchTime >= '$Last7date%' GROUP BY 
             search_history.agentId ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last7DaysInactiveAgentWiseSearch = $conn->query("SELECT company, phone FROM agent WHERE agentId NOT IN 
+    $Last7DaysInactiveAgentWiseSearch = $conn->query("SELECT id, company, phone FROM agent WHERE agentId NOT IN 
                                 (SELECT agentId FROM search_history where searchTime = '$Last7date')")->fetch_all(MYSQLI_ASSOC);
             
-    $Last7DaysStaffWiseSearch = $conn->query("SELECT agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last7DaysStaffWiseSearch = $conn->query("SELECT agent.id, agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId where searchTime >= '$Last7date%' GROUP BY
              search_history.searchBy ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last7DaysDestination = $conn->query("SELECT DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history where searchTime >= '$Last7date%'
+    $Last7DaysDestination = $conn->query("SELECT id, DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history where searchTime >= '$Last7date%'
                     GROUP BY DepFrom, ArrTo HAVING COUNT(*) > 0 ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
 
@@ -158,19 +158,19 @@ if (array_key_exists("all", $_GET)) {
     $Last15DaysReturnSearch = $conn->query("SELECT * FROM search_history where searchtype ='return' AND searchTime>= '$Last15date' ORDER BY id DESC")->num_rows;
     $Last15DaysMulticitySearch = $conn->query("SELECT * FROM search_history where searchtype ='multicity' AND searchTime>= '$Last15date' ORDER BY id DESC")->num_rows;
 
-    $Last15DaysAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last15DaysAgentWiseSearch = $conn->query("SELECT search_history.id,search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY 
             search_history.agentId HAVING searchTime>= '$Last15date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last15DaysInactiveAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime, COUNT(*) as Search FROM
+    $Last15DaysInactiveAgentWiseSearch = $conn->query("SELECT search_history.id, search_history.agentId, agent.company,searchTime, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY 
             search_history.agentId HAVING Search < 1 AND searchTime>= '$Last15date'  ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
             
-    $Last15DaysStaffWiseSearch = $conn->query("SELECT agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last15DaysStaffWiseSearch = $conn->query("SELECT agent.id, agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY
              search_history.searchBy HAVING searchTime>= '$Last15date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last15DaysDestination = $conn->query("SELECT DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history 
+    $Last15DaysDestination = $conn->query("SELECT id, DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history 
                     GROUP BY DepFrom, ArrTo HAVING COUNT(*) > 0 AND searchTime>= '$Last15date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
 
@@ -191,19 +191,19 @@ if (array_key_exists("all", $_GET)) {
     $Last30DaysReturnSearch = $conn->query("SELECT * FROM search_history where searchtype ='return' AND searchTime>= '$Last30date' ORDER BY id DESC")->num_rows;
     $Last30DaysMulticitySearch = $conn->query("SELECT * FROM search_history where searchtype ='multicity' AND searchTime>= '$Last30date' ORDER BY id DESC")->num_rows;
 
-    $Last30DaysAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last30DaysAgentWiseSearch = $conn->query("SELECT search_history.id, search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY 
             search_history.agentId HAVING searchTime>= '$Last30date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last30DaysInactiveAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime, COUNT(*) as Search FROM
+    $Last30DaysInactiveAgentWiseSearch = $conn->query("SELECT search_history.id, search_history.agentId, agent.company,searchTime, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY 
             search_history.agentId HAVING Search < 1 AND searchTime>= '$Last30date'  ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
             
-    $Last30DaysStaffWiseSearch = $conn->query("SELECT agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last30DaysStaffWiseSearch = $conn->query("SELECT agent.id, agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY
              search_history.searchBy HAVING searchTime>= '$Last30date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last30DaysDestination = $conn->query("SELECT DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history 
+    $Last30DaysDestination = $conn->query("SELECT id, DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history 
                     GROUP BY DepFrom, ArrTo HAVING COUNT(*) > 0 AND searchTime>= '$Last30date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
 
@@ -224,19 +224,19 @@ if (array_key_exists("all", $_GET)) {
     $Last90DaysReturnSearch = $conn->query("SELECT * FROM search_history where searchtype ='return' AND searchTime>= '$Last90date' ORDER BY id DESC")->num_rows;
     $Last90DaysMulticitySearch = $conn->query("SELECT * FROM search_history where searchtype ='multicity' AND searchTime>= '$Last90date' ORDER BY id DESC")->num_rows;
 
-    $Last90DaysAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last90DaysAgentWiseSearch = $conn->query("SELECT search_history.id, search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY 
             search_history.agentId HAVING searchTime>= '$Last90date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last90DaysInactiveAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime, COUNT(*) as Search FROM
+    $Last90DaysInactiveAgentWiseSearch = $conn->query("SELECT search_history.id,search_history.agentId, agent.company,searchTime, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY 
             search_history.agentId HAVING Search < 1 AND searchTime>= '$Last90date'  ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
             
-    $Last90DaysStaffWiseSearch = $conn->query("SELECT agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last90DaysStaffWiseSearch = $conn->query("SELECT agent.id, agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY
              search_history.searchBy HAVING searchTime>= '$Last90date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last90DaysDestination = $conn->query("SELECT DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history 
+    $Last90DaysDestination = $conn->query("SELECT id, DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history 
                     GROUP BY DepFrom, ArrTo HAVING COUNT(*) > 0 AND searchTime>= '$Last90date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
 
@@ -257,19 +257,19 @@ if (array_key_exists("all", $_GET)) {
     $Last365DaysReturnSearch = $conn->query("SELECT * FROM search_history where searchtype ='return' AND searchTime>= '$Last365date' ORDER BY id DESC")->num_rows;
     $Last365DaysMulticitySearch = $conn->query("SELECT * FROM search_history where searchtype ='multicity' AND searchTime>= '$Last365date' ORDER BY id DESC")->num_rows;
 
-    $Last365DaysAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last365DaysAgentWiseSearch = $conn->query("SELECT search_history.id, search_history.agentId, agent.company,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY 
             search_history.agentId HAVING searchTime>= '$Last365date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last365DaysInactiveAgentWiseSearch = $conn->query("SELECT search_history.agentId, agent.company,searchTime, COUNT(*) as Search FROM
+    $Last365DaysInactiveAgentWiseSearch = $conn->query("SELECT search_history.id,search_history.agentId, agent.company,searchTime, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY 
             search_history.agentId HAVING Search < 1 AND searchTime>= '$Last365date'  ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
             
-    $Last365DaysStaffWiseSearch = $conn->query("SELECT agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
+    $Last365DaysStaffWiseSearch = $conn->query("SELECT agent.id, agent.company, search_history.searchBy,searchTime,search_history.searchtype, COUNT(*) as Search FROM
             `search_history` INNER JOIN agent ON agent.agentId = search_history.agentId GROUP BY
              search_history.searchBy HAVING searchTime>= '$Last365date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
-    $Last365DaysDestination = $conn->query("SELECT DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history 
+    $Last365DaysDestination = $conn->query("SELECT id, DepFrom, ArrTo,searchtype,searchTime, COUNT(*) as Search FROM search_history 
                     GROUP BY DepFrom, ArrTo HAVING COUNT(*) > 0 AND searchTime>= '$Last365date' ORDER BY Search DESC")->fetch_all(MYSQLI_ASSOC);
 
 

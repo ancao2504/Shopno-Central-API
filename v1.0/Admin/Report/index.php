@@ -18,11 +18,11 @@ if(array_key_exists("all", $_GET)){
     echo json_encode($response);
     }
 
-}else if(array_key_exits("search", $_GET)){
+}else if(array_key_exists("search", $_GET)){
     $Search = $_GET['search'];
     $getData = $conn->query("SELECT * FROM booking WHERE status = 'Ticketed' AND  ")->fetch_assoc();
     
-}else if(array_key_exists("startdate", $_GET) && array_key_exits("enddate", $_GET)){
+}else if(array_key_exists("startdate", $_GET) && array_key_exists("enddate", $_GET)){
         $StartDate = $_GET['startdate'];
         $EndDate = $_GET['enddate'];
         $getData = $conn->query("SELECT * FROM booking WHERE bookedAt=< $StartDate AND bookedAt=>$EndDate")->fetch_assoc();

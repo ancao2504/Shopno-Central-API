@@ -792,6 +792,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 									"lastTicketTime"=> "$timelimit",
 									"basePrice" => $baseFareAmount ,
 									"taxes" => $totalTaxAmount,
+									"netCost" => "$AgentPrice",
 									"price" => "$MarkupPrice",
 									"clientPrice"=> "$totalFare",
 									"comission"=> "$Commission",
