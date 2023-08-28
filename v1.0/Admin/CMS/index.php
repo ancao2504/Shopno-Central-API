@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_POST = json_decode(file_get_contents('php://input'), true);
     if (array_key_exists("option", $_GET)) {
         $Option = $_GET['option'];
-         if ($Option == 'companylogo') {
+        if ($Option == 'companylogo') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
             $fileSize = $_FILES['file']['size'];
@@ -149,9 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         } else if ($Option == "aboutus") {
             $about_us = $_POST["data"];
-            if (mysqli_num_rows($result) > 0) {
-
-                $sql = "UPDATE cms SET about_us ='$about_us' ";
+            
+                $sql = "UPDATE cms SET aboutus ='$about_us' ";
                 if ($conn->query($sql) === true) {
 
                     $response["status"] = "success";
@@ -161,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $response['message'] = "Update Failed";
                 }
                 echo json_encode($response);
-            }
+            
 
         } else if ($Option == "address") {
             $address = $_POST["data"];
@@ -232,8 +231,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         } else if ($Option == "fblink") {
             $fb_link = $_POST["data"];
-            if (mysqli_num_rows($result) > 0) {
-                $sql = "UPDATE cms SET fb_link ='$fb_link' ";
+                $sql = "UPDATE cms SET fblink ='$fb_link' ";
                 if ($conn->query($sql) === true) {
                     $response['status'] = "success";
                     $response['message'] = "facebook_link Update Successfully";
@@ -242,12 +240,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $response['message'] = "Update Failed";
                 }
                 echo json_encode($response);
-            }
+            
 
         } else if ($Option == "whatsappnum") {
             $whatsapp_num = $_POST['data'];
-            if (mysqli_num_rows($result) > 0) {
-                $sql = "UPDATE cms SET whatsapp_num = '$whatsapp_num'";
+                $sql = "UPDATE cms SET whatsappnum = '$whatsapp_num'";
                 if ($conn->query($sql) === true) {
                     $response['status'] = "success";
                     $response['message'] = "whatsapp Number Update Successfully";
@@ -256,13 +253,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $response['message'] = "Update Failed";
                 }
                 echo json_encode($response);
-            }
+            
 
         } else if ($Option == "linkedinlink") {
 
             $linkedin_link = $_POST['data'];
-            if (mysqli_num_rows($result) > 0) {
-                $sql = "UPDATE cms SET linkedin_link= '$linkedin_link' ";
+                $sql = "UPDATE cms SET linkedinlink= '$linkedin_link' ";
                 if ($conn->query($sql) === true) {
                     $response['status'] = "success";
                     $response['message'] = "linkedin_link Update Successfully";
@@ -271,13 +267,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $response['message'] = "Update Failed";
                 }
                 echo json_encode($response);
-            }
 
         } else if ($Option == "aboutuslong") {
 
             $aboutuslong = str_replace("'", "''", $_POST['data']);
-            if (mysqli_num_rows($result) > 0) {
-                $sql = "UPDATE cms SET about_us_long ='$aboutuslong'";
+    
+                $sql = "UPDATE cms SET aboutuslong ='$aboutuslong'";
                 if ($conn->query($sql) === true) {
                     $response['status'] = "success";
                     $response['message'] = "About Us Long Update Successfully";
@@ -286,12 +281,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $response['message'] = "Update Failed";
                 }
                 echo json_encode($response);
-            }
+            
 
         } else if ($Option == "privacy") {
             $privacy_policy = str_replace("'", "''", $_POST['data']);
-            if (mysqli_num_rows($result) > 0) {
-                $sql = "UPDATE cms SET privacy_policy='$privacy_policy' WHERE agentId='$agentId'";
+            
+                $sql = "UPDATE cms SET privacypolicy='$privacy_policy'";
                 if ($conn->query($sql) === true) {
                     $response['status'] = "success";
                     $response['message'] = "privacy policy Update Successfully";
@@ -301,12 +296,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 echo json_encode($response);
 
-            }
+            
 
         } else if ($Option == 'terms') {
             $terms_condition = str_replace("'", "''", $_POST["data"]);
-            if (mysqli_num_rows($result) > 0) {
-                $sql = "UPDATE cms SET terms_condition='$terms_condition' ";
+           
+                $sql = "UPDATE cms SET termscondition='$terms_condition' ";
 
                 if ($conn->query($sql) === true) {
                     $response['status'] = "success";
@@ -316,12 +311,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $response['message'] = "Update Failed";
                 }
                 echo json_encode($response);
-            }
+            
 
         } else if ($Option == 'refund') {
             $refund_policy = str_replace("'", "''", $_POST["data"]);
-            if (mysqli_num_rows($result) > 0) {
-                $sql = "UPDATE cms SET refund_policy= '$refund_policy'";
+            
+                $sql = "UPDATE cms SET refundpolicy= '$refund_policy'";
                 if ($conn->query($sql) === true) {
                     $response['status'] = "success";
                     $response['message'] = "refund policy Update Successfully";
@@ -330,7 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $response['message'] = "Update Failed";
                 }
                 echo json_encode($response);
-            }
+            
 
         } else if ($Option == 'favicon1') {
             $fileName = $_FILES['file']['name'];
@@ -507,7 +502,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 if (!isset($errorMSG)) {
                     $fileUrl = "$renameFile";
-                    $query = mysqli_query($conn, 'UPDATE `cms` SET `mainbannerimg`="' . $fileUrl . '" WHERE agentId="' . $agentId . '"');
+                    $query = mysqli_query($conn, 'UPDATE `cms` SET `mainbannerimg`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
@@ -559,7 +554,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // }
                 if (!isset($errorMSG)) {
                     $fileUrl = "$renameFile";
-                    $query = mysqli_query($conn, 'UPDATE `cms` SET `mainbannervideo`="' . $fileUrl . '" WHERE agentId="' . $agentId . '"');
+                    $query = mysqli_query($conn, 'UPDATE `cms` SET `mainbannervideo`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Video Updated Successfully", "status" => "success"));
                 }
@@ -610,7 +605,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 if (!isset($errorMSG)) {
                     $fileUrl = "$renameFile";
-                    $query = mysqli_query($conn, 'UPDATE `cms` SET `slider_img1`="' . $fileUrl . '" WHERE agentId="' . $agentId . '"');
+                    $query = mysqli_query($conn, 'UPDATE `cms` SET `sliderimg1`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
@@ -661,7 +656,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 if (!isset($errorMSG)) {
                     $fileUrl = "$renameFile";
-                    $query = mysqli_query($conn, 'UPDATE `cms` SET `slider_img2`="' . $fileUrl . '" WHERE agentId="' . $agentId . '"');
+                    $query = mysqli_query($conn, 'UPDATE `cms` SET `sliderimg2`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
@@ -712,7 +707,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 if (!isset($errorMSG)) {
                     $fileUrl = "$renameFile";
-                    $query = mysqli_query($conn, 'UPDATE `cms` SET `slider_img3`="' . $fileUrl . '" WHERE agentId="' . $agentId . '"');
+                    $query = mysqli_query($conn, 'UPDATE `cms` SET `sliderimg3`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
@@ -743,7 +738,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     move_uploaded_file($tempPath, $upload_path . $renameFile);
 
                     $fileUrl = "$renameFile";
-                    $query = mysqli_query($conn, 'UPDATE `cms` SET `slider_img4`="' . $fileUrl . '" WHERE agentId="' . $agentId . '"');
+                    $query = mysqli_query($conn, 'UPDATE `cms` SET `sliderimg4`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
 
@@ -777,7 +772,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if (!isset($errorMSG)) {
                     $fileUrl = "$renameFile";
-                    $query = mysqli_query($conn, 'UPDATE `cms` SET `slider_img5`="' . $fileUrl . '" WHERE agentId="' . $agentId . '"');
+                    $query = mysqli_query($conn, 'UPDATE `cms` SET `sliderimg5`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
@@ -792,7 +787,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     }
 
-}else if(array_key_exists('all', $_GET)){
+}
+else if(array_key_exists('all', $_GET)){
     $data = $conn->query("SELECT * FROM cms")->fetch_all(MYSQLI_ASSOC);
     if(!empty($data)){
         echo json_encode($data);
