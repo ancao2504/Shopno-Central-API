@@ -5620,8 +5620,11 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
         $grossCost = $SaveBookingData["grosscost"];
         $BaseFare = $SaveBookingData["basefare"];
         $taxFare = $SaveBookingData["tax"];
+        $segment=$SaveBookingData["segment"];
         $Coupon = isset($SaveBookingData["coupon"]) ? $SaveBookingData["coupon"] : '';
         $Platform = isset($SaveBookingData["platform"]) ? $SaveBookingData["platform"] : "";
+        $LastTicketTime = isset($SaveBookingData["timeLimit"]) ? $SaveBookingData["timeLimit"] : '';
+
         $airlinesCode =  isset($saveBookingAarray['flightData']['career']) ? $saveBookingAarray['flightData']['career']  : $saveBookingAarray['roundData']['career'];
 
         //Com
@@ -5645,8 +5648,7 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
 
 
 
-        $LastTicketTime = isset($newTimeLimit) ? $newTimeLimit : '';
-
+        
 
 
         $DateTime = date("D d M Y h:i A");
@@ -5765,11 +5767,12 @@ function addBookingQueue($conn, $BookingPNR, $AirlinesPNR, $UniversalPnr, $booki
                           `comissiontype`,
                           `comissionvalue`,
                           `airlinescomref`,
-                          `currency`)
+                          `currency`,
+                          `gds_segment`)
 
   VALUES('$uId','$BookingId','$userId','$AgentId','$staffId','$subagentId','$Email','$Phone','$Name','$Refundable','$UniversalPnr','$Pnr','$Type','$journeyType','$Pax','$adultBag','$childBag','$infantBag','$adultCount','$childCount','$infantCount',
         '$netCost','$subagentprice','$adultCostBase','$childCostBase','$infantCostBase','$adultCostTax','$childCostTax','$infantCostTax','$grossCost',
-        '$BaseFare','$taxFare','$From','$Airlines','$To','$System','Hold','$Coupon','$travelDate','$LastTicketTime','$dateTime','$BookedBy','$searchId','$resultId','$createdTime','$Platform','$airlinesCode','$comissiontype','$comissionvalue','$airlinescomref','$currency')";
+        '$BaseFare','$taxFare','$From','$Airlines','$To','$System','Hold','$Coupon','$travelDate','$LastTicketTime','$dateTime','$BookedBy','$searchId','$resultId','$createdTime','$Platform','$airlinesCode','$comissiontype','$comissionvalue','$airlinescomref','$currency', '$segment')";
 
         if ($conn->query($sql) === true) {
             addPax($conn, $BookingPNR, $AgentId, $subagentId, $userId, $BookingId, $PassengerData);

@@ -16,6 +16,7 @@ if (!empty($controlrow)) {
     $Sabre = $controlrow['sabre'];
     // $Sabre = 0;
     $Galileo = $controlrow['galileo'];
+    $Galileo = 0;
     $FlyHub = 0; //$controlrow['flyhub'];
 }
 
@@ -640,6 +641,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         "lastTicketTime" => "$timelimit",
                         "BasePrice" => "$baseFareAmount",
                         "Taxes" => "$totalTaxAmount",
+                        "netCost" => "$AgentPrice",
                         "price" => "$MarkupPrice",
                         "clientPrice" => "$totalFare",
                         "comission" => $Commission,
