@@ -9,7 +9,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
 
-    $sql = "SELECT dept1 AS dept, IF(arrive2='', arrive1, arrive2) AS arrive FROM groupfare
+    $sql = "SELECT deptName1 AS dept, IF(arriveName2='', arriveName1, arriveName2) AS arrive FROM groupfare
     WHERE deactivated='false' AND deleted='false'
     ORDER BY groupFareId DESC";
     $response = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);

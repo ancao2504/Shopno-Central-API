@@ -32,41 +32,62 @@ table where the "groupFareId" column matches the value of the variable "". The f
 function is then used to retrieve all the rows returned by the query as an array. */
     $flightData = $conn->query("SELECT * FROM groupfare WHERE groupFareId='$gfId'")->fetch_assoc();
 
-    $dept1 = $flightData["dept1"];
-    $arrive1 = $flightData["arrive1"];
-    $dept2 = $flightData["dept2"];
-    $arrive2 = $flightData["arrive2"];
+    $gfId = $flightData["groupFareId"];
+    $segment = $flightData["segment"];
+    $deptCode1 = $flightData["deptCode1"];
+    $deptName1 = $flightData["deptName1"];
+    $deptAddress1 = $flightData["deptAddress1"];
+    $deptCode2 = $flightData["deptCode2"];
+    $deptName2 = $flightData["deptName2"];
+    $deptAddress2 = $flightData["deptAddress2"];
+    $deptTime1 = $flightData["deptTime1"];
+    $deptTime2 = $flightData["deptTime2"];
+    $arriveCode1 = $flightData["arriveCode1"];
+    $arriveName1 = $flightData["arriveName1"];
+    $arriveAddress1 = $flightData["arriveAddress1"];
+    $arriveCode2 = $flightData["arriveCode2"];
+    $arriveName2 = $flightData["arriveName2"];
+    $arriveAddress2 = $flightData["arriveAddress2"];
+    $arriveTime1 = $flightData["arriveTime1"];
+    $arriveTime2 = $flightData["arriveTime2"];
+    $carrierName1 = $flightData["carrierName1"];
+    $carrierCode1 = $flightData["carrierCode1"];
+    $carrierNameBangla1 = $flightData["carrierNameBangla1"];
+    $carrierName2 = $flightData["carrierName2"];
+    $carrierCode2 = $flightData["carrierCode2"];
+    $carrierNameBangla2 = $flightData["carrierNameBangla2"];
     $flightNum1 = $flightData["flightNum1"];
     $flightNum2 = $flightData["flightNum2"];
     $flightCode1 = $flightData["flightCode1"];
     $flightCode2 = $flightData["flightCode2"];
     $cabin1 = $flightData["cabin1"];
     $cabin2 = $flightData["cabin2"];
-    $class1 = $flightData["cabin1"];
-    $class2 = $flightData["cabin2"];
+    $class1 = $flightData["class1"];
+    $class2 = $flightData["class2"];
     $baggage1 = $flightData["baggage1"];
     $baggage2 = $flightData["baggage2"];
     $travelTime1 = $flightData["travelTime1"];
     $travelTime2 = $flightData["travelTime2"];
     $transitTime = $flightData["transitTime"];
+    $totalSeat = $flightData["totalSeat"];
     $availableSeat = $flightData["availableSeat"];
-    $segment = $flightData["segment"];
-    $deptTime1=$flightData["deptTime1"];
-    $deptTime2=$flightData["deptTime2"];
+    $grossFare = $flightData["grossFare"];
+    $createdAt = $flightData["createdAt"];
+    $deactivated = $flightData["deactivated"];
+    $deleted = $flightData["deleted"];
     $currentDateTime = date('Y-m-d H:i:s');
-    $carrierName1 = json_decode($flightData["carrierName1"],true);
-    $carrierName2 = json_decode($flightData["carrierName2"],true);
+
+    $arrivalCode = (empty($arriveCode2)) ? $arriveCode2 : $arriveCode2;
+    $arrivalName = (empty($arriveName2)) ? $arriveName2 : $arriveName2;
+    $arrivalAddress = (empty($arriveAddress2)) ? $arriveAddress2 : $arriveAddress2;
+
+    $airlines = (empty($carrierName2))?$carrierName1:"$carrierName1  - $carrierName2";
 
 
-    $arrival = (empty($dept2)) ? $arrive1 : $arrive2;
-    $airlines = $carrierName1["name"] . "," . $carrierName2["name"];
-   
     /* This code block is checking if the number of groupfare passengers is greater than the available
     seats left in the group fare, which can be found in database. 
     This is a validation check to ensure that the number of passengers does not exceed the available
     seats before proceeding with the booking process. */
-
-
     if ($pax > $availableSeat) {
         $response["pax"] = $pax;
         $response["availableSeat"] = $availableSeat;
@@ -88,8 +109,8 @@ function is then used to retrieve all the rows returned by the query as an array
             // echo("$lastAmount\n$grossCost\n");
             $newAmount = $lastAmount - $grossCost;
             // echo("$newAmount\n");
-            $details="GFBOOKING-$gfId"."_PAX-$pax";
-            
+            $details = "GFBOOKING-$gfId" . "_PAX-$pax";
+
             $sql = "INSERT INTO agent_ledger (agentId, purchase, lastAmount, transactionId, details, reference, actionBy, createdAt)
             VALUES ('$agentId', '$grossCost', '$newAmount', '$gfId', '$details', '$gfId', '$agentId' ,'$currentDateTime')";
 
@@ -112,9 +133,10 @@ function is then used to retrieve all the rows returned by the query as an array
                 }
 
                 $sql = "INSERT gf_booking
-                (bookingId, agentId, customer_email, customer_phone, customer_name, pax, deptFrom, airlines, arriveTo, segment, `status`, travelDate, 
-                bookedAt,  grossCost, groupFareId)
-                VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$dept1', '$airlines', '$arrival', '$segment', 'Issued', '$deptTime1', '$currentDateTime',
+                (bookingId, agentId, customer_email, customer_phone, customer_name, pax, deptFromCode, deptFromName, deptFromAddress, 
+                airlines, arriveToCode, arriveToName, arriveToAddress, segment, `status`, travelDate, bookedAt,  grossCost, groupFareId)
+                VALUES ('$bookingId','$agentId',  '$email', '$phone', '$name', '$pax', '$deptCode1', '$deptName1', '$deptAddress1', 
+                '$airlines', '$arrivalCode', '$arrivalName', '$arrivalAddress', '$segment', 'Issued', '$deptTime1', '$currentDateTime',
                  '$grossCost', '$gfId')";
 
                 // echo ($sql); exit;
