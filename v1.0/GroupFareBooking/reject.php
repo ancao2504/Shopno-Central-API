@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $status = $bookingDataRow["status"];
         $refundAmount = $bookingDataRow["grossCost"];
         $pax = $bookingDataRow["pax"];
-        
+
 
         /* This code block is checking if the status of the booking is already "rejected". */
         if ($status == "rejected") {
@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($conn->query($ledgerUpdate)) {
 
-                $updateGF = "UPDATE groupfare SET availableSeat=availableSeat+'$pax' WHERE groupFareId='$gfId'";
+                $updateGF = "UPDATE groupfare SET availableSeat=availableSeat+'$pax', deactivated='true' WHERE groupFareId='$gfId'";
 
                 if ($conn->query($updateGF)) {
 

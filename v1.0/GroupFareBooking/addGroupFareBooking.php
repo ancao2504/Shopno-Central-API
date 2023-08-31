@@ -35,27 +35,15 @@ function is then used to retrieve all the rows returned by the query as an array
     $gfId = $flightData["groupFareId"];
     $segment = $flightData["segment"];
     $deptCode1 = $flightData["deptCode1"];
-    $deptName1 = $flightData["deptName1"];
-    $deptAddress1 = $flightData["deptAddress1"];
     $deptCode2 = $flightData["deptCode2"];
-    $deptName2 = $flightData["deptName2"];
-    $deptAddress2 = $flightData["deptAddress2"];
     $deptTime1 = $flightData["deptTime1"];
     $deptTime2 = $flightData["deptTime2"];
     $arriveCode1 = $flightData["arriveCode1"];
-    $arriveName1 = $flightData["arriveName1"];
-    $arriveAddress1 = $flightData["arriveAddress1"];
     $arriveCode2 = $flightData["arriveCode2"];
-    $arriveName2 = $flightData["arriveName2"];
-    $arriveAddress2 = $flightData["arriveAddress2"];
     $arriveTime1 = $flightData["arriveTime1"];
     $arriveTime2 = $flightData["arriveTime2"];
-    $carrierName1 = $flightData["carrierName1"];
     $carrierCode1 = $flightData["carrierCode1"];
-    $carrierNameBangla1 = $flightData["carrierNameBangla1"];
-    $carrierName2 = $flightData["carrierName2"];
     $carrierCode2 = $flightData["carrierCode2"];
-    $carrierNameBangla2 = $flightData["carrierNameBangla2"];
     $flightNum1 = $flightData["flightNum1"];
     $flightNum2 = $flightData["flightNum2"];
     $flightCode1 = $flightData["flightCode1"];
@@ -77,11 +65,26 @@ function is then used to retrieve all the rows returned by the query as an array
     $deleted = $flightData["deleted"];
     $currentDateTime = date('Y-m-d H:i:s');
 
-    $arrivalCode = (empty($arriveCode2)) ? $arriveCode2 : $arriveCode2;
-    $arrivalName = (empty($arriveName2)) ? $arriveName2 : $arriveName2;
-    $arrivalAddress = (empty($arriveAddress2)) ? $arriveAddress2 : $arriveAddress2;
+    //regex
+    $deptName1 = str_replace("'", "''", $flightData["deptName1"]);
+    $deptAddress1 = str_replace("'", "''", $flightData["deptAddress1"]);
+    $deptName2 = str_replace("'", "''", $flightData["deptName2"]);
+    $deptAddress2 = str_replace("'", "''", $flightData["deptAddress2"]);
+    $arriveName1 = str_replace("'", "''", $flightData["arriveName1"]);
+    $arriveAddress1 = str_replace("'", "''", $flightData["arriveAddress1"]);
+    $arriveName2 = str_replace("'", "''", $flightData["arriveName2"]);
+    $arriveAddress2 = str_replace("'", "''", $flightData["arriveAddress2"]);
+    $carrierName1 = str_replace("'", "''", $flightData["carrierName1"]);
+    $carrierNameBangla1 = str_replace("'", "''", $flightData["carrierNameBangla1"]);
+    $carrierName2 = str_replace("'", "''", $flightData["carrierName2"]);
+    $carrierNameBangla2 = str_replace("'", "''", $flightData["carrierNameBangla2"]);
 
-    $airlines = (empty($carrierName2))?$carrierName1:"$carrierName1  - $carrierName2";
+    /*putting arrival destination*/
+    $arrivalCode = (empty($arriveCode2)) ? $arriveCode1 : $arriveCode2;
+    $arrivalName = (empty($arriveName2)) ? $arriveName1 : $arriveName2;
+    $arrivalAddress = (empty($arriveAddress2)) ? $arriveAddress1 : $arriveAddress2;
+
+    $airlines = (empty($carrierName2)) ? $carrierName1 : "$carrierName1  - $carrierName2";
 
 
     /* This code block is checking if the number of groupfare passengers is greater than the available
