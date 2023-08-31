@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST['id'];
     $userId = $_POST['userId'];
     $actionBy = $_POST['actionBy'];
-    $reason = $_POST['reason'];
+    // $reason = $_POST['reason'];
 
     //Agent Info
     $agentdata = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM `agent` where userId='$userId' AND platform='B2C'"));
@@ -69,8 +69,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $Message1 = "Dear Shopno Tours Travels, Our Stuff $staffName has been
               requested for deposit request amount of $amount BDT on $Time which has been rejected";
     }
-
-    $sql1 = "UPDATE deposit_request SET status='rejected', remarks='$reason',rejectBy='$actionBy',actionAt='$Time' WHERE id='$id' AND platform='B2B'";
+    // remarks='$reason',
+    $sql1 = "UPDATE deposit_request SET status='rejected', rejectBy='$actionBy',actionAt='$Time' WHERE id='$id' AND platform='B2B'";
 
     if ($conn->query($sql1) === true) {
                 $response['status'] = "success";

@@ -8,55 +8,73 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 if (array_key_exists("all", $_GET)) {
-    $sql = "SELECT * FROM agent WHERE platform = 'B2C'";
-    echo json_encode($conn->query($sql)->fetch_all(MYSQLI_ASSOC));
+    // $sql = "SELECT * FROM agent WHERE platform = 'B2C'";
+    // // echo json_encode($conn->query($sql)->fetch_all(MYSQLI_ASSOC));
     // $Data = array();
     // if ($result = $conn->query($sql)) {
+        
     //     while ($row = $result->fetch_assoc()) {
     //         $UserId = $row["userId"];
-    //         /**Total Booking */
-    //         $bookingSql = "SELECT COUNT(*) FROM booking WHERE userId ='$UserId' AND status ='Ticketed'";
-    //         if ($conn->query($bookingSql)) {
-    //             $totalBooking = $bookingSql;
-    //         } else {
-    //             $totalBooking = 0;
-    //         }
-    //         /**Total Traveler */
-    //         $travelerSql = "SELECT COUNT(*) FROM passengers WHERE userId ='$UserId'";
-    //         if ($conn->query($travelerSql)) {
-    //             $totalTraveler = $travelerSql;
-    //         } else {
-    //             $totalTraveler = 0;
-    //         }
+            
+    // //         /**Total Booking */
+    // //         $bookingSql = "SELECT COUNT(*) FROM booking WHERE userId ='$UserId' AND status ='Ticketed'";
+    // //         if ($conn->query($bookingSql)) {
+    // //             $totalBooking = $bookingSql;
+    // //         } else {
+    // //             $totalBooking = 0;
+    // //         }
+    // //         /**Total Traveler */
+    // //         $travelerSql = "SELECT COUNT(*) FROM passengers WHERE userId ='$UserId'";
+    // //         if ($conn->query($travelerSql)) {
+    // //             $totalTraveler = $travelerSql;
+    // //         } else {
+    // //             $totalTraveler = 0;
+    // //         }
 
-    //         //   /**Total Search */ 
-    //         // $searchSql = "SELECT COUNT(*) FROM search_history WHERE userId ='$UserId'";
-    //         // if($conn->query($searchSql)){
-    //         //     $totalSearch = $searchSql;
-    //         // }else{
-    //         //     $totalSearch = 0;
-    //         // }
+    // //         //   /**Total Search */ 
+    // //         // $searchSql = "SELECT COUNT(*) FROM search_history WHERE userId ='$UserId'";
+    // //         // if($conn->query($searchSql)){
+    // //         //     $totalSearch = $searchSql;
+    // //         // }else{
+    // //         //     $totalSearch = 0;
+    // //         // }
 
-    //         /**Last Balance */
-    //         $BalanceSql = $conn->query("SELECT lastAmount FROM agent_ledger WHERE userId ='$UserId' LIMIT 1")->fetch_all(MYSQLI_ASSOC);
+    // //         /**Last Balance */
+    //         $BalanceSql = $conn->query("SELECT lastAmount FROM agent_ledger WHERE userId ='$UserId' LIMIT 1")->fetch_assoc();
     //         if (!empty($BalanceSql)) {
-    //             $lastAmount = $BalanceSql;
+    //             $lastAmount = $BalanceSql["lastAmount"];
     //         } else {
     //             $lastAmount = 0;
     //         }
-
-    //         $response = $row;
-    //         // $response = $totalBooking;
-    //         // $response = $totalTraveler;
-    //         // $response = $totalSearch;
-    //         $response = $lastAmount;
-    //         array_push($Data, $response);
+    //         $Data["lastAmount"] = $lastAmount;
+    // //         $response = $row;
+    // //         // $response = $totalBooking;
+    // //         // $response = $totalTraveler;
+    // //         // $response = $totalSearch;
+    //         // $response = $lastAmount;
+    // //         array_push($Data, $response);
     //     }
-    //     echo json_encode($Data);
+    //     // echo json_encode($Data);
     // } else {
     //     $response = [];
     //     echo json_encode($response);
     // }
+
+
+    $respopnse=$conn->query("SELECT agent.*, agent_ledger.lastAmount FROM `agent_ledger`
+    JOIN agent ON agent_ledger.userId=agent.userId
+    WHERE 
+    agent.platform='B2C'
+    AND
+    agent_ledger.id IN (
+        SELECT MAX(id)
+        FROM agent_ledger
+        GROUP BY userId
+    )")->fetch_all(MYSQLI_ASSOC);
+
+   
+    echo json_encode($respopnse);
+    
 } else if (array_key_exists("status", $_GET)) {
     $_POST = json_decode(file_get_contents("php://input"), true);
     $Status = $_POST['status'];
