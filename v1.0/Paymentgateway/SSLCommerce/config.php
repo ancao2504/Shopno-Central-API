@@ -2,8 +2,8 @@
 
 if (!defined('PROJECT_PATH')) {
 
-    // define('PROJECT_PATH', 'https://shopno.api.flyfarint.com/v1.0/Paymentgateway/SSLCommerce'); // replace this value with your project path
-    define('PROJECT_PATH', 'http://localhost/shopno-tours-travels/v1.0/Paymentgateway/SSLCommerce'); // replace this value with your project path
+    define('PROJECT_PATH', 'https://shopno.api.flyfarint.com/v1.0/Paymentgateway/SSLCommerce'); // replace this value with your project path
+    // define('PROJECT_PATH', 'http://localhost/shopno-tours-travels/v1.0/Paymentgateway/SSLCommerce'); // replace this value with your project path
 }
 
 if (!defined('IS_SANDBOX')) {

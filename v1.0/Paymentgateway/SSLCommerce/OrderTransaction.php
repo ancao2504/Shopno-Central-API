@@ -139,12 +139,13 @@ class OrderTransaction
                 echo json_encode($response);
 
                 //redirect
-                header("Location: https://b2b.shopnotour.com/dashboard/depositreq/successful");
-                // header("Location: http://localhost:3002/dashboard/depositreq/successful");
+                // header("Location: https://b2b.shopnotour.com/dashboard/depositreq/successful");
+                header("Location: http://localhost:3002/dashboard/depositreq/successful");
                 ////////////////////////
             }
         } else {
-            header("Location: https://b2b.shopnotour.com/dashboard/depositreq/fail");
+            // header("Location: https://b2b.shopnotour.com/dashboard/depositreq/fail");
+            header("Location: http://localhost:3002/dashboard/depositreq/fail");
             exit();
         }
     }
@@ -241,12 +242,13 @@ class OrderTransaction
                 echo json_encode($response);
 
                 //redirect
-                header("Location: https://b2b.shopnotour.com/dashboard/depositreq/successful");
-                // header("Location: http://localhost:3002/dashboard/depositreq/successful");
+                // header("Location: https://b2b.shopnotour.com/dashboard/depositreq/successful");
+                header("Location: http://localhost:3002/dashboard/depositreq/successful");
                 ////////////////////////
             }
         } else {
-            header("Location: https://b2b.shopnotour.com/dashboard/depositreq/fail");
+            // header("Location: https://b2b.shopnotour.com/dashboard/depositreq/fail");
+            header("Location: http://localhost:3002/dashboard/depositreq/fail");
             exit();
         }
     }

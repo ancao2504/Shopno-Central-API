@@ -48,14 +48,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if ($conn->query($ledgerUpdate)) {
 
-                $updateGF = "UPDATE groupfare SET availableSeat=availableSeat+'$pax', deactivated='true' WHERE groupFareId='$gfId'";
+                $updateGF = "UPDATE groupfare SET availableSeat=availableSeat+'$pax', deactivated='false' WHERE groupFareId='$gfId'";
 
                 if ($conn->query($updateGF)) {
 
                     $updateStatus = "UPDATE `gf_booking` SET `status`='rejected', `updatedAt`='$updatedAt' WHERE `groupFareId`='$gfId' AND `bookingId`='$bookingId'";
 
                     if ($conn->query($updateStatus)) {
-
                         $response["status"] = "success";
                         $response["message"] = "Booking Rejected Successfully";
                         echo json_encode($response);
