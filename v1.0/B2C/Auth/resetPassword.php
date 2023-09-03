@@ -1,6 +1,6 @@
 <?php
 
-include_once('../config.php');
+include_once('../../config.php');
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -16,7 +16,7 @@ if(array_key_exists("auth",$_GET)){
     if(!empty($row)){  
         $Email = $row['email']; 
         $response['status'] = "active";
-        $response['agentId'] = $row['agentId'];
+        $response['userId'] = $row['userId'];
         $response['email'] = $row['email']; 
         $response['link'] = $row['link'];
         $response['expire'] = $row['expire'];             

@@ -99,10 +99,10 @@ if (array_key_exists("userId", $_GET)) {
 
             $_POST = json_decode(file_get_contents('php://input'), true);
 
-            $agentId = $_POST["agentId"];
+            $userId = $_POST["userId"];
             $newPassword = $_POST["newpassword"];
 
-            $updatesql = "UPDATE `agent` SET `password`='$newPassword' WHERE agentId='$agentId'";
+            $updatesql = "UPDATE `agent` SET `password`='$newPassword' WHERE userId='$userId'";
 
             if ($conn->query($updatesql) === true) {
                 $response['status'] = "success";

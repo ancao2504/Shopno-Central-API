@@ -7,10 +7,7 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-use PHPMailer\PHPMailer\Exception;
-use PHPMailer\PHPMailer\PHPMailer;
 
-require '../../../vendor/autoload.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -46,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   if (isset($bookingId)) {
     $sqlTravelDate = mysqli_query($conn, "SELECT * FROM booking WHERE bookingId='$bookingId' AND userId='$userId'");
     $rowTravelDate = mysqli_fetch_array($sqlTravelDate, MYSQLI_ASSOC);
-
+    // echo json_encode($rowTravelDate); exit;
     if (!empty($rowTravelDate)) {
       $travelDate = $rowTravelDate['travelDate'];
       $pax = $rowTravelDate['pax'];
@@ -124,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   $LeadgerUpdate = "INSERT INTO `agent_ledger`(`userId`,`purchase`, `lastAmount`, `transactionId`, `details`, `reference`,`actionBy`,`createdAt`)
     VALUES ('$userId','$subagentCost','$agentnewBalance','$bookingId','$Type Air Ticket $Route - $Airlines By $userId ','$bookingId','','$createdTime')";
-
+  // echo json_encode($LeadgerUpdate); exit;
   if ($conn->query($LeadgerUpdate) === true) {
 
     // $conn->query("INSERT INTO `activityLog`(`ref`,`userId`,`status`,`actionBy`, `actionAt`)
