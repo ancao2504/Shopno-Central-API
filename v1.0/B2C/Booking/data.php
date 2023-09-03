@@ -1099,14 +1099,14 @@ else if (array_key_exists("agentId", $_GET) && array_key_exists("userId", $_GET)
         
 
     echo json_encode($return_arr);
-}else if (array_key_exists("all", $_GET) && array_key_exists("userId", $_GET) && array_key_exists("agentId", $_GET)) {
+}else if (array_key_exists("all", $_GET) && array_key_exists("userId", $_GET)) {
     
-    $agentId = $_GET["agentId"];
+    // $agentId = $_GET["agentId"];
     $userId = $_GET["userId"];
     $staffId = "";
-    $sql = "SELECT * FROM `booking` WHERE agentId='$agentId' AND userId='$userId' ORDER BY id DESC";
+    $sql = "SELECT * FROM `booking` WHERE userId='$userId' ORDER BY id DESC";
     $result = $conn->query($sql);
-    $totaldata = $conn->query("SELECT * FROM `booking` where agentId='$agentId' AND userId='$userId'")->num_rows;
+    $totaldata = $conn->query("SELECT * FROM `booking` where userId='$userId'")->num_rows;
 
     $return_arr = array();
     $Data = array();
@@ -1115,7 +1115,7 @@ else if (array_key_exists("agentId", $_GET) && array_key_exists("userId", $_GET)
         while ($row = $result->fetch_assoc()) {
             $count++;
             $staffId = $row['staffId'];
-            $agentId = $row['agentId'];
+            // $agentId = $row['agentId'];
             $pnr = $row['pnr'];
             $tripType = $row['tripType'];
 

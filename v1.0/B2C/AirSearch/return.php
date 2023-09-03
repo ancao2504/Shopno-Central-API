@@ -16,6 +16,7 @@ $controlrow = mysqli_fetch_array($control,MYSQLI_ASSOC);
 if(!empty($controlrow)){
 	$Sabre = $controlrow['sabre'];
 	$Galileo =  $controlrow['galileo'];
+	$Galileo =  0;
 	$FlyHub = $controlrow['flyhub'];
 }
 

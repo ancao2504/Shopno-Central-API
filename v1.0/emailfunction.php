@@ -248,6 +248,7 @@ function sendToAgent($subject, $message, $agentId, $header, $property, $data)
   $companyName = $row["company"];
   $agentEmailAdd = $row["email"];
 
+
   $emailBody = '<!DOCTYPE html>
   <html lang="en">
     <head>
@@ -634,10 +635,12 @@ function sendToAgent($subject, $message, $agentId, $header, $property, $data)
 
     if (!$mail->Send()) {
       echo "Mailer Error: " . $mail->ErrorInfo;
+      
     }
 
   } catch (Exception $e) {
     echo "Mailer Error: " . $e;
+   
   }
 
 }
