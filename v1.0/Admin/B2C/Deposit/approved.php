@@ -364,7 +364,3 @@ Pay Using Account Number:  <span style="color: #dc143c">' . $sender . '</span>
 
 }
 $conn->close();
-?>
-
-
-

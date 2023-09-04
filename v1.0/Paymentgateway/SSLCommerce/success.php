@@ -16,16 +16,20 @@ include_once(__DIR__ . "/OrderTransaction.php");
 use SslCommerz\SslCommerzNotification;
 
 $sslc = new SslCommerzNotification();
+$ot = new OrderTransaction();
+
 $tran_id = $_POST['tran_id'];
-$amount = $_POST['amount'];
+$amount = $_POST['store_amount'];
 $currency = $_POST['currency'];
 
-$ot = new OrderTransaction();
+
 $sql = $ot->getRecordQuery($tran_id);
 $result = $conn->query($sql);
+
+//if b2b $row will have agentId,
+//if b2c $row will have userId
 $row = $result->fetch_array(MYSQLI_ASSOC);
-$agentId = $row['agentId'];
-// echo ($agentId);
+
 
 if ($row['status'] == 'Pending' || $row['status'] == 'Processing') {
   $validated = $sslc->orderValidate($_POST, $tran_id, $amount, $currency);
@@ -39,125 +43,27 @@ if ($row['status'] == 'Pending' || $row['status'] == 'Processing') {
       $bank_trxId = $_POST['bank_tran_id'];
       $amount = $_POST['amount'];
 
-      saveData($conn, $tran_id, $amount, $agentId, $bank_trxId);
+     /* The code block is checking if the key 'agentId' exists in the array. If it
+     does, it means that the transaction is a B2B transaction. Otherwise it is a B2C transaction */
+     
+      if (isset($row['agentId'])) {
 
+        $_POST['agentId'] = $row['agentId'];
+        $ot->saveB2BTransaction($conn, $_POST);
+
+      } else if (isset($row['userId'])) {
+
+        $_POST['userId'] = $row['userId'];
+        $ot->saveB2CTransaction($conn, $_POST);
+
+      }
     } else {
-
     }
-
   } else {
 
     echo 'Payment was not valid. Please contact with the merchant';
-
   }
-
 } else {
 
   echo 'Invalid Information1';
-
-}
-function saveData($conn, $tran_id, $amount, $agentId, $bank_trxId)
-{
-
-  $DuplicateItem = $conn->query("SELECT * from deposit_request where transactionId='$tran_id'")->num_rows;
-
-  // print($DuplicateItem);
-  if ($DuplicateItem == 0) {
-
-    $DepositId = "";
-    $sql = "SELECT * FROM deposit_request ORDER BY depositId DESC LIMIT 1";
-    $result = $conn->query($sql);
-    if ($result->num_rows > 0) {
-      while ($row = $result->fetch_assoc()) {
-        $outputString = preg_replace('/[^0-9]/', '', $row["depositId"]);
-        $number = (int) $outputString + 1;
-        $DepositId = "STD$number";
-      }
-    } else {
-      $DepositId ="STD1000";
-    }
-
-    $agentdata = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'"), MYSQLI_ASSOC);
-
-    if (!empty($agentdata)) {
-      $CompanyName = $agentdata["company"];
-      $CompanyEmail = $agentdata["email"];
-    }
-
-    $createdAt = date('Y-m-d H:i:s');
-
-    //Last Amount     
-    $amountsql = "SELECT lastAmount FROM `agent_ledger` WHERE agentId='$agentId' ORDER BY id DESC LIMIT 1";
-    $result1 = mysqli_query($conn, $amountsql);
-    $data1 = mysqli_fetch_array($result1);
-
-    $lastAmount = 0;
-    if (!empty($data1['lastAmount'])) {
-      $lastAmount = $data1['lastAmount'];
-    } else {
-      $lastAmount = 0;
-    }
-
-    $lessamount = $amount * 0.978;
-
-    $newAmount = $lastAmount + $lessamount;
-    echo($agentId);
-
-    $sql = "INSERT INTO `deposit_request`(
-                    `agentId`,
-                    `depositId`,
-                    `sender`,
-                    `reciever`,
-                    `paymentway`,
-                    `paymentmethod`,
-                    `transactionId`,
-                    `amount`,
-                    `ref`,
-                    `status`,
-                    `createdAt`,
-                    `platform`)
-                    VALUES( 
-                    '$agentId',
-                    '$DepositId',
-                    '$CompanyName',
-                    'ST Marchant',
-                    'sslcommerce',
-                    'SSL',
-                    '$tran_id',
-                    '$lessamount',
-                    '$bank_trxId',
-                    'approved',
-                    '$createdAt',
-                    'B2B')";
-  // echo ($sql);
-    if ($conn->query($sql) === TRUE) {
-      $conn->query("INSERT INTO `agent_ledger`(`agentId`,`deposit`, `lastAmount`,`details`, `transactionId`,`reference`,`createdAt`, `platform`)
-                        VALUES ('$agentId','$lessamount','$newAmount','$lessamount TK Deposit successfully SSL Commerce - PaymentId-$bank_trxId','$tran_id','$DepositId','$createdAt', 'B2B')");
-
-      //send email
-      $adminMessage = "We sent you new deposit request amount of $amount BDT, Which has been approved.";
-      $agentMessage = "Your new deposit request amount of $amount BDT has been accepeted, Thank you";
-      $subject = "Deposit Request Approved";
-      $header = $subject;
-      $property = "Deposit ID: ";
-      $data = $DepositId;
-
-      sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
-      sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
-      ///////////////////////////
-
-      $response['status'] = 'success';
-      $response['message'] = 'Deposit Successfully Done';
-      echo json_encode($response);
-
-      //redirect
-      header("Location: https://b2b.shopnotour.com/dashboard/depositreq/successful");
-      // header("Location: http://localhost:3002/dashboard/depositreq/successful");
-      ////////////////////////
-    }
-  } else {
-    header("Location: https://b2b.shopnotour.com/dashboard/depositreq/fail");
-    exit();
-  }
-
 }

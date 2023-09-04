@@ -99,10 +99,10 @@ if (array_key_exists("userId", $_GET)) {
 
             $_POST = json_decode(file_get_contents('php://input'), true);
 
-            $agentId = $_POST["agentId"];
+            $userId = $_POST["userId"];
             $newPassword = $_POST["newpassword"];
 
-            $updatesql = "UPDATE `agent` SET `password`='$newPassword' WHERE agentId='$agentId'";
+            $updatesql = "UPDATE `agent` SET `password`='$newPassword' WHERE userId='$userId'";
 
             if ($conn->query($updatesql) === true) {
                 $response['status'] = "success";
@@ -157,10 +157,11 @@ else if(array_key_exists("edit",$_GET)){
     $email = $_POST['email'];
     $phone = $_POST['phone'];
     $password = $_POST['password'];
+    $address = $_POST['address'];
     if(isset($userId)){
         $checker = $conn->query("SELECT * FROM agent WHERE userId = '$userId'")->fetch_assoc();
         if(!empty($checker)){
-                $sql = "UPDATE agent SET name = '$name', email='$email', phone='$phone', password='$password' WHERE userId ='$userId'";
+                $sql = "UPDATE agent SET name = '$name', email='$email', phone='$phone', password='$password', userAddress='$address' WHERE userId ='$userId'";
                 if($conn->query($sql)){
                     $response['status'] = "success";
                     $response['message'] ="User Details updated successfully";

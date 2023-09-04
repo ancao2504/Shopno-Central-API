@@ -11,6 +11,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
     
     $conn->query("UPDATE groupfare SET deleted='true' WHERE deptTime1 < CURDATE() AND deleted='false'");
+    $conn->query("UPDATE groupfare SET deactivated='true' WHERE availableSeat=0 AND deactivated='false' AND deleted='false'");
+    
     
     $response = $conn->query("SELECT * FROM groupfare WHERE deactivated='false' AND deleted='false' ORDER BY groupFareId DESC")->fetch_all(MYSQLI_ASSOC);
 

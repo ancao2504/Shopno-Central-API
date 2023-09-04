@@ -8,17 +8,14 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
 
-require("../vendor/autoload.php");
 
 if (array_key_exists("email", $_GET)) {
 
   $email = $_GET["email"];
 
   $sql = mysqli_query($conn, "SELECT * FROM agent WHERE email='$email'");
+
   $row = mysqli_fetch_array($sql, MYSQLI_ASSOC);
 
   if (!empty($row)) {
@@ -38,11 +35,17 @@ if (array_key_exists("email", $_GET)) {
 
 
       $header = $subject = "Forget Password";
-      $property = "Password: ";
-      $data = $encryption;
-      $message = "Please use this temporary password, 
-      Once after login please change this password with your own.";
-
+      $property = "";
+      $data = "";
+      $message = 'We saw you recently requested a new password. We are here to help!
+      <br>
+      Please 
+      <a style="font-size: 13px; color: #003566" href="'.$link.'" target="_blank">click</a>  here to reset your Shopno Tours Travels account. Link
+      valid for 10 minutes.
+      <br>
+      If you didn’t make this request then let us know immediately. We take your security seriously. <br>
+      If you have any questions, just contact us we are always ready to help you out.';
+      
       sendToAgent($subject, $message, $agentId, $header, $property, $data);
 
       

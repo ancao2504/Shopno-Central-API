@@ -38,8 +38,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $id = $data['id'];
     $userId = $data['userId'];
-    $staffId = $data['staffId'];
-
     $depositId = $data['depositId'];
     $transactionId = $data['transactionId'];
     $ref = $data['ref'];
@@ -52,25 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $Time = date("Y-m-d H:i:s");
     $DateTime = date("D d M Y h:i A");
 
-    $staffName = "";
-    $staffsql = mysqli_query($conn, "SELECT * FROM `staffList` where staffId='$staffId'");
-    $staffdata = mysqli_fetch_array($staffsql);
-    if (!empty($staffdata)) {
-        $staffName = $staffdata['name'];
-        $Message = "Dear $Name, Your Deposit Request has been
-        Rejected amount of $amount BDT on $Time";
-
-        $Message1 = "Dear Shopno Tours Travels,  Our
-              requested deposit request amount of $amount BDT on $Time which has been rejected";
-    } else {
-        $Message = "Dear $Name, Your Deposit Request has been
-              Rejected amount of $amount BDT on $DateTime";
-
-        $Message1 = "Dear Shopno Tours Travels, Our Stuff $staffName has been
-              requested for deposit request amount of $amount BDT on $Time which has been rejected";
-    }
-
-    $sql1 = "UPDATE deposit_request SET status='rejected', remarks='$reason',rejectBy='$actionBy',actionAt='$Time' WHERE id='$id' AND platform='B2B'";
+    
+    $sql1 = "UPDATE deposit_request SET status='rejected', rejectBy='$actionBy', remarks='$reason',actionAt='$Time' WHERE id='$id' AND platform='B2C'";
 
     if ($conn->query($sql1) === true) {
                 $response['status'] = "success";
@@ -81,4 +62,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 }
 $conn->close();
-?>

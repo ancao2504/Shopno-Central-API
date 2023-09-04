@@ -8,7 +8,7 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 if(array_key_exists("all", $_GET)){
-    $sql = "SELECT * FROM booking WHERE platform = 'B2C'";
+    $sql = "SELECT * FROM booking WHERE platform LIKE 'B2C%'";
     $result = $conn->query($sql);
     $Data = array();
     if($result->num_rows > 0){
@@ -20,6 +20,10 @@ if(array_key_exists("all", $_GET)){
             
             $response = $row;
             $response['lastBalance'] = $balance;
+
+            $userQuery=mysqli_query($conn, "SELECT * FROM agent WHERE userId='$UserId'");
+            $userData=mysqli_fetch_assoc($userQuery);
+            $response["userEmail"]=$userData["email"];
             array_push($Data, $response);
         }
         echo json_encode($Data);
