@@ -60,19 +60,31 @@ if (array_key_exists("all", $_GET)) {
     //     echo json_encode($response);
     // }
 
+    //////////////////////////////////Query Explanation///////////////////////////////////////////////
+    /*
+    1. COALESCE to handle cases where there may not be a corresponding ledger entry (defaulting to 0).
+    2. LEFT JOIN operation is used to join between the agent table and the agent_ledger table, 
+    allowing you to combine data from both tables priotizing left table which is agent Table.
+    3. subquery within the LEFT JOIN condition. It ensures that you are joining with the latest 
+    ledger entry for each user by finding the maximum id from the agent_ledger table for the same user
+    */
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    $respopnse=$conn->query(
+    "SELECT A.id, A.userId,A.name, A.email, A.phone, COALESCE(AL.lastAmount, 0) AS lastAmount
+    FROM agent AS A
+    LEFT JOIN agent_ledger AS AL
+    ON A.userId = AL.userId
+    AND AL.id = (
+            SELECT MAX(id)
+            FROM agent_ledger AS subAL
+            WHERE subAL.userId = A.userId
+    )
+    WHERE A.platform = 'B2C'
+    ORDER BY A.userId DESC
+    "
+    )->fetch_all(MYSQLI_ASSOC);
 
-    $respopnse=$conn->query("SELECT agent.*, agent_ledger.lastAmount FROM `agent_ledger`
-    JOIN agent ON agent_ledger.userId=agent.userId
-    WHERE 
-    agent.platform='B2C'
-    AND
-    agent_ledger.id IN (
-        SELECT MAX(id)
-        FROM agent_ledger
-        GROUP BY userId
-    )")->fetch_all(MYSQLI_ASSOC);
-
-   
     echo json_encode($respopnse);
     
 } else if (array_key_exists("status", $_GET)) {
