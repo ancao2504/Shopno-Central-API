@@ -76,7 +76,7 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
 
 
     # First, save the input data into local database table `orders`
-    $sql = $query->saveTransactionQuery($post_data);
+    $sql = $query->saveTransactionQuery($post_data, "B2B");
 
     if ($conn->query($sql) === TRUE) {
 
@@ -89,7 +89,7 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
 
         echo json_encode($response);
     }
-} else if (array_key_exists("amount", $_GET) && array_key_exists("userId", $_GET)) {
+}else if (array_key_exists("amount", $_GET) && array_key_exists("userId", $_GET) && array_key_exists("app", $_GET) ) {
     
     $query = new OrderTransaction();
 
@@ -152,7 +152,84 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
     // exit;
 
     # First, save the input data into local database table `orders`
-    $sql = $query->saveTransactionQuery($post_data);
+    
+    $sql = $query->saveTransactionQuery($post_data, "B2CApp");
+    if ($conn->query($sql) === TRUE) {
+        
+        # Call the Payment Gateway Library
+        $sslcomz = new SslCommerzNotification();
+        $sslcomz->makePayment($post_data, 'hosted');
+        
+    } else {
+        $response['status'] = 'success';
+        $response['message'] = 'Someting went Wrong';
+
+        echo json_encode($response);
+    }
+}else if (array_key_exists("amount", $_GET) && array_key_exists("userId", $_GET) && !array_key_exists("app", $_GET)) {
+    
+    $query = new OrderTransaction();
+
+    
+    $userId = $_GET["userId"];
+    $_SESSION['userId'] = $userId;
+    $_SESSION['amount'] = $_GET["amount"];
+
+
+    
+    $userdata = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM agent WHERE userId='$userId'"), MYSQLI_ASSOC);
+    // echo json_encode($userdata);
+    // exit;
+    if (!empty($userdata)) {
+        $name = $userdata["name"];
+        $email = $userdata["email"];
+        $phone = $userdata["phone"];
+        $address = $userdata["companyadd"];
+    }
+
+
+    # Organize the submitted/inputted data
+    $post_data = array();
+
+    $post_data['total_amount'] = $_GET['amount'];
+    $post_data['currency'] = "BDT";
+    $post_data['tran_id'] = "$userId-" . uniqid();
+    $post_data['userId'] = $userId;
+
+    # CUSTOMER INFORMATION
+    $post_data['cus_name'] = isset($name) ? $name : "John Doe";
+    $post_data['cus_email'] = isset($email) ? $email : "john.doe@email.com";
+    $post_data['cus_add1'] = "Dhaka";
+    $post_data['cus_add2'] = "Dhaka";
+    $post_data['cus_city'] = "Dhaka";
+    $post_data['cus_state'] = "Dhaka";
+    $post_data['cus_postcode'] = "1000";
+    $post_data['cus_country'] = "Bangladesh";
+    $post_data['cus_phone'] = isset($phone) ? $phone : "01711111111";
+    $post_data['cus_fax'] = "01711111111";
+
+    # SHIPMENT INFORMATION
+    $post_data["shipping_method"] = "YES";
+    $post_data['ship_name'] = "Store Test";
+    $post_data['ship_add1'] = "Dhaka";
+    $post_data['ship_add2'] = "Dhaka";
+    $post_data['ship_city'] = "Dhaka";
+    $post_data['ship_state'] = "Dhaka";
+    $post_data['ship_postcode'] = "1000";
+    $post_data['ship_phone'] = "";
+    $post_data['ship_country'] = "Bangladesh";
+
+    $post_data['emi_option'] = "1";
+    $post_data["product_category"] = "Electronic";
+    $post_data["product_profile"] = "general";
+    $post_data["product_name"] = "Computer";
+    $post_data["num_of_item"] = "1";
+
+    // echo json_encode($post_data);
+    // exit;
+
+    # First, save the input data into local database table `orders`
+    $sql = $query->saveTransactionQuery($post_data, "B2C");
     if ($conn->query($sql) === TRUE) {
         
         # Call the Payment Gateway Library
