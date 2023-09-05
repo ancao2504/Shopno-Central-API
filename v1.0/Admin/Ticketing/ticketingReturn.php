@@ -23,6 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   if (!empty($rowTicketing)) {
     $agentId = $rowTicketing["agentId"];
+    $userId = $rowTicketing["userId"];
     $subagentId = $rowTicketing["subagentId"];
     $bookingId = $rowTicketing["bookingId"];
     $staffId = $rowTicketing["staffId"];
@@ -49,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
     if (isset($agentId)) {
-      $sql1 = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
+      $sql1 = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId' AND userId='$userId'");
       $row1 = mysqli_fetch_array($sql1, MYSQLI_ASSOC);
 
       if (!empty($row1)) {
@@ -63,40 +64,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $staffsql2 = mysqli_query($conn, "SELECT * FROM `staffList` where agentId = '$agentId' AND staffId='$staffId'");
     $staffrow2 = mysqli_fetch_array($staffsql2, MYSQLI_ASSOC);
 
-
-    
-    
-    $sql1 = mysqli_query($conn, "SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' 
+    $sql1 = mysqli_query($conn, "SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' AND userId='$userId'
             ORDER BY id DESC LIMIT 1");
     $row1 = mysqli_fetch_array($sql1, MYSQLI_ASSOC);
+
     if (!empty($row1)) {
       $lastAmount = $row1['lastAmount'];
     }
-    
+
     $newBalance = $lastAmount + $netCost;
 
-    
+
     if ($Bonus == "yes") {
       $BonusAmountadded = $bonusAmount + 100;
       $conn->query("UPDATE `agent` SET `bonus` = '$BonusAmountadded' where agentId = '$agentId'");
     }
-    
-    $sql = "INSERT INTO `agent_ledger`(`agentId`,`returnMoney`, `lastAmount`, `transactionId`, `details`, `reference`, `actionBy`, `createdAt`)
+    if ($agentId != "") {
+      $ledgerUpdate = "INSERT INTO `agent_ledger`(`agentId`,`returnMoney`, `lastAmount`, `transactionId`, `details`, `reference`, `actionBy`, `createdAt`)
          VALUES ('$agentId','$netCost','$newBalance','$bookingId','Return Money $Type Air Ticket $Route - $Airlines','$bookingId','$actionBy','$createdTime')";
 
-    if ($conn->query($sql)) {
-      $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
-                    VALUES ('$bookingId','$agentId','Issue Rejecteed','$remarks','$actionBy','$createdTime')");
+      $activityLogUpdate = "INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
+      VALUES ('$bookingId','$agentId','Issue Rejected','$remarks','$actionBy','$createdTime')";
+    } else if ($userId != "") {
+      $ledgerUpdate = "INSERT INTO `agent_ledger`(`userId`,`returnMoney`, `lastAmount`, `transactionId`, `details`, `reference`, `actionBy`, `createdAt`)
+         VALUES ('$userId','$netCost','$newBalance','$bookingId','Return Money $Type Air Ticket $Route - $Airlines','$bookingId','$actionBy','$createdTime')";
 
-$conn->query("UPDATE `booking` SET `status`='Issue Rejected',`lastUpdated`='$createdTime' where bookingId='$bookingId'");
+      $activityLogUpdate = "INSERT INTO `activitylog`(`ref`,`userId`,`status`,`remarks`,`actionBy`, `actionAt`)
+      VALUES ('$bookingId','$userId','Issue Rejected','$remarks','$actionBy','$createdTime')";
+    }
 
+    if ($conn->query($ledgerUpdate)) {
+      $conn->query($activityLogUpdate);
+      $conn->query("UPDATE `booking` SET `status`='Issue Rejected',`lastUpdated`='$createdTime' where bookingId='$bookingId'");
 
+      if ($GDS == "FlyHub") {
 
-if ($GDS == "FlyHub") {
+        $curlflyhubauth = curl_init();
 
-  $curlflyhubauth = curl_init();
-
-  curl_setopt_array($curlflyhubauth, array(
+        curl_setopt_array($curlflyhubauth, array(
           CURLOPT_URL => 'https://api.flyhub.com/api/v1/Authenticate',
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_ENCODING => '',
@@ -113,13 +118,13 @@ if ($GDS == "FlyHub") {
             'Content-Type: application/json'
           ),
         ));
-        
+
         $Tokenresponse = curl_exec($curlflyhubauth);
-        
+
         $TokenJson = json_decode($Tokenresponse, true);
-        
+
         $FlyhubToken = $TokenJson['TokenId'];
-        
+
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -141,16 +146,28 @@ if ($GDS == "FlyHub") {
         ));
 
         $FlyHubresponse = curl_exec($curl);
-        
+
         curl_close($curl);
+
+        $subject = $header = "Booking Issue Request Rejected";
+        $property = "Booking ID: ";
+        $data = $bookingId;
+        $adminMessage = "Our Booking Issue Request has been Rejected";
+        $agentMessage = "Your Booking Issue Request has been Rejected";
+        sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
+        sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
+
+        $response['status'] = "success";
+        $response['InvoiceId'] = "$bookingId";
+        $response['message'] = "Ticketing Refund Successfully";
       } else if ($GDS == "Sabre") {
         try {
           $client_id = base64_encode("V1:351640:27YK:AA");
           $client_secret = base64_encode("spt5164");
-          
+
           $token = base64_encode($client_id . ":" . $client_secret);
           $data = 'grant_type=client_credentials';
-          
+
           $headers = array(
             'Authorization: Basic ' . $token,
             'Accept: /',
@@ -169,15 +186,15 @@ if ($GDS == "FlyHub") {
           curl_close($ch);
           $resf = json_decode($res, 1);
           $access_token = $resf['access_token'];
-          
+
           //print_r($resf);
-          
+
         } catch (Exception $e) {
         }
-        
-        
+
+
         $curl = curl_init();
-        
+
         curl_setopt_array($curl, array(
           CURLOPT_URL => 'https://api.platform.sabre.com/v1/trip/orders/cancelBooking',
           CURLOPT_RETURNTRANSFER => true,
@@ -199,13 +216,13 @@ if ($GDS == "FlyHub") {
             "Authorization: Bearer $access_token"
           ),
         ));
-        
+
         $SabreResponse = curl_exec($curl);
         curl_close($curl);
       }
 
-      
-      
+
+
       $subject = $header = "Booking Issue Request Rejected";
       $property = "Booking ID: ";
       $data = $bookingId;
@@ -213,7 +230,7 @@ if ($GDS == "FlyHub") {
       $agentMessage = "Your Booking Issue Request has been Rejected";
       sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
       sendToAgent($subject, $agentMessage, $agentId, $header, $property, $data);
-      
+
       $response['status'] = "success";
       $response['InvoiceId'] = "$bookingId";
       $response['message'] = "Ticketing Refund Successfully";

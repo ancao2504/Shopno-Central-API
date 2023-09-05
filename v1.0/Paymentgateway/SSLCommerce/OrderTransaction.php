@@ -103,7 +103,8 @@ class OrderTransaction
                     `ref`,
                     `status`,
                     `createdAt`,
-                    `platform`)
+                    `platform`, 
+                    `actionAt`)
                     VALUES( 
                     '$agentId',
                     '$DepositId',
@@ -116,7 +117,8 @@ class OrderTransaction
                     '$bank_trxId',
                     'approved',
                     '$createdAt',
-                    'B2B')";
+                    'B2B',
+                    '$createdAt')";
             // echo ($sql);
             if ($conn->query($sql) === TRUE) {
                 $conn->query("INSERT INTO `agent_ledger`(`agentId`,`deposit`, `lastAmount`,`details`, `transactionId`,`reference`,`createdAt`, `platform`)
@@ -204,7 +206,8 @@ class OrderTransaction
                     `ref`,
                     `status`,
                     `createdAt`,
-                    `platform`)
+                    `platform`,
+                    `actionAt`)
                     VALUES( 
                     '$userId',
                     '$DepositId',
@@ -217,7 +220,8 @@ class OrderTransaction
                     '$bank_trxId',
                     'approved',
                     '$createdAt',
-                    'B2C')";
+                    'B2C',
+                    '$createdAt')";
 
 
 
@@ -242,12 +246,12 @@ class OrderTransaction
                 echo json_encode($response);
 
                 //redirect
-                // header("Location: https://b2b.shopnotour.com/dashboard/depositreq/successful");
+                // header("Location: https://shopnotour.com/dashboard/depositreq/successful");
                 header("Location: http://localhost:3002/dashboard/depositreq/successful");
                 ////////////////////////
             }
         } else {
-            // header("Location: https://b2b.shopnotour.com/dashboard/depositreq/fail");
+            // header("Location: https://shopnotour.com/dashboard/depositreq/fail");
             header("Location: http://localhost:3002/dashboard/depositreq/fail");
             exit();
         }

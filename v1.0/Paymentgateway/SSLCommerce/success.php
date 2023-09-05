@@ -19,10 +19,10 @@ $sslc = new SslCommerzNotification();
 $ot = new OrderTransaction();
 
 $tran_id = $_POST['tran_id'];
-$amount = $_POST['store_amount'];
+$amount = $_POST['amount'];
 $currency = $_POST['currency'];
 
-
+// echo json_encode($_POST); exit;
 $sql = $ot->getRecordQuery($tran_id);
 $result = $conn->query($sql);
 

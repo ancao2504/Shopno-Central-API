@@ -18,9 +18,8 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 use SslCommerz\SslCommerzNotification;
 
 if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
-
     
-
+    $query = new OrderTransaction();
     
     $agentId = $_GET["agentId"];
     $_SESSION['agentId'] = $agentId;
@@ -77,7 +76,6 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
 
 
     # First, save the input data into local database table `orders`
-    $query = new OrderTransaction();
     $sql = $query->saveTransactionQuery($post_data);
 
     if ($conn->query($sql) === TRUE) {
@@ -91,8 +89,7 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
 
         echo json_encode($response);
     }
-} 
-else if (array_key_exists("amount", $_GET) && array_key_exists("userId", $_GET)) {
+} else if (array_key_exists("amount", $_GET) && array_key_exists("userId", $_GET)) {
     
     $query = new OrderTransaction();
 
