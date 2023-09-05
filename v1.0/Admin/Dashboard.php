@@ -71,23 +71,23 @@ if (array_key_exists("agentId", $_GET)) {
 
     } else if (array_key_exists("deposit", $_GET)) {
         //deposit status information
-        $TotalDeposit = $conn->query("SELECT * FROM subagent_deposit_request where agentId='$agentId' ORDER BY id DESC")->num_rows;
-        $TotalDepositData = $conn->query("SELECT depositId, status, paymentway, amount, (select company from subagent where subagentId=subagent_deposit_request.subagentId) as company
-         FROM subagent_deposit_request where agentId='$agentId' AND subagentId !='' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
-        $TotalApproved = $conn->query("SELECT * FROM subagent_deposit_request where agentId='$agentId' AND status ='approved' ORDER BY id DESC")->num_rows;
-        $TotalApprovedDeposit = $conn->query("SELECT SUM(amount) as totalApprovedAmount FROM `subagent_deposit_request` WHERE agentId='$agentId' AND subagentId !='' AND status='approved' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
-        $TotalRejected = $conn->query("SELECT * FROM subagent_deposit_request where agentId='$agentId' AND status ='rejected' ORDER BY id DESC")->num_rows;
-        $TotalRejectedDeposit = $conn->query("SELECT SUM(amount) as totalRejectedAmount FROM `subagent_deposit_request` WHERE agentId='$agentId' AND status='rejected'ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
-        $TotalPending = $conn->query("SELECT * FROM subagent_deposit_request where agentId='$agentId' AND status ='pending' ORDER BY id DESC")->num_rows;
-        $TotalPendingDeposit = $conn->query("SELECT SUM(amount) as totalPendingAmount FROM `subagent_deposit_request` WHERE agentId='$agentId' AND status='pending' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
-        $TotalCheque = $conn->query("SELECT * FROM subagent_deposit_request where agentId='$agentId' AND paymentway='Cheque' ORDER BY id DESC")->num_rows;
-        $TotalChequeDeposit = $conn->query("SELECT SUM(amount) as totalChequeAmount FROM `subagent_deposit_request` WHERE agentId='$agentId' AND paymentway='Cheque' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
-        $TotalBankTransfer = $conn->query("SELECT * FROM subagent_deposit_request where agentId='$agentId' AND paymentway='bankTransfer' ORDER BY id DESC")->num_rows;
-        $TotalBankTransferDeposit = $conn->query("SELECT SUM(amount) as totalBankTransferAmount FROM `subagent_deposit_request` WHERE agentId='$agentId' AND paymentway='bankTransfer' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
-        $TotalMobileTransfer = $conn->query("SELECT * FROM subagent_deposit_request where agentId='$agentId' AND paymentway='mobileTransfer' ORDER BY id DESC")->num_rows;
-        $TotalMobileTransferDeposit = $conn->query("SELECT SUM(amount) as totalMobileTransferAmount FROM `subagent_deposit_request` WHERE agentId='$agentId' AND paymentway='mobileTransfer' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
-        $TotalCash = $conn->query("SELECT * FROM subagent_deposit_request where agentId='$agentId' AND paymentway='Cash' ORDER BY id DESC")->num_rows;
-        $TotalCashDeposit = $conn->query("SELECT SUM(amount) as totalCashAmount FROM `subagent_deposit_request` WHERE agentId='$agentId' AND paymentway='Cash' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
+        $TotalDeposit = $conn->query("SELECT * FROM deposit_request where agentId='$agentId' ORDER BY id DESC")->num_rows;
+        $TotalDepositData = $conn->query("SELECT depositId, status, paymentway, amount, (select company from subagent where subagentId=deposit_request.subagentId) as company
+         FROM deposit_request where agentId='$agentId' AND subagentId !='' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
+        $TotalApproved = $conn->query("SELECT * FROM deposit_request where agentId='$agentId' AND status ='approved' ORDER BY id DESC")->num_rows;
+        $TotalApprovedDeposit = $conn->query("SELECT SUM(amount) as totalApprovedAmount FROM `deposit_request` WHERE agentId='$agentId' AND subagentId !='' AND status='approved' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
+        $TotalRejected = $conn->query("SELECT * FROM deposit_request where agentId='$agentId' AND status ='rejected' ORDER BY id DESC")->num_rows;
+        $TotalRejectedDeposit = $conn->query("SELECT SUM(amount) as totalRejectedAmount FROM `deposit_request` WHERE agentId='$agentId' AND status='rejected'ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
+        $TotalPending = $conn->query("SELECT * FROM deposit_request where agentId='$agentId' AND status ='pending' ORDER BY id DESC")->num_rows;
+        $TotalPendingDeposit = $conn->query("SELECT SUM(amount) as totalPendingAmount FROM `deposit_request` WHERE agentId='$agentId' AND status='pending' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
+        $TotalCheque = $conn->query("SELECT * FROM deposit_request where agentId='$agentId' AND paymentway='Cheque' ORDER BY id DESC")->num_rows;
+        $TotalChequeDeposit = $conn->query("SELECT SUM(amount) as totalChequeAmount FROM `deposit_request` WHERE agentId='$agentId' AND paymentway='Cheque' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
+        $TotalBankTransfer = $conn->query("SELECT * FROM deposit_request where agentId='$agentId' AND paymentway='bankTransfer' ORDER BY id DESC")->num_rows;
+        $TotalBankTransferDeposit = $conn->query("SELECT SUM(amount) as totalBankTransferAmount FROM `deposit_request` WHERE agentId='$agentId' AND paymentway='bankTransfer' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
+        $TotalMobileTransfer = $conn->query("SELECT * FROM deposit_request where agentId='$agentId' AND paymentway='mobileTransfer' ORDER BY id DESC")->num_rows;
+        $TotalMobileTransferDeposit = $conn->query("SELECT SUM(amount) as totalMobileTransferAmount FROM `deposit_request` WHERE agentId='$agentId' AND paymentway='mobileTransfer' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
+        $TotalCash = $conn->query("SELECT * FROM deposit_request where agentId='$agentId' AND paymentway='Cash' ORDER BY id DESC")->num_rows;
+        $TotalCashDeposit = $conn->query("SELECT SUM(amount) as totalCashAmount FROM `deposit_request` WHERE agentId='$agentId' AND paymentway='Cash' ORDER BY id DESC LIMIT 15")->fetch_all(MYSQLI_ASSOC);
 
         //deposit status information
         $Total['TotalDeposit'] = $TotalDeposit;
@@ -162,8 +162,6 @@ if (array_key_exists("agentId", $_GET)) {
     $response["agentAmount"] = $result[29]["count"];
     $response["afterMarkUp"] = $response["todayTotalTicketedAmount"];
     $response["lossProfit"] = $lossProf;
-
-
 
 
     echo json_encode($response);
@@ -281,19 +279,19 @@ function getDashBoardData($date)
         UNION ALL
     
         SELECT 'totalPendingDepositAmount' AS category, COALESCE(SUM(amount), 0) AS count
-        FROM `subagent_deposit_request`
+        FROM `deposit_request`
         WHERE DATE(createdAt)='$date' AND status = 'pending' 
     
         UNION ALL
     
         SELECT 'totalApprovedDepositAmount' AS category, COALESCE(SUM(amount), 0) AS count
-        FROM `subagent_deposit_request`
+        FROM `deposit_request`
         WHERE DATE(actionAt)='$date' AND status = 'approved' 
     
         UNION ALL
     
         SELECT 'totalRejectedDepositAmount' AS category, COALESCE(SUM(amount), 0) AS count
-        FROM `subagent_deposit_request`
+        FROM `deposit_request`
         WHERE DATE(actionAt)='$date' AND status = 'rejected' 
     
         UNION ALL
@@ -362,7 +360,7 @@ function getDashBoardData($date)
         FROM booking 
         WHERE DATE(lastUpdated)=CURDATE() AND status='Cancelled' AND platform = '$platform'
         ";
-
+    
     $result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
 
     return $result;
