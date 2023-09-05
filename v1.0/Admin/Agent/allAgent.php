@@ -7,7 +7,46 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if (array_key_exists("page", $_GET)) {
+if (array_key_exists("all", $_GET)) {
+
+  $sql = "SELECT * FROM `agent` WHERE platform='B2B' ORDER BY id DESC";
+  //echo $sql;
+  $totaldata = $conn->query("SELECT * FROM `agent` WHERE platform='B2B' ORDER BY id DESC")->num_rows;
+  $result = $conn->query($sql);
+ 
+  $return_arr = array();
+  $Data = array();
+  $count=0;
+  if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()){
+      $count++;
+      $agentId = $row['agentId'];
+    
+      $checkBalanced = mysqli_query($conn,"SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' AND platform='B2B'
+            ORDER BY id DESC LIMIT 1");
+        $row1 = mysqli_fetch_array($checkBalanced,MYSQLI_ASSOC);  
+        
+        if(!empty($row1)){
+            $lastAmount = $row1['lastAmount'];							
+        }else{
+          $lastAmount = 0;
+        }
+    
+      $response = $row;
+      $response['serial'] = $count;
+      $response['lastBalance'] = $lastAmount;
+      array_push($Data, $response);
+    }
+  }
+
+  array_multisort(array_column($Data, 'lastBalance'), SORT_DESC, $Data);
+  
+  $return_arr['total'] = $totaldata;
+  $return_arr['data'] = $Data;
+
+  echo json_encode($return_arr);
+
+}else if (array_key_exists("page", $_GET)) {
   $page = $_GET['page'];
   $result_per_page = 20;
   $page_first_result = ($page-1) * $result_per_page;
