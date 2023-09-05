@@ -43,20 +43,27 @@ if ($row['status'] == 'Pending' || $row['status'] == 'Processing') {
       $bank_trxId = $_POST['bank_tran_id'];
       $amount = $_POST['amount'];
 
-     /* The code block is checking if the key 'agentId' exists in the array. If it
-     does, it means that the transaction is a B2B transaction. Otherwise it is a B2C transaction */
-     
-      if (isset($row['agentId'])) {
+      $_POST['platform'] = $row['platform'];
+      /* The code block is checking if the key 'agentId' exists in the array. If it
+      does, it means that the transaction is a B2B transaction. Otherwise it is a B2C transaction */
+
+      if ($row['platform'] == "B2B") {
 
         $_POST['agentId'] = $row['agentId'];
         $ot->saveB2BTransaction($conn, $_POST);
 
-      } else if (isset($row['userId'])) {
-
+      } else if ($row['platform'] == "B2C") {
+        
         $_POST['userId'] = $row['userId'];
         $ot->saveB2CTransaction($conn, $_POST);
 
+      } else if ($row['platform'] == "B2CApp") {
+        
+        $_POST['userId'] = $row['userId'];
+        $ot->saveB2CAppTransaction($conn, $_POST);
+
       }
+
     } else {
     }
   } else {

@@ -33,12 +33,12 @@ function getOne($id, $tablename)
     }
 }
 
-function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
+function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName, $newFileName)
 {           
             $tempname=$_FILES[$imagename]['tmp_name'];
             $filesize=$_FILES[$imagename]['size'];
 
-            $validExt=['jpg', 'jpeg', 'png'];
+            $validExt=['jpg', 'jpeg', 'png', 'webp'];
             $fileExt= strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
 
@@ -46,8 +46,22 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
             {
                 if($filesize<$acceptablesize)
                 {
-                    move_uploaded_file($tempname, $cdnpath.$fileName);
-                    return true;
+                    if(move_uploaded_file($tempname, $cdnpath.$newFileName))
+                    {
+                        $uri=$cdnpath.$newFileName;
+                        return $uri;
+                    }
+                    else
+                    {
+                        echo json_encode(
+                            array(
+                                "status" => "error",
+                                "message" => "File Not Moved"
+                            )
+                    
+                            );
+                            exit;
+                    }
                 }
                 else
                 {
@@ -58,7 +72,7 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
                         )
                 
                         );
-                        return false;
+                        exit;
                 }
             }
             else
@@ -69,10 +83,9 @@ function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName)
                         "message" => "Invalid Extension"
                     )
                     );
-                    return false;
+                    exit;
             }
 }
-
 
 
 function deletedata($id, $tablename){
