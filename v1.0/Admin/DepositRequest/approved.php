@@ -84,9 +84,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $afterDeposit = $lastAmount + $deposit;
             $newAmount = $lastAmount + $amount;
 
-            if ($newAmount >= 0) {
-                $conn->query("UPDATE `agent` SET `credit`='0' where agentId='$agentId' AND platform='B2B'");
-            }
+            // if ($newAmount >= 0) {
+            //     $conn->query("UPDATE `agent` SET `credit`='0' where agentId='$agentId' AND platform='B2B'");
+            // }
 
             $createdTime = date("Y-m-d H:i:s");
 
