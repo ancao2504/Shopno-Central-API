@@ -211,8 +211,8 @@ if (array_key_exists("bookingId", $_GET)) {
       if ($conn->query($sql) === true) {
         $details = "Reissue $TicketId Ticket Invoice $Type Air Ticket $deptFrom - $arriveTo with carrier $Airlines was Requested By $reissuerequestedBy";
 
-        $conn->query("INSERT INTO `agent_ledger`(`agentId`,`reissue`, `lastAmount`, `transactionId`, `details`, `reference`, `actionBy`, `createdAt`)
-            VALUES ('$agentId','$reissuecharge','$newBalance','$bookingId','$details','$reissueId','$actionBy','$createdTime')");
+        $conn->query("INSERT INTO `agent_ledger`(`agentId`,`platform`,`reissue`, `lastAmount`, `transactionId`, `details`, `reference`, `actionBy`, `createdAt`)
+            VALUES ('$agentId','B2B','$reissuecharge','$newBalance','$bookingId','$details','$reissueId','$actionBy','$createdTime')");
 
         $conn->query("UPDATE `booking` SET `status`='Reissued',`lastUpdated`='$createdTime', `reissueId`='$reissueId' where bookingId='$bookingId'");
         $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
