@@ -61,7 +61,7 @@ if ($row['status'] == 'Pending' || $row['status'] == 'Processing') {
         
         $_POST['userId'] = $row['userId'];
         $ot->saveB2CAppTransaction($conn, $_POST);
-
+        
       }
 
     } else {

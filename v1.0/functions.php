@@ -1,6 +1,6 @@
 <?php
 
-require './config.php';
+require 'config.php';
 
 function getALL($tablename)
 {   
@@ -33,23 +33,28 @@ function getOne($id, $tablename)
     }
 }
 
-function uploadImage($imagename, $acceptablesize, $cdnpath, $fileName, $newFileName)
+function uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName)
 {           
+            
             $tempname=$_FILES[$imagename]['tmp_name'];
             $filesize=$_FILES[$imagename]['size'];
 
             $validExt=['jpg', 'jpeg', 'png', 'webp'];
             $fileExt= strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
+            
+            $newFileName="$newFileName.$fileExt";
+            $folder="$folder/$newFileName";
+            $cdnpath="../../../asset/$folder";
 
             if(in_array($fileExt, $validExt))
             {
                 if($filesize<$acceptablesize)
-                {
-                    if(move_uploaded_file($tempname, $cdnpath.$newFileName))
-                    {
-                        $uri=$cdnpath.$newFileName;
-                        return $uri;
+                {   
+                   
+                    if(move_uploaded_file($tempname, $cdnpath))
+                    {   
+                        return "https://shopno.api.flyfarint.com/asset/$folder";
+                        
                     }
                     else
                     {

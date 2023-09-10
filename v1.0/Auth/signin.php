@@ -8,23 +8,24 @@ header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-use Firebase\JWT\JWT;
-use Firebase\JWT\KEY;
+// use Firebase\JWT\JWT;
+// use Firebase\JWT\KEY;
 
-require __DIR__ . '/../../vendor/autoload.php';
+// require __DIR__ . '/../../vendor/autoload.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $currentTime = date("Y-m-d H:i:s");
-
+    
     $_POST = json_decode(file_get_contents('php://input'), true);
-
+    
+    $currentTime = date("Y-m-d H:i:s");
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-    
+
     if ($_SERVER['REMOTE_ADDR']) {
-        $ip = $_SERVER['REMOTE_ADDR'];
         include 'Browser.php';
+
+        $ip = $_SERVER['REMOTE_ADDR'];
         $ua = getBrowser();
         $browser = $ua['name'];
         $platform = $ua['platform'];
@@ -33,17 +34,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $ip = 'No IP';
     }
 
-    $agentSql = mysqli_query($conn, "SELECT email, status FROM agent WHERE email='$email'");
+    $agentSql = mysqli_query($conn, "SELECT `email`, `status` FROM `agent` WHERE `email`='$email' AND `platform`='B2B'");
     $agentrow = mysqli_fetch_array($agentSql, MYSQLI_ASSOC);
 
-    $staffSql = mysqli_query($conn, "SELECT email, status FROM staffList WHERE email='$email'");
+    $staffSql = mysqli_query($conn, "SELECT `email`, `status` FROM `staffList` WHERE `email`='$email'");
     $staffrow = mysqli_fetch_array($staffSql, MYSQLI_ASSOC);
+    // echo json_encode("a".$agentrow);
+    // echo json_encode($staffrow); exit;
 
     if (empty($agentrow) && empty($staffrow)) {
         $response['status'] = "error";
         $response['message'] = "User does not exist";
+
     } else if (!empty($agentrow)) {
-        $checkUserquery = "SELECT agentId, email, name, company, phone, status FROM agent WHERE email='$email' AND `password`=convert('$password' using utf8mb4) collate utf8mb4_bin";
+        $checkUserquery = "SELECT agentId, email, name, company, phone, status FROM agent WHERE email='$email' AND `password`='$password' AND `platform`='B2B'";
         $resultant = mysqli_query($conn, $checkUserquery);
 
         $SECRET_KEY = "qfrfdfgrterdfsgdferersdf9iewfjhfkjsdfifmkknhzxiwreiueridjfdmjihirywtbbxcgsdfsdnnmmklqqzznbnbewfijsfnjkijwhirweijrnmkmllkljojsdfskjqqweewdnfdfjdkfjkljsdfiuirqwhwfnbvqwtvvxfsguyrewijflkdjnvjqwerewrtrctuywernhnliuiywtwhbjcsdughcbbux mnzsncijdshdsfnknuhjsefinbcvijtqwrhxuiwnjcibmchdfgsjjchrdytwilsmdjjddpwwweweqmfhjehuiwezazcvdwewtwttlmkhgrwefaedw";
@@ -59,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $expireTime = $issueAt + 60;
                     $payload = [
                         'user' => $row,
-                        'admin_secretKey'=>  $adminkey,
+                        'admin_secretKey' =>  $adminkey,
                         'issue_ time' => $issueAt,
                         'expire_time' => $expireTime,
                     ];
@@ -71,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // $response['token'] = $Token;
                     $response['action'] = "complete";
                     $response['message'] = "success";
-                    $conn->query("UPDATE `agent` SET `isActive`='yes',`loginIp`='$ip',`browser`='$browser' WHERE email='$email'");
+                    $conn->query("UPDATE `agent` SET `isActive`='yes',`loginIp`='$ip',`browser`='$browser' WHERE email='$email' AND `platform`='B2B'");
                     $conn->query("INSERT INTO `lastLogin`(`agentId`, `agencyName`, `StaffName`, `loginIp`, `success`,`browser`,`platform`, `craetedTime`)
                VALUES ('$agentId','$agencyName','No','$ip','yes','$browser','B2B','$currentTime')");
                 } else if ($row['status'] == 'pending') {
@@ -85,27 +89,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $response['message'] = "Status Is Rejected";
                 }
             }
-
         } else {
             $response['action'] = "incomplete";
             $response['message'] = "Wrong Password";
         }
-
     } else if (!empty($staffrow)) {
-        $checkUserquery = "SELECT staffId, agentId, email, phone, name fROM staffList WHERE email='$email' AND password=convert('$password' using utf8mb4) collate utf8mb4_bin";
+        $checkUserquery = "SELECT staffId, agentId, email, phone, name fROM staffList WHERE email='$email' AND `password`='$password'";
         $resultant = mysqli_query($conn, $checkUserquery);
 
         if (mysqli_num_rows($resultant) > 0) {
             while ($row = $resultant->fetch_assoc()) {
                 $agentId = $row['agentId'];
-                $checkAgent = mysqli_fetch_array(mysqli_query($conn, "SELECT agentId FROM agent WHERE agentId='$agentId'"), MYSQLI_ASSOC);
+                $checkAgent = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId' AND `platform`='B2B'"), MYSQLI_ASSOC);
                 $agentSatus = $checkAgent['status'];
 
                 if (isset($agentSatus)) {
                     if ($agentSatus == 'deactive') {
                         $response['action'] = "incomplete";
                         $response['message'] = "Agent Is Deactive";
-
                     } else if ($agentSatus == 'active') {
                         $agencyName = $checkAgent['company'];
                         $response['user'] = $row;

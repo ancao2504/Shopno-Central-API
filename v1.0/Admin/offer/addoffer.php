@@ -18,14 +18,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $webFileName = $_FILES['webImage']['name'];
     $mobFileName = $_FILES['mobileImage']['name'];
 
-    $cdn = "https://shopno.api.flyfarint.com/asset/Admin/Offers/";
-    $size = 50000;
+    $folder = "Admin/Offers";
+    $size = 5000000;
     $time = date("dmYHis");
-    $webImgNewFileName = "web_$title_$time";
-    $mobImgNewFileName = "mob_$title_$time";
+    $webImgNewFileName = "web_$title";
+    $mobImgNewFileName = "mob_$title";
 
-    $webImgURI = uploadImage("webImage", $size, $cdn, $webFileName, $webImgNewFileName);
-    $mobImgURI = uploadImage("mobileImage", $size, $cdn, $mobFileName, $mobImgNewFileName);
+    $webImgURI = uploadImage("webImage", $size, $folder, $webFileName, $webImgNewFileName);
+    $mobImgURI = uploadImage("mobileImage", $size, $folder, $mobFileName, $mobImgNewFileName);
 
     $offerId = "";
     $result = $conn->query("SELECT offerId FROM offers ORDER BY offerId DESC LIMIT 1");
@@ -38,9 +38,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $offerId = "STOFF1000";
     }
 
-    $sql = "INSERT INTO offers (`offerId`, `category`, `title`, `description`, `web_img`, `mob_img`)
-    VALUES ('$offerId', '$category', '$title', '$description', '$webImgURI', '$mobImgURI')";
-
+    $sql = "INSERT INTO offers (`offerId`, `category`, `title`, `description`, `web_img`, `mob_img`, `created_at`) 
+    VALUES ('$offerId', '$category', '$title', '$description', '$webImgURI', '$mobImgURI', '$time')";
+    // echo $sql;
     if($conn->query($sql))
     {
         echo json_encode(

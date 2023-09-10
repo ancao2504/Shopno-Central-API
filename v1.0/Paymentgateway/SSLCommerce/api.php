@@ -18,14 +18,19 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 use SslCommerz\SslCommerzNotification;
 
 if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
-    
+
     $query = new OrderTransaction();
-    
+
     $agentId = $_GET["agentId"];
     $_SESSION['agentId'] = $agentId;
     $_SESSION['amount'] = $_GET["amount"];
 
     $agentdata = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'"), MYSQLI_ASSOC);
+
+    if ($agentdata["phone"] == "") {
+        echo json_encode(array("status" => "error", "message" => "Please update your phone number"));
+        exit;
+    }
 
     if (!empty($agentdata)) {
         $company = $agentdata["company"];
@@ -89,27 +94,30 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
 
         echo json_encode($response);
     }
-}else if (array_key_exists("amount", $_GET) && array_key_exists("userId", $_GET) && array_key_exists("app", $_GET) ) {
-    
-    $query = new OrderTransaction();
+} else if (array_key_exists("amount", $_GET) && array_key_exists("userId", $_GET) && array_key_exists("app", $_GET)) {
 
-    
     $userId = $_GET["userId"];
     $_SESSION['userId'] = $userId;
     $_SESSION['amount'] = $_GET["amount"];
 
 
-    
+
     $userdata = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM agent WHERE userId='$userId'"), MYSQLI_ASSOC);
-    // echo json_encode($userdata);
-    // exit;
+
+    if ($userdata["phone"] == "") {
+        echo json_encode(array("status" => "error", "message" => "Please update your phone number"));
+        exit;
+    }
+
     if (!empty($userdata)) {
         $name = $userdata["name"];
         $email = $userdata["email"];
         $phone = $userdata["phone"];
         $address = $userdata["companyadd"];
+    } else {
+        echo json_encode(array("status" => "error", "message" => "No user data found"));
+        exit;
     }
-
 
     # Organize the submitted/inputted data
     $post_data = array();
@@ -152,34 +160,39 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
     // exit;
 
     # First, save the input data into local database table `orders`
-    
+    $query = new OrderTransaction();
+
     $sql = $query->saveTransactionQuery($post_data, "B2CApp");
+
     if ($conn->query($sql) === TRUE) {
-        
         # Call the Payment Gateway Library
+        // echo json_encode($post_data);
         $sslcomz = new SslCommerzNotification();
-        $sslcomz->makePayment($post_data, 'hosted');
-        
+        echo json_encode($sslcomz->makePayment($post_data, 'hosted'));
     } else {
-        $response['status'] = 'success';
+        $response['status'] = 'error';
         $response['message'] = 'Someting went Wrong';
 
         echo json_encode($response);
     }
-}else if (array_key_exists("amount", $_GET) && array_key_exists("userId", $_GET) && !array_key_exists("app", $_GET)) {
-    
-    $query = new OrderTransaction();
+} else if (array_key_exists("amount", $_GET) && array_key_exists("userId", $_GET) && !array_key_exists("app", $_GET)) {
 
-    
+
+
+
     $userId = $_GET["userId"];
     $_SESSION['userId'] = $userId;
     $_SESSION['amount'] = $_GET["amount"];
 
 
-    
+
     $userdata = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM agent WHERE userId='$userId'"), MYSQLI_ASSOC);
     // echo json_encode($userdata);
     // exit;
+    if ($userdata["phone"] == "") {
+        echo json_encode(array("status" => "error", "message" => "Please update your phone number"));
+        exit;
+    }
     if (!empty($userdata)) {
         $name = $userdata["name"];
         $email = $userdata["email"];
@@ -227,21 +240,38 @@ if (array_key_exists("amount", $_GET) && array_key_exists("agentId", $_GET)) {
 
     // echo json_encode($post_data);
     // exit;
-
+    $query = new OrderTransaction();
     # First, save the input data into local database table `orders`
     $sql = $query->saveTransactionQuery($post_data, "B2C");
     if ($conn->query($sql) === TRUE) {
-        
         # Call the Payment Gateway Library
         $sslcomz = new SslCommerzNotification();
-        $sslcomz->makePayment($post_data, 'hosted');
-        
+        // echo json_encode($post_data);
+        echo json_encode($sslcomz->makePayment($post_data, 'hosted'));
     } else {
         $response['status'] = 'success';
         $response['message'] = 'Someting went Wrong';
 
         echo json_encode($response);
     }
+} else if (array_key_exists("appredirect", $_GET) && array_key_exists("success", $_GET)) {
+
+    echo json_encode(
+        array(
+            "status" => "success",
+            "message" => "Deposit Successfully Done"
+        )
+    );
+    exit;
+} else if (array_key_exists("appredirect", $_GET) && array_key_exists("failed", $_GET)) {
+
+    echo json_encode(
+        array(
+            "status" => "error",
+            "message" => "Deposit Failed"
+        )
+    );
+    exit;
 } else {
     $response['status'] = 'error';
     $response['message'] = 'Invalid Request';

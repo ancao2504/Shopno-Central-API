@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.shopno_app_b2c",
+            "sha256_cert_fingerprints": [
+                "3F:36:B4:23:46:0E:A2:57:33:FB:C7:82:D8:25:B2:F0:15:1C:4C:85:77:DC:4D:1C:AE:59:C0:50:6E:5A:CF:FB"
+            ]
+        }
+    }
+]

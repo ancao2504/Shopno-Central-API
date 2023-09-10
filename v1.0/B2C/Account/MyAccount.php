@@ -20,10 +20,10 @@ if (array_key_exists("userId", $_GET)) {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
 
-            $Balance = $conn->query("SELECT lastAmount FROM `agent_ledger` where userId = '$Search' ORDER BY id DESC LIMIT 1")->fetch_all(MYSQLI_ASSOC);
+            $Balance = $conn->query("SELECT lastAmount FROM `agent_ledger` where userId = '$Search' ORDER BY id DESC LIMIT 1")->fetch_assoc();
             $response = $row;
             if (!empty($Balance)) {
-                $response['balance'] = $Balance[0];
+                $response['balance'] = $Balance['lastAmount'];
 
             }else if(empty($Balance)){
               $response['balance'] = 0;

@@ -66,10 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $outputString = preg_replace('/[^0-9]/', '', $row["agentId"]);
             $number = (int) $outputString + 1;
             $AgentId = "STA$number";
-        }
-        else
-        {
-            $AgentId = "STA1000";    
+        } else {
+            $AgentId = "STA1000";
         }
     } else {
 
@@ -78,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 
-    $checkUser = "SELECT * FROM agent WHERE email='$userEmail' OR phone ='$phone' OR company='$company_name' AND platform='B2B'";
+    $checkUser = "SELECT * FROM agent WHERE platform='B2B' AND email='$userEmail' OR phone ='$phone' OR company='$company_name'";
 
     $result = mysqli_query($conn, $checkUser);
 

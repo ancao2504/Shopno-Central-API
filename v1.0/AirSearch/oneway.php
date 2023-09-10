@@ -434,15 +434,15 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                 //Individual Markup
                 if (!empty($agentmarkrow) && (empty($agentmarkrow['alliMarkup']) && empty($agentmarkrow['alldMarkup']))) {
-                    $imarkuptype = $agentmarkrow['iMarkupType'];
+                    $imarkuptype =  $agentmarkrow['iMarkupType'];
                     $dmarkuptype = $agentmarkrow['dMarkupType'];
                     if ($imarkuptype == 'amount' || $dmarkuptype == 'amount') {
                         if ($TripType == 'Inbound') {
-                            $markup = $agentmarkrow['dMarkup'];
+                            $markup =  $agentmarkrow['dMarkup'];
                         } else {
-                            $markup = $agentmarkrow['iMarkup'];
+                            $markup =  $agentmarkrow['iMarkup'];
                         }
-                        $MarkupPrice = $AgentPrice + $markup;
+                        $MarkupPrice = $AgentPrice + (int) $markup;
                     } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
                         if ($TripType == 'Inbound') {
                             $markup = $agentmarkrow['dMarkup'];
@@ -462,7 +462,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         } else {
                             $markup = $agentmarkrow['alliMarkup'];
                         }
-                        $MarkupPrice = $AgentPrice + $markup;
+                        $MarkupPrice = $AgentPrice + (int) $markup;
                     } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
                         if ($TripType == 'Inbound') {
                             $markup = $agentmarkrow['alldMarkup'];

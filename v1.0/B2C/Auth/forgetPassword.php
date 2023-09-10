@@ -14,9 +14,9 @@ if (array_key_exists("email", $_GET)) {
 
   $email = $_GET["email"];
 
-  $sql = mysqli_query($conn, "SELECT * FROM agent WHERE email='$email'");
+  $sql = mysqli_query($conn, "SELECT * FROM agent WHERE platform='B2C' AND email='$email'");
   $row = mysqli_fetch_array($sql, MYSQLI_ASSOC);
- 
+
   if (!empty($row)) {
 
     $userId = $row['userId'];

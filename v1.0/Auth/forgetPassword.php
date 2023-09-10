@@ -14,7 +14,7 @@ if (array_key_exists("email", $_GET)) {
 
   $email = $_GET["email"];
 
-  $sql = mysqli_query($conn, "SELECT * FROM agent WHERE email='$email'");
+  $sql = mysqli_query($conn, "SELECT * FROM agent WHERE platform='B2B' AND email='$email'");
 
   $row = mysqli_fetch_array($sql, MYSQLI_ASSOC);
 
@@ -57,7 +57,7 @@ if (array_key_exists("email", $_GET)) {
     }
   } else {
     $response['status'] = "error";
-    $response['message'] = "Email Not Found";
+    $response['message'] = "Email Not Found"; 
   }
 
   echo json_encode($response);

@@ -349,12 +349,12 @@ class OrderTransaction
                 echo json_encode($response);
 
                 //redirect
-                // header("Location: https://shopnotour.com/dashboard/depositreq/successful");
+                header("Location: https://shopno.api.flyfarint.com/v1.0/Paymentgateway/SSLCommerce/api.php?appredirect&success");
                 // header("Location: http://localhost:3002/dashboard/depositreq/successful");
                 ////////////////////////
             }
         } else {
-            // header("Location: https://shopnotour.com/dashboard/depositreq/fail");
+            header("Location: https://shopno.api.flyfarint.com/v1.0/Paymentgateway/SSLCommerce/api.php?appredirect&failed");
             // header("Location: http://localhost:3002/dashboard/depositreq/fail");
             exit();
         }

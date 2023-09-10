@@ -505,7 +505,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 			   		 }else{
 			   			  $markup = $agentmarkrow['iMarkup'];
 			   		 }
-			   		 $MarkupPrice = $AgentPrice + $markup; 
+			   		 $MarkupPrice = $AgentPrice +  (int) $markup; 
 					   
 						 
 			   	 }else if($imarkuptype == 'percentage' || $dmarkuptype == 'percentage'){
@@ -528,7 +528,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 					   }else{
 							$markup = $agentmarkrow['alliMarkup'];
 					   }
-					   $MarkupPrice = $AgentPrice + $markup;
+					   $MarkupPrice = $AgentPrice + (int) $markup;
 					  
 				   }else if($imarkuptype == 'percentage' || $dmarkuptype == 'percentage'){
 					   if($TripType == 'Inbound'){
