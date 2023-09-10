@@ -84,9 +84,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $afterDeposit = $lastAmount + $deposit;
             $newAmount = $lastAmount + $amount;
 
-            if ($newAmount >= 0) {
-                $conn->query("UPDATE `agent` SET `credit`='0' where agentId='$agentId' AND platform='B2B'");
-            }
+            // if ($newAmount >= 0) {
+            //     $conn->query("UPDATE `agent` SET `credit`='0' where agentId='$agentId' AND platform='B2B'");
+            // }
 
             $createdTime = date("Y-m-d H:i:s");
 
@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     VALUES ('$agentId','$staffId','$amount','$newAmount','$amount TK Deposit By $staffName successfully','$transactionId','B2B','$depositId','$createdAt')";
 
 
-            echo($newAmount);
+            //echo($newAmount);
             if ($conn->query($sql_query) === true) {
                 $conn->query("UPDATE deposit_request SET status='approved', approvedBy='$actionBy', actionAt='$createdTime'  WHERE agentId='$agentId' AND depositId='$depositId' ");
                 $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`platform`,`actionBy`, `actionAt`)

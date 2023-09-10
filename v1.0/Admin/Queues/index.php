@@ -1147,4 +1147,24 @@ if (array_key_exists("all", $_GET)) {
 
 
 
+}else if (array_key_exists("allother", $_GET)) {
+
+    $sql = "SELECT * FROM `bookingothers` where agentId='$agentId' ORDER BY id DESC";
+    $result = $conn->query($sql);
+
+    $return_arr = array();
+
+    $count = 0;
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $count++;
+
+            $response = $row;
+            $response['serial'] = "$count";
+
+            array_push($return_arr, $response);
+        }
+    }
+
+    echo json_encode($return_arr);
 }

@@ -57,7 +57,7 @@ require("../../vendor/autoload.php");
 	$errorMSG = json_encode(array("message" => "please select image", "status" => false));	
 	echo $errorMSG;
 }else{
-	$upload_path = "../../../../cdn.flyfarint.com/OthersDocuments/$agentId/"; // set upload folder path 
+	$upload_path = "../../../asset/Admin/OthersDocuments/$agentId/"; // set upload folder path 
 	
 	if (!file_exists($upload_path)) {
     	mkdir($upload_path, 0777, true);
@@ -105,7 +105,7 @@ require("../../vendor/autoload.php");
 		
 
 if(!isset($errorMSG)){
-    $fileUrl = "https://cdn.flyfarint.com/OthersDocuments/$agentId/$renameFile";
+    $fileUrl = "https://shopno.api.flyfarint.com/asset/Admin/OthersDocuments/$agentId/$renameFile";
     
 	$sql = "INSERT INTO `bookingothers`(
             `othersId`,
@@ -142,27 +142,38 @@ if(!isset($errorMSG)){
         }
 
         
+        if ($lastAmount >= $amount) {
+          $colum = '';
+          if ($serviceType == 'Void') {
+              $colum = 'void';
+              $newBalance = $lastAmount + $amount;
+          } elseif ($serviceType == 'Reissue') {
+              $colum = 'reissue';
+              $newBalance = $lastAmount - $amount;
+          } elseif ($serviceType == 'Return') {
+              $colum = 'returnMoney';
+              $newBalance = $lastAmount - $amount;
+          } elseif ($serviceType == 'Air Ticket') {
+              $colum = 'purchase';
+              $newBalance = $lastAmount - $amount;
+          }
+      } else {
+          $response['status'] = 'error';
+          $response['message'] = 'Your invoice has been failed due to insufficient balanced';
+          echo json_encode($response);
+          exit();
+      }
 
-        $colum='';
-        if($serviceType == 'Void'){
-            $colum = 'void';
-            $newBalance = $lastAmount + $amount;
-        }else if($serviceType == 'Refund'){
-            $colum = 'refund';
-            $newBalance = $lastAmount + $amount;
-        }else if($serviceType == 'Reissue'){
-            $colum = 'reissue';
-            $newBalance = $lastAmount - $amount;
-        }else if($serviceType == 'Return'){
-            $colum = 'returnMoney';
-            $newBalance = $lastAmount - $amount;
-        }else if($serviceType == 'Air Ticket'){
-            $colum = 'purchase';
-            $newBalance = $lastAmount - $amount;
-        }else{
-            $colum = 'others';
-            $newBalance = $lastAmount - $amount;
-        }
+      if ($serviceType == 'Bonus') {
+          $colum = 'bonus';
+          $newBalance = $lastAmount + $amount;
+      } elseif ($serviceType == 'Refund') {
+          $colum = 'refund';
+          $newBalance = $lastAmount + $amount;
+      } else {
+          $colum = 'others';
+          $newBalance = $lastAmount - $amount;
+      }
 
        
         if ($conn->query($sql) === TRUE) {
