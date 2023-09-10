@@ -101,12 +101,24 @@ function saveData($agentId, $creditAmount, $currentBalance, $createdAt, $reason,
         $NewCreditAmount = $creditAmount;
     }
 
+    
+    // Credit Id Generated
+    $data = $conn->query("SELECT id, creditId FROM credit ORDER BY id DESC LIMIT 1")->fetch_all(MYSQLI_ASSOC);
+
+    if (!empty($data[0]['creditId'])) {
+        $id = $data[0]['id'];
+        $getCreditId = preg_replace("/[^0-9]/", '', $data[0]['creditId']);
+        $creditId = "STL".$id;
+    } else {
+        $creditId = "STL1000";
+    }
+
     $conn->query("UPDATE agent SET credit='$NewCreditAmount' WHERE agentId='$agentId'");
 
     $conn->query("INSERT INTO `agent_ledger`(`agentId`,`platform`,`loan`, `lastAmount`,`details`, `transactionId`,`reference`,`createdAt`)
-                      VALUES ('$agentId','B2B','$creditAmount','$currentBalance','$creditAmount TK Credit By Shopno Tours & Travels','','','$createdAt')");
+                      VALUES ('$agentId','B2B','$creditAmount','$currentBalance','$creditAmount TK Credit By Shopno Tours & Travels','$creditId','','$createdAt')");
 
-    $sql = "INSERT INTO credit (agentId, platform,remaining_booking, last_flight_date,current_balance, credit_amount, reason, createdAt) VALUES ('$agentId','B2B','$remainingBooking','$lastFlightDate','$currentBalance','$creditAmount','$reason', '$createdAt')";
+    $sql = "INSERT INTO credit (agentId, creditId, platform,remaining_booking, last_flight_date,current_balance, credit_amount, reason, createdAt) VALUES ('$agentId','$creditId','B2B','$remainingBooking','$lastFlightDate','$currentBalance','$creditAmount','$reason', '$createdAt')";
     if ($conn->query($sql)) {
         $response['status'] = 'success';
         $response['message'] = "Credit added successfully";
