@@ -119,7 +119,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if ($lastAmount >= $netCost) {
-
         $newBalance = $lastAmount - $netCost;
     } else if ($lastAmount <= 0 && $creditBalance >= $netCost) {
 
