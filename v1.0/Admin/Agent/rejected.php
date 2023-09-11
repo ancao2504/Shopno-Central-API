@@ -28,7 +28,7 @@ if (array_key_exists("agentId", $_GET) && array_key_exists("actionBy", $_GET)) {
             $response['status'] = "error";
             $response['message'] = "Agent Already Rejected";
         } else {
-            $sql = "UPDATE `agent` SET `status`='rejected' WHERE agentId='$agentId' AND platform='B2B'";
+            $sql = "UPDATE `agent` SET `status`='rejected',`actionBy`='$actionBy', `updated_at`='$createdTime' WHERE agentId='$agentId' AND platform='B2B'";
 
             if ($conn->query($sql) === true) {
                 $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`,`platform`, `actionAt`)

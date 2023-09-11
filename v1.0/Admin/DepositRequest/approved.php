@@ -90,8 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $createdTime = date("Y-m-d H:i:s");
 
-            $sql_query = "INSERT INTO `agent_ledger`(`agentId`,`staffId`,`deposit`, `lastAmount`,`details`, `transactionId`,`platform`,`reference`,`createdAt`)
-                    VALUES ('$agentId','$staffId','$amount','$newAmount','$amount TK Deposit By $staffName successfully','$transactionId','B2B','$depositId','$createdAt')";
+            $sql_query = "INSERT INTO `agent_ledger`(`agentId`,`staffId`,`deposit`, `lastAmount`,`details`, `transactionId`,`platform`,`reference`,`createdAt`, `actionBy`)
+                    VALUES ('$agentId','$staffId','$amount','$newAmount','$amount TK Deposit By $staffName successfully','$transactionId','B2B','$depositId','$createdAt', '$actionBy')";
 
 
             //echo($newAmount);

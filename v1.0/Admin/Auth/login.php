@@ -16,8 +16,8 @@
     $password = $_POST['password'];
 
     
-    // $adminSql = mysqli_query($conn, "SELECT `email`, `status` FROM admin WHERE email='$email'");
-    // $adminRow = mysqli_fetch_array($adminSql, MYSQLI_ASSOC);
+    $adminSql = mysqli_query($conn, "SELECT `email`, `status` FROM admin WHERE email='$email'");
+    $adminRow = mysqli_fetch_array($adminSql, MYSQLI_ASSOC);
 
     $staffSql = mysqli_query($conn, "SELECT `email`, `status` FROM admin_stafflist WHERE email='$email'");
     $staffRow = mysqli_fetch_array($staffSql, MYSQLI_ASSOC);
@@ -25,26 +25,25 @@
     // echo json_encode ($staffRow);
 
 
-    // empty($adminRow) &&
-    if (empty($staffRow)) {
+    // 
+    if (empty($adminRow) && empty($staffRow)) {
       $response['status'] = "error";
       $response['message'] = "User does not exist";
       echo json_encode($response);
     } 
-    // else if (!empty($adminRow) && empty($staffRow)) {
-    //   $sql = "SELECT * FROM admin WHERE `email`='$email' and `password`='$password'";
-    //   $result = mysqli_query($conn, $sql);
-    //   if (mysqli_num_rows($result) > 0) {
-    //     $response['user'] = $result->fetch_assoc();
-    //     $response['status'] = "complete";
-    //     $response['message'] = "success";
-    //   } else {
-    //     $response['status'] = "Incomplete";
-    //     $response['message'] = "Wrong Password";
-    //   }
-    //   echo json_encode($response);
-    // } 
-    // empty($adminRow) && 
+    else if (!empty($adminRow)) {
+      $sql = "SELECT * FROM admin WHERE `email`='$email' and `password`='$password'";
+      $result = mysqli_query($conn, $sql);
+      if (mysqli_num_rows($result) > 0) {
+        $response['user'] = $result->fetch_assoc();
+        $response['status'] = "complete";
+        $response['message'] = "success";
+      } else {
+        $response['status'] = "Incomplete";
+        $response['message'] = "Wrong Password";
+      }
+      echo json_encode($response);
+    } 
     else if (!empty($staffRow)) {
       $sql = "SELECT * FROM admin_stafflist WHERE `email`='$email' and `password`='$password'";
       $result = mysqli_query($conn, $sql);

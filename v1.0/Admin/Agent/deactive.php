@@ -38,7 +38,7 @@ if (!empty($data)) {
       $response['status']="error";                     
       $response['message']=" Agent Already Deactivated";
     }else {
-    $sql="UPDATE `agent` SET `status`='deactive'  WHERE agentId='$agentId' AND platform='B2B'";
+    $sql="UPDATE `agent` SET `status`='deactive', `actionBy`='$actionBy', `updated_at`='$createdTime'  WHERE agentId='$agentId' AND platform='B2B'";
 
     if ($conn->query($sql) === true) {
         $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`platform`,`actionBy`, `actionAt`)
