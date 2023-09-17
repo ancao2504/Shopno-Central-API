@@ -9,7 +9,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 if(array_key_exists('all',$_GET))
 {
-    $withdrawList=$conn->query("SELECT * FROM `withdraw_req`")->fetch_all(MYSQLI_ASSOC);
+    $withdrawList=$conn->query("SELECT * FROM `withdraw_req` ORDER BY `id` DESC")->fetch_all(MYSQLI_ASSOC);
     echo json_encode($withdrawList);
 
 }else if(array_key_exists('id',$_GET))

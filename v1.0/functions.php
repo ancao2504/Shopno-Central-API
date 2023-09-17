@@ -50,8 +50,8 @@ function uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileNa
                     ];
                 }
             }
-            
-            $newFileName=$newFileName.$fileExt;
+
+            $newFileName="$newFileName.$fileExt";
             $folder="$folder/$newFileName";
             $cdnpath="../../../asset/$folder";
 

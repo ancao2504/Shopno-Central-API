@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         WHERE 
         `id`= '$withdrawalId'
         AND
-        `userId`='$userId
+        `userId`='$userId'
         "
     );
 
