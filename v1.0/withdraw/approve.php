@@ -1,7 +1,6 @@
 <?php
 
 require '../../config.php';
-require '../../functions.php';
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -24,9 +23,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $folder="User/$userId/WithdrawMoney";
     $dFFile=date('YmdHis');
     $newFileName= "withdraw$userId".$actionBy.$dFFile;
-    $createdAt=date("Y-m-d H:i:s");
 
-    $amountQuery= $conn->query("SELECT `status`, `amount`, `withdrawType` FROM `withdraw_req` WHERE id='$withdrawalId'")->fetch_assoc();
+
+    $amountQuery= $conn->query("SELECT `amount`, `withdrawType` FROM `withdraw_req` WHERE id='$withdrawalId'")->fetch_assoc();
     
     if(empty($amountQuery))
     {
@@ -39,17 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $conn->close();
         exit;
     }
-    if($amountQuery["status"]=="approved" || $amountQuery["status"]=="rejected")
-    {   $status=$amountQuery['status'];
-        echo json_encode(
-            [
-                "status" => "error",
-                "message" => "Request Is Already $status"
-            ]
-        );
-        $conn->close();
-        exit;
-    }
+    
 
     $amount=$amountQuery["amount"];
     $withdrawType=$amountQuery["withdrawType"];
@@ -69,8 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $lastAmountResult = $conn->query("SELECT `lastAmount` FROM `agent_ledger` WHERE `userId`='$userId' ORDER BY id DESC LIMIT 1")->fetch_assoc();
 
-
-    if ( empty($lastAmountResult) || $lastAmountResult['lastAmount'] < $amount) {
+    if ( empty($lastAmount) || $lastAmountResult['lastAmount'] < $amount) {
         echo json_encode(
             [
                 "status" => "error",
@@ -88,11 +76,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         `status`= 'approved',
         `attachment`='$attachLink', 
         `actionBy`= '$actionBy',
-        `updatedAt`= '$createdAt'
+        `updatedAt`= CURDATE()
         WHERE 
         `id`= '$withdrawalId'
         AND
-        `userId`='$userId'
+        `userId`='$userId
         "
     );
 
@@ -127,10 +115,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         '$platform',
         '$amount',
         '$withdrawalId',
-        '$amount Withdrawal Request Through $withdrawType Approved By $actionBy',
+        '$amount Withdrawal Request Through $withdrawType Approved By $actionBy'
         '$withdrawalId',
         '$actionBy',
-        '$createdAt'
+        CURDATE()
     )
     ");
     if(!$ledgerQuery)
