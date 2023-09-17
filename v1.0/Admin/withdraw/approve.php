@@ -125,7 +125,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     (
         '$userId',
         '$platform',
-        '$amount',
+        '$newAmount',
         '$withdrawalId',
         '$amount Withdrawal Request Through $withdrawType Approved By $actionBy',
         '$withdrawalId',
