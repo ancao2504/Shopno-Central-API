@@ -158,10 +158,18 @@ else if(array_key_exists("edit",$_GET)){
     $phone = $_POST['phone'];
     $password = $_POST['password'];
     $address = $_POST['address'];
+    $fileName=$_FILES["userImg"]["name"];
+    $imagename="userImg";
+    $acceptablesize=5000000;
+    $folder="User/$userId/myAccount";
+    $newFileName=$userId.$name;
+    
+    $link=uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
+
     if(isset($userId)){
         $checker = $conn->query("SELECT * FROM agent WHERE userId = '$userId'")->fetch_assoc();
         if(!empty($checker)){
-                $sql = "UPDATE agent SET name = '$name', email='$email', phone='$phone', password='$password', userAddress='$address' WHERE userId ='$userId'";
+                $sql = "UPDATE agent SET companyImage='$link' , name = '$name', email='$email', phone='$phone', password='$password', userAddress='$address' WHERE userId ='$userId'";
                 if($conn->query($sql)){
                     $response['status'] = "success";
                     $response['message'] ="User Details updated successfully";

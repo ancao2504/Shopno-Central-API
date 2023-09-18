@@ -42,6 +42,15 @@ function uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileNa
             $validExt=['jpg', 'jpeg', 'png', 'webp'];
             $fileExt= strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
             
+            if (!is_dir("../../../asset/$folder")) {
+                if (!mkdir("../../../asset/$folder", 0777, true)) {
+                    return [
+                        "status" => "error",
+                        "message" => "Failed to create the directory for file storage."
+                    ];
+                }
+            }
+
             $newFileName="$newFileName.$fileExt";
             $folder="$folder/$newFileName";
             $cdnpath="../../../asset/$folder";

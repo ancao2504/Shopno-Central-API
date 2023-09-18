@@ -13,8 +13,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
 
     $_POST = json_decode(file_get_contents('php://input'), true);
 
-    $staffId = $_POST["staffId"];
     $agentId = $_POST["agentId"];
+    $staffId = $_POST["staffId"];
     $Name  = $_POST['Name'];
     $Email  = $_POST['Email'];
     $Designation  = $_POST['Designation'];
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST"){
         $response['message']="Updated Successfully";
     }else{
         $response['status']="error";
-            $response['message']="Updated Query Failed";
+        $response['message']="Updated Query Failed";
     }
 
     echo json_encode($response);
