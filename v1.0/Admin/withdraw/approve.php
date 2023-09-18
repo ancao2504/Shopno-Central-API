@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     
     $userId=$_POST["userId"];
-    $withdrawalId=$_POST["withdrawalId"];
+    $id=$_POST["withdrawalId"];
     $actionBy=$_POST["actionBy"];
     $remarks=$_POST["remarks"];
     $platform=$_POST["platform"];
@@ -26,8 +26,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $newFileName= "withdraw$userId".$actionBy.$dFFile;
     $createdAt=date("Y-m-d H:i:s");
 
-    $amountQuery= $conn->query("SELECT `status`, `amount`, `withdrawType` FROM `withdraw_req` WHERE id='$withdrawalId'")->fetch_assoc();
-    
+    $amountQuery= $conn->query("SELECT `withdrawId` ,`status`, `amount`, `withdrawType` FROM `withdraw_req` WHERE id='$id'")->fetch_assoc();
+
     if(empty($amountQuery))
     {
         echo json_encode(
@@ -53,6 +53,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $amount=$amountQuery["amount"];
     $withdrawType=$amountQuery["withdrawType"];
+    $withdrawalId=$amountQuery["withdrawId"];
+   
 
     $userExists = $conn->query("SELECT * FROM `agent` WHERE `userId`='$userId'");
 
@@ -90,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         `actionBy`= '$actionBy',
         `updatedAt`= '$createdAt'
         WHERE 
-        `id`= '$withdrawalId'
+        `id`= '$id'
         AND
         `userId`='$userId'
         "
@@ -120,17 +122,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         `details`,
         `reference`,
         `actionBy`,
-        `createdAt`
+        `createdAt`,
+        `lastAmount`
     )VALUES
     (
         '$userId',
         '$platform',
-        '$newAmount',
-        '$withdrawalId',
+        '$amount',
+        '$id',
         '$amount Withdrawal Request Through $withdrawType Approved By $actionBy',
         '$withdrawalId',
         '$actionBy',
-        '$createdAt'
+        '$createdAt',
+        '$newAmount'
     )
     ");
     if(!$ledgerQuery)
