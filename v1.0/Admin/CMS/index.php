@@ -8,6 +8,7 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_POST = json_decode(file_get_contents('php://input'), true);
+
     if (array_key_exists("option", $_GET)) {
         $Option = $_GET['option'];
         if ($Option == 'companylogo') {
@@ -33,9 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     if (!file_exists($upload_path . $fileName)) {
 
                         move_uploaded_file($tempPath, $upload_path . $renameFile);
-
                     }
-
                 }
             }
 
@@ -128,7 +127,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($conn->query($sql) === true) {
                 $response['status'] = "success";
                 $response['message'] = "Primary Color Update Successfully";
-
             } else {
                 $response['status'] = "Error";
                 $response['message'] = "Update Failed";
@@ -140,28 +138,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($conn->query($sql) === true) {
                 $response['status'] = "success";
                 $response['message'] = "Secondary Color Update Successfully";
-
             } else {
                 $response['status'] = "Error";
                 $response['message'] = "Update Failed";
             }
             echo json_encode($response);
-
         } else if ($Option == "aboutus") {
             $about_us = $_POST["data"];
-            
-                $sql = "UPDATE cms SET aboutus ='$about_us' ";
-                if ($conn->query($sql) === true) {
 
-                    $response["status"] = "success";
-                    $response["message"] = "About us Update successfully";
-                } else {
-                    $response['status'] = "Error";
-                    $response['message'] = "Update Failed";
-                }
-                echo json_encode($response);
-            
+            $sql = "UPDATE cms SET aboutus ='$about_us' ";
+            if ($conn->query($sql) === true) {
 
+                $response["status"] = "success";
+                $response["message"] = "About us Update successfully";
+            } else {
+                $response['status'] = "Error";
+                $response['message'] = "Update Failed";
+            }
+            echo json_encode($response);
         } else if ($Option == "address") {
             $address = $_POST["data"];
             $sql = "UPDATE cms SET address ='$address' ";
@@ -173,7 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $response['message'] = "Update Failed";
             }
             echo json_encode($response);
-
         } else if ($Option == "email") {
 
             $email = $_POST["data"];
@@ -192,7 +185,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 echo json_encode($response);
             }
-
         } else if ($Option == "othersemail") {
 
             $othersemail = $_POST["data"];
@@ -211,7 +203,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 echo json_encode($response);
             }
-
         } else if ($Option == "phone") {
             $phone = $_POST["data"];
             $agentIdChecker = "SELECT * FROM cms ";
@@ -228,105 +219,90 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
                 echo json_encode($response);
             }
-
         } else if ($Option == "fblink") {
             $fb_link = $_POST["data"];
-                $sql = "UPDATE cms SET fblink ='$fb_link' ";
-                if ($conn->query($sql) === true) {
-                    $response['status'] = "success";
-                    $response['message'] = "facebook_link Update Successfully";
-                } else {
-                    $response['status'] = "Error";
-                    $response['message'] = "Update Failed";
-                }
-                echo json_encode($response);
-            
-
+            $sql = "UPDATE cms SET fblink ='$fb_link' ";
+            if ($conn->query($sql) === true) {
+                $response['status'] = "success";
+                $response['message'] = "facebook_link Update Successfully";
+            } else {
+                $response['status'] = "Error";
+                $response['message'] = "Update Failed";
+            }
+            echo json_encode($response);
         } else if ($Option == "whatsappnum") {
             $whatsapp_num = $_POST['data'];
-                $sql = "UPDATE cms SET whatsappnum = '$whatsapp_num'";
-                if ($conn->query($sql) === true) {
-                    $response['status'] = "success";
-                    $response['message'] = "whatsapp Number Update Successfully";
-                } else {
-                    $response['status'] = "Error";
-                    $response['message'] = "Update Failed";
-                }
-                echo json_encode($response);
-            
-
+            $sql = "UPDATE cms SET whatsappnum = '$whatsapp_num'";
+            if ($conn->query($sql) === true) {
+                $response['status'] = "success";
+                $response['message'] = "whatsapp Number Update Successfully";
+            } else {
+                $response['status'] = "Error";
+                $response['message'] = "Update Failed";
+            }
+            echo json_encode($response);
         } else if ($Option == "linkedinlink") {
 
             $linkedin_link = $_POST['data'];
-                $sql = "UPDATE cms SET linkedinlink= '$linkedin_link' ";
-                if ($conn->query($sql) === true) {
-                    $response['status'] = "success";
-                    $response['message'] = "linkedin_link Update Successfully";
-                } else {
-                    $response['status'] = "Error";
-                    $response['message'] = "Update Failed";
-                }
-                echo json_encode($response);
-
+            $sql = "UPDATE cms SET linkedinlink= '$linkedin_link' ";
+            if ($conn->query($sql) === true) {
+                $response['status'] = "success";
+                $response['message'] = "linkedin_link Update Successfully";
+            } else {
+                $response['status'] = "Error";
+                $response['message'] = "Update Failed";
+            }
+            echo json_encode($response);
         } else if ($Option == "aboutuslong") {
 
             $aboutuslong = str_replace("'", "''", $_POST['data']);
-    
-                $sql = "UPDATE cms SET aboutuslong ='$aboutuslong'";
-                if ($conn->query($sql) === true) {
-                    $response['status'] = "success";
-                    $response['message'] = "About Us Long Update Successfully";
-                } else {
-                    $response['status'] = "Error";
-                    $response['message'] = "Update Failed";
-                }
-                echo json_encode($response);
-            
 
+            $sql = "UPDATE cms SET aboutuslong ='$aboutuslong'";
+            if ($conn->query($sql) === true) {
+                $response['status'] = "success";
+                $response['message'] = "About Us Long Update Successfully";
+            } else {
+                $response['status'] = "Error";
+                $response['message'] = "Update Failed";
+            }
+            echo json_encode($response);
         } else if ($Option == "privacy") {
             $privacy_policy = str_replace("'", "''", $_POST['data']);
-            
-                $sql = "UPDATE cms SET privacypolicy='$privacy_policy'";
-                if ($conn->query($sql) === true) {
-                    $response['status'] = "success";
-                    $response['message'] = "privacy policy Update Successfully";
-                } else {
-                    $response['status'] = "Error";
-                    $response['message'] = "Update Failed";
-                }
-                echo json_encode($response);
 
-            
-
+            $sql = "UPDATE cms SET privacypolicy='$privacy_policy'";
+            if ($conn->query($sql) === true) {
+                $response['status'] = "success";
+                $response['message'] = "privacy policy Update Successfully";
+            } else {
+                $response['status'] = "Error";
+                $response['message'] = "Update Failed";
+            }
+            echo json_encode($response);
         } else if ($Option == 'terms') {
             $terms_condition = str_replace("'", "''", $_POST["data"]);
-           
-                $sql = "UPDATE cms SET termscondition='$terms_condition' ";
 
-                if ($conn->query($sql) === true) {
-                    $response['status'] = "success";
-                    $response['message'] = "terms_condition Update Successfully";
-                } else {
-                    $response['status'] = "Error";
-                    $response['message'] = "Update Failed";
-                }
-                echo json_encode($response);
-            
+            $sql = "UPDATE cms SET termscondition='$terms_condition' ";
 
+            if ($conn->query($sql) === true) {
+                $response['status'] = "success";
+                $response['message'] = "terms_condition Update Successfully";
+            } else {
+                $response['status'] = "Error";
+                $response['message'] = "Update Failed";
+            }
+            echo json_encode($response);
         } else if ($Option == 'refund') {
             $refund_policy = str_replace("'", "''", $_POST["data"]);
-            
-                $sql = "UPDATE cms SET refundpolicy= '$refund_policy'";
-                if ($conn->query($sql) === true) {
-                    $response['status'] = "success";
-                    $response['message'] = "refund policy Update Successfully";
-                } else {
-                    $response['status'] = "Error";
-                    $response['message'] = "Update Failed";
-                }
-                echo json_encode($response);
-            
 
+            $sql = "UPDATE cms SET refundpolicy= '$refund_policy'";
+            if ($conn->query($sql) === true) {
+                $response['status'] = "success";
+                $response['message'] = "refund policy Update Successfully";
+            } else {
+                $response['status'] = "Error";
+                $response['message'] = "Update Failed";
+            }
+            echo json_encode($response);
         } else if ($Option == 'favicon1') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -354,19 +330,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => "error"));
                             echo $errorMSG;
                         }
-
                     }
-
                 }
                 if (!isset($errorMSG)) {
                     $fileUrl = "$renameFile";
-                    $query = mysqli_query($conn, 'UPDATE `cms` SET `favicon1`="' . $fileUrl .'"');
+                    $query = mysqli_query($conn, 'UPDATE `cms` SET `favicon1`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Favicon Updated Successfully", "status" => "success"));
                 }
-
             }
-
         } else if ($Option == 'favicon2') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -394,9 +366,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => "error"));
                             echo $errorMSG;
                         }
-
                     }
-
                 }
                 if (!isset($errorMSG)) {
                     $fileUrl = "$renameFile";
@@ -404,9 +374,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     echo json_encode(array("message" => "Favicon Updated Successfully", "status" => "success"));
                 }
-
             }
-
         } else if ($Option == 'favicon3') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -434,7 +402,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => "error"));
                             echo $errorMSG;
                         }
-
                     } else {
                         // check file size '5MB'
                         if ($fileSize < 2000000) {
@@ -444,20 +411,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             echo $errorMSG;
                         }
                     }
-
                 } else {
                     $errorMSG = json_encode(array("message" => "PNG, ico, JPG, jpeg files are allowed", "status" => "error"));
                     echo $errorMSG;
                 }
                 if (!isset($errorMSG)) {
                     $fileUrl = "$renameFile";
-                    $query = mysqli_query($conn, 'UPDATE `cms` SET `favicon3`="'. $fileUrl .'"');
+                    $query = mysqli_query($conn, 'UPDATE `cms` SET `favicon3`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Favicon Updated Successfully", "status" => "success"));
                 }
-
             }
-
         } else if ($Option == 'mainbannerimg') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -485,7 +449,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => "error"));
                             echo $errorMSG;
                         }
-
                     } else {
                         // check file size '5MB'
                         if ($fileSize < 5000000) {
@@ -495,7 +458,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             echo $errorMSG;
                         }
                     }
-
                 } else {
                     $errorMSG = json_encode(array("message" => "Sorry, only  PNG files are allowed", "status" => "error"));
                     echo $errorMSG;
@@ -506,9 +468,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
-
             }
-
         } else if ($Option == 'mainbannervideo') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -536,7 +496,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 10 MB size", "status" => "error"));
                             echo $errorMSG;
                         }
-
                     } else {
                         // check file size '5MB'
                         if ($fileSize < 30000000) {
@@ -546,7 +505,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             echo $errorMSG;
                         }
                     }
-
                 }
                 //else{
                 //     $errorMSG = json_encode(array("message" => "Sorry, only  PNG files are allowed", "status" => "error"));
@@ -558,9 +516,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     echo json_encode(array("message" => "Video Updated Successfully", "status" => "success"));
                 }
-
             }
-
         } else if ($Option == 'sliderimg1') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -588,7 +544,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => "error"));
                             echo $errorMSG;
                         }
-
                     } else {
                         // check file size '5MB'
                         if ($fileSize < 2000000) {
@@ -598,7 +553,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             echo $errorMSG;
                         }
                     }
-
                 } else {
                     $errorMSG = json_encode(array("message" => "Sorry, only  PNG files are allowed", "status" => "error"));
                     echo $errorMSG;
@@ -609,9 +563,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
-
             }
-
         } else if ($Option == 'sliderimg2') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -639,7 +591,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => "error"));
                             echo $errorMSG;
                         }
-
                     } else {
                         // check file size '5MB'
                         if ($fileSize < 2000000) {
@@ -649,7 +600,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             echo $errorMSG;
                         }
                     }
-
                 } else {
                     $errorMSG = json_encode(array("message" => "Sorry, only  PNG files are allowed", "status" => "error"));
                     echo $errorMSG;
@@ -660,9 +610,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
-
             }
-
         } else if ($Option == 'sliderimg3') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -690,7 +638,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             $errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 5 MB size", "status" => "error"));
                             echo $errorMSG;
                         }
-
                     } else {
                         // check file size '5MB'
                         if ($fileSize < 2000000) {
@@ -700,7 +647,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             echo $errorMSG;
                         }
                     }
-
                 } else {
                     $errorMSG = json_encode(array("message" => "Sorry, only  PNG files are allowed", "status" => "error"));
                     echo $errorMSG;
@@ -711,9 +657,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
-
             }
-
         } else if ($Option == 'sliderimg4') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -741,10 +685,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $query = mysqli_query($conn, 'UPDATE `cms` SET `sliderimg4`="' . $fileUrl . '"');
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
-
                 }
             }
-
         } else if ($Option == 'sliderimg5') {
             $fileName = $_FILES['file']['name'];
             $tempPath = $_FILES['file']['tmp_name'];
@@ -767,7 +709,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (!file_exists($upload_path . $fileName)) {
 
                     move_uploaded_file($tempPath, $upload_path . $renameFile);
-
                 }
 
                 if (!isset($errorMSG)) {
@@ -776,29 +717,86 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
                 }
-
             }
+        } else if ($Option == 'appSliderImg1') {
 
+            $imagename = "file";
+            $acceptablesize = 5000000;
+            $folder = "Admin/Company";
+            $fileName = $_FILES["file"]["name"];
+            $newFileName = "appSliderImg1";
+
+
+            $fileUrl = uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
+            $query = mysqli_query($conn, "UPDATE `cms` SET `appSliderImg1`='$fileUrl'");
+
+            echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
+        } else if ($Option == 'appSliderImg2') {
+
+            $imagename = "file";
+            $acceptablesize = 5000000;
+            $folder = "Admin/Company";
+            $fileName = $_FILES["file"]["name"];
+            $newFileName = "appSliderImg2";
+
+            $fileUrl = uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
+            $query = mysqli_query($conn, "UPDATE `cms` SET `appSliderImg2`='$fileUrl'");
+
+            echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
+        } else if ($Option == 'appSliderImg3') {
+
+            $imagename = "file";
+            $acceptablesize = 5000000;
+            $folder = "Admin/Company";
+            $fileName = $_FILES["file"]["name"];
+            $newFileName = "appSliderImg3";
+
+            $fileUrl = uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
+            $query = mysqli_query($conn, "UPDATE `cms` SET `appSliderImg3`='$fileUrl'");
+
+            echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
+        } else if ($Option == 'appSliderImg4') {
+
+            $imagename = "file";
+            $acceptablesize = 5000000;
+            $folder = "Admin/Company";
+            $fileName = $_FILES["file"]["name"];
+            $newFileName = "appSliderImg4";
+
+            $fileUrl = uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
+            $query = mysqli_query($conn, "UPDATE `cms` SET `appSliderImg4`='$fileUrl'");
+
+            echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
+        } else if ($Option == 'appSliderImg5') {
+
+            $imagename = "file";
+            $acceptablesize = 5000000;
+            $folder = "Admin/Company";
+            $fileName = $_FILES["file"]["name"];
+            $newFileName = "appSliderImg5";
+
+            $fileUrl = uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
+            $query = mysqli_query($conn, "UPDATE `cms` SET `appSliderImg5`='$fileUrl'");
+
+            echo json_encode(array("message" => "Image Updated Successfully", "status" => "success"));
         } else {
             $response['status'] = "error";
             $response['message'] = $Option . " is invalid";
             echo json_encode($response);
         }
-
     }
-
-}
-else if(array_key_exists('all', $_GET)){
+} else if (array_key_exists('all', $_GET)) {
     $data = $conn->query("SELECT * FROM cms")->fetch_all(MYSQLI_ASSOC);
-    if(!empty($data)){
+    if (!empty($data)) {
         echo json_encode($data);
-    }else {
+    } else {
         $response['status'] = 'error';
         $response['message'] = "Data not found";
         echo json_encode($response);
     }
-
 }
 
 $conn->close();
-?>
+
+
+
