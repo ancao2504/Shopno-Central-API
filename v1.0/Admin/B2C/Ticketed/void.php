@@ -1,7 +1,7 @@
 <?php
 
-require '../../config.php';
-require '../../emailfunction.php';
+require '../../../config.php';
+require '../../../emailfunction.php';
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
@@ -11,7 +11,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 
-require "../../vendor/autoload.php";
+require "../../../vendor/autoload.php";
 
 if (array_key_exists("bookingId", $_GET)) {
     $voidId = $_GET["bookingId"];
@@ -42,7 +42,7 @@ if (array_key_exists("bookingId", $_GET)) {
         $_POST = json_decode(file_get_contents('php://input'), true);
 
         $bookingId = $_POST['bookingId'];
-        $agentId = $_POST['agentId'];
+        $userId = $_POST['userId'];
         $actionBy = $_POST['actionBy'];
         $voidId = $_POST['voidId'];
 
@@ -57,7 +57,7 @@ if (array_key_exists("bookingId", $_GET)) {
             if (!empty($rowTravelDate)) {
                 $travelDate = $rowTravelDate['travelDate'];
                 $staffId = $rowTravelDate['staffId'];
-                $subagentId = $rowTravelDate["subagentId"];
+                $userId = $rowTravelDate["userId"];
                 $pax = $rowTravelDate['pax'];
                 $gds = $rowTravelDate['gds'];
                 $pnr = $rowTravelDate['pnr'];
@@ -75,46 +75,23 @@ if (array_key_exists("bookingId", $_GET)) {
 
         if ($status == 'Void In Processing') {
           
-            if (isset($agentId)) {
-                $sql1 = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
-                $row1 = mysqli_fetch_array($sql1, MYSQLI_ASSOC);
 
-                if (!empty($row1)) {
-                    $agentEmail = $row1['email'];
-                    $companyname = $row1['company'];
-                }
-            }
-
-            $staffName = '';
             $voidtextBy = '';
-            $staffsql2 = mysqli_query($conn, "SELECT * FROM `staffList` where agentId = '$agentId' AND staffId='$staffId'");
-            $staffrow2 = mysqli_fetch_array($staffsql2, MYSQLI_ASSOC);
+            $sql2 = mysqli_query($conn, "SELECT * FROM `agent` where userId='$userId'");
+            $staffrow2 = mysqli_fetch_array($sql2, MYSQLI_ASSOC);
 
             if (!empty($staffrow2)) {
-                $staffName = $staffrow2['name'];
-
                 $voidBy = $staffrow2['name'];
-                $voidtextBy = "Void Request Approve By: $voidBy, $companyname";
+                $voidtextBy = "Void Request Approve By: $voidBy";
             } else {
 
-                $voidtextBy = "Void Request Approve By: $companyname";
+                $voidtextBy = "Void Request Approve By: $voidBy";
             }
-
-            // if(isset($voidId)){
-            //     $sqlvoid = mysqli_query($conn, "SELECT * FROM void WHERE bookingId='$bookingId'");
-            //     $rowsqlvoid = mysqli_fetch_array($sqlvoid,MYSQLI_ASSOC);
-
-            //     if(!empty($rowsqlvoid)){
-            //         $voidrequestedBy = $rowsqlvoid['requestedBy'];
-            //         $voidrequestedAt = $rowsqlvoid['requestedAt'];
-
-            //     }
-            // }
 
             $refundAmount = $TicketCost - 500;
             $sarefundAmount = $subagentCost - 500;
 
-            $checkBalanced = mysqli_query($conn, "SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' ORDER BY id DESC LIMIT 1");
+            $checkBalanced = mysqli_query($conn, "SELECT lastAmount FROM `agent_ledger` where userId = '$userId' ORDER BY id DESC LIMIT 1");
             $rowcheckBalanced = mysqli_fetch_array($checkBalanced, MYSQLI_ASSOC);
             if (!empty($rowcheckBalanced)) {
                 $lastAmount = $rowcheckBalanced['lastAmount'];
@@ -122,32 +99,24 @@ if (array_key_exists("bookingId", $_GET)) {
 
             $newBalance = $lastAmount + $refundAmount;
 
-            $subagentsql1 = mysqli_query($conn, "SELECT lastAmount FROM `agent_ledger` where agentId = '$agentId' AND subagentId ='$subagentId'
-            ORDER BY id DESC LIMIT 1");
-            $subagentrow1 = mysqli_fetch_array($subagentsql1, MYSQLI_ASSOC);
-            if (!empty($subagentrow1)) {
-                $salastAmount = $subagentrow1['lastAmount'];
-            }
 
-            $sanewBalance = $salastAmount + $sarefundAmount;
-
-            $sql = "UPDATE `void` SET `status`='approved',`refundAmount`='$refundAmount',`actionBy`='$actionBy',`actionAt`='$createdTime' WHERE bookingId='$bookingId' AND agentId='$agentId'";
+            $sql = "UPDATE `void` SET `status`='approved',`refundAmount`='$refundAmount',`actionBy`='$actionBy',`actionAt`='$createdTime' WHERE bookingId='$bookingId'";
 
             if ($conn->query($sql) === true) {
-                $conn->query("INSERT INTO `agent_ledger`(`agentId`,`void`, `lastAmount`, `transactionId`, `details`, `reference`,`createdAt`)
-         VALUES ('$agentId','$refundAmount','$newBalance','$bookingId','Voided Money $TicketId Ticket Invoice $Type Air Ticket $deptFrom - $arriveTo with carrier $Airlines was Requested By $actionBy','$voidId','$createdTime')");
+                $conn->query("INSERT INTO `agent_ledger`(`userId`,`void`, `lastAmount`, `transactionId`, `details`, `reference`,`createdAt`)
+         VALUES ('$useId','$refundAmount','$newBalance','$bookingId','Voided Money $TicketId Ticket Invoice $Type Air Ticket $deptFrom - $arriveTo with carrier $Airlines was Requested By $actionBy','$voidId','$createdTime')");
 
                 $conn->query("UPDATE `booking` SET `status`='Voided',`lastUpdated`='$createdTime' where bookingId='$bookingId'");
-                $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`,`actionAt`)
-                VALUES ('$bookingId','$agentId','Voided',' ','$actionBy','$createdTime')");
+                $conn->query("INSERT INTO `activitylog`(`ref`,`userId`,`status`,`remarks`,`actionBy`,`actionAt`)
+                VALUES ('$bookingId','$userId','Voided',' ','$actionBy','$createdTime')");
 
                 $subject = $header = "Booking Void Request Accepted";
                 $property = "Booking ID: ";
                 $data = $bookingId;
                 $adminMessage = "Our Booking Void Request has been Accepted.";
                 $agentMesssage = "Your Booking Void Request has been Accepted.";
-                sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
-                sendToAgent($subject, $agentMesssage, $agentId, $header, $property, $data);
+               // sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
+               // sendToAgent($subject, $agentMesssage, $agentId, $header, $property, $data);
 
                 $response['status'] = "success";
                 $response['InvoiceId'] = "$voidId";
@@ -165,7 +134,7 @@ if (array_key_exists("bookingId", $_GET)) {
         $_POST = json_decode(file_get_contents('php://input'), true);
 
         $bookingId = $_POST['bookingId'];
-        $agentId = $_POST['agentId'];
+        $userId = $_POST['userId'];
         $actionBy = $_POST['actionBy'];
         $remarks = $_POST['remarks'];
 
@@ -178,7 +147,7 @@ if (array_key_exists("bookingId", $_GET)) {
 
             if (!empty($rowTravelDate)) {
                 $travelDate = $rowTravelDate['travelDate'];
-                $subagentId = $rowTravelDate['subagentId'];
+                $userId = $rowTravelDate['userId'];
                 $pax = $rowTravelDate['pax'];
                 $gds = $rowTravelDate['gds'];
                 $pnr = $rowTravelDate['pnr'];
@@ -192,30 +161,21 @@ if (array_key_exists("bookingId", $_GET)) {
             }
         }
 
-        if (isset($agentId)) {
-            $sql1 = mysqli_query($conn, "SELECT * FROM agent WHERE agentId='$agentId'");
-            $row1 = mysqli_fetch_array($sql1, MYSQLI_ASSOC);
 
-            if (!empty($row1)) {
-                $agentEmail = $row1['email'];
-                $companyname = $row1['company'];
-            }
-        }
-
-        $sql = "UPDATE `void` SET `status`='rejected',`actionBy`='$actionBy',`actionAt`='$createdTime' WHERE bookingId='$bookingId' AND agentId='$agentId'";
+        $sql = "UPDATE `void` SET `status`='rejected',`actionBy`='$actionBy',`actionAt`='$createdTime' WHERE bookingId='$bookingId' AND userId='$userId'";
 
         if ($conn->query($sql) === true) {
             $conn->query("UPDATE `booking` SET `status`='Void Rejected',`lastUpdated`='$createdTime' WHERE bookingId='$bookingId'");
-            $conn->query("INSERT INTO `activitylog`(`ref`,`agentId`,`status`,`remarks`,`actionBy`, `actionAt`)
-                VALUES ('$bookingId','$agentId','Void Rejected',' ','$actionBy','$createdTime')");
+            $conn->query("INSERT INTO `activitylog`(`ref`,`userId`,`status`,`remarks`,`actionBy`, `actionAt`)
+                VALUES ('$bookingId','$userId','Void Rejected','$remarks','$actionBy','$createdTime')");
 
             $subject = $header = "Booking Void Request Cancelled";
             $property = "Booking ID: ";
             $data = $bookingId;
             $adminMessage = "Our Booking Void Request has been Cancelled.";
             $agentMesssage = "Your Booking Void Request has been Cancelled.";
-            sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
-            sendToAgent($subject, $agentMesssage, $agentId, $header, $property, $data);
+            //sendToAdmin($subject, $adminMessage, $agentId, $header, $property, $data);
+            //sendToAgent($subject, $agentMesssage, $agentId, $header, $property, $data);
 
             $response['status'] = "success";
             $response['InvoiceId'] = "$bookingId";
