@@ -151,7 +151,7 @@ if (array_key_exists("userId", $_GET)) {
     }
 }
 else if(array_key_exists("edit",$_GET)){
-    $_POST = json_decode(file_get_contents("php://input"), true);
+    
     $userId = $_POST['userId'];
     $name = $_POST['name'];
     $email = $_POST['email'];

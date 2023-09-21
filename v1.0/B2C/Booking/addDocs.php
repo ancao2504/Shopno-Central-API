@@ -74,7 +74,7 @@ if(array_key_exists('paxId', $_GET) && array_key_exists('passportCopy', $_GET)){
 // if no error caused, continue ....
 	if(!isset($errorMSG))
 	{
-		$fileUrl = "https:///shopno.api.flyfarint.com/asset/Document/B2C/$paxId/$renameFile";
+		$fileUrl = "https://shopno.api.flyfarint.com/asset/Document/B2C/$paxId/$renameFile";
 		
 		$query = mysqli_query($conn,'UPDATE `passengers` SET `passportCopy`="'.$fileUrl.'" WHERE paxId="'.$paxId.'"');
 				
@@ -83,7 +83,7 @@ if(array_key_exists('paxId', $_GET) && array_key_exists('passportCopy', $_GET)){
 
 }else if(array_key_exists('paxId', $_GET) && array_key_exists('visaCopy', $_GET)){
 
-		$paxId = $_GET['paxId'];
+	$paxId = $_GET['paxId'];
 
 	$fileName  =  $_FILES['file']['name'];
 	$tempPath  =  $_FILES['file']['tmp_name'];
@@ -91,13 +91,13 @@ if(array_key_exists('paxId', $_GET) && array_key_exists('passportCopy', $_GET)){
 
 	$needheight = 80;
 	$needwidth = 150;
-			
+
 	if(empty($fileName)){
 		$errorMSG = json_encode(array("message" => "please select image", "status" => false));	
 		echo $errorMSG;
 	}
 	else{
-		$upload_path = "../../../../asset/Document/B2C/$paxId/"; // set upload folder path 
+		$upload_path = "../../../asset/Document/B2C/$paxId/"; // set upload folder path 
 		
 		if (!file_exists($upload_path)) {
 			mkdir($upload_path, 0777, true);
@@ -115,13 +115,13 @@ if(array_key_exists('paxId', $_GET) && array_key_exists('passportCopy', $_GET)){
 		if(in_array($fileExt, $valid_extensions)){				
 			//check file not exist our upload folder path
 			if(!file_exists($upload_path . $fileName)){
-					if($fileSize < 1000000){
-						move_uploaded_file($tempPath, $upload_path . $renameFile); 
-					}
-					else{		
-						$errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 1 MB size", "status" => "error"));	
-						echo $errorMSG;
-					}
+				if($fileSize < 1000000){
+					move_uploaded_file($tempPath, $upload_path . $renameFile); 
+				}
+				else{		
+					$errorMSG = json_encode(array("message" => "Sorry, your file is too large, please upload 1 MB size", "status" => "error"));	
+					echo $errorMSG;
+				}
 			}
 			else
 			{		
@@ -145,7 +145,7 @@ if(array_key_exists('paxId', $_GET) && array_key_exists('passportCopy', $_GET)){
 // if no error caused, continue ....
 	if(!isset($errorMSG))
 	{
-		$fileUrl = "https:///shopno.api.flyfarint.com/asset/Document/B2C/$paxId/$renameFile";
+		$fileUrl = "https://shopno.api.flyfarint.com/asset/Document/B2C/$paxId/$renameFile";
 		
 		$query = mysqli_query($conn,'UPDATE `passengers` SET `visaCopy`="'.$fileUrl.'" WHERE paxId="'.$paxId.'"');
 				
