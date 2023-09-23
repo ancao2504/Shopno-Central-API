@@ -32,6 +32,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
     $infants = $_GET['infant'];
     $agentId = $_GET['agentId'];
 
+    $pxCount=(int)$adult+(int)$child+(int)$infants;
+  
     // Trip Type
     $fromsql = mysqli_query($conn, "SELECT name, cityName, countryCode FROM airports WHERE code='$From' ");
     $fromrow = mysqli_fetch_array($fromsql, MYSQLI_ASSOC);
@@ -442,14 +444,14 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         } else {
                             $markup =  $agentmarkrow['iMarkup'];
                         }
-                        $MarkupPrice = $AgentPrice + (int) $markup;
+                        $MarkupPrice = $AgentPrice + (((int) $markup)*$pxCount);
                     } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
                         if ($TripType == 'Inbound') {
                             $markup = $agentmarkrow['dMarkup'];
                         } else {
                             $markup = $agentmarkrow['iMarkup'];
                         }
-                        $MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup / 100)));
+                        $MarkupPrice = ceil($AgentPrice + (($AgentPrice * ($markup / 100))*$pxCount));
                     } else {
                         $MarkupPrice = $AgentPrice;
                     }
@@ -462,14 +464,14 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         } else {
                             $markup = $agentmarkrow['alliMarkup'];
                         }
-                        $MarkupPrice = $AgentPrice + (int) $markup;
+                        $MarkupPrice = $AgentPrice + (((int) $markup)*$pxCount);
                     } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
                         if ($TripType == 'Inbound') {
                             $markup = $agentmarkrow['alldMarkup'];
                         } else {
                             $markup = $agentmarkrow['alliMarkup'];
                         }
-                        $MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup / 100)));
+                        $MarkupPrice = ceil($AgentPrice + (($AgentPrice * ($markup / 100))*$pxCount));
                     } else {
                         $MarkupPrice = $AgentPrice;
                     }
@@ -477,7 +479,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $MarkupPrice = $AgentPrice;
                 }
 
-
+         
                 $ref = $var['legs'][0]['ref'];
                 $id = $ref - 1;
 

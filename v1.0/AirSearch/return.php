@@ -41,6 +41,9 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 	$child = $_GET['child'];
 	$infants = $_GET['infant'];
 
+	$pxCount=(int)$adult+(int)$child+(int)$infants;
+
+
 	$fromsql = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$From' ");
 	$fromrow = mysqli_fetch_array($fromsql,MYSQLI_ASSOC);
 
@@ -505,7 +508,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 			   		 }else{
 			   			  $markup = $agentmarkrow['iMarkup'];
 			   		 }
-			   		 $MarkupPrice = $AgentPrice +  (int) $markup; 
+			   		 $MarkupPrice = $AgentPrice +  (((int) $markup)*$pxCount); 
 					   
 						 
 			   	 }else if($imarkuptype == 'percentage' || $dmarkuptype == 'percentage'){
@@ -514,7 +517,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 			   		 }else{
 			   			  $markup = $agentmarkrow['iMarkup'];
 			   		 }
-			   		$MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup/100))); 
+			   		$MarkupPrice = ceil($AgentPrice + (($AgentPrice * ($markup/100))*$pxCount)); 
 						
 			   	 }else{
 			   		 $MarkupPrice = $AgentPrice;
@@ -528,7 +531,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 					   }else{
 							$markup = $agentmarkrow['alliMarkup'];
 					   }
-					   $MarkupPrice = $AgentPrice + (int) $markup;
+					   $MarkupPrice = $AgentPrice + (((int) $markup)*$pxCount);
 					  
 				   }else if($imarkuptype == 'percentage' || $dmarkuptype == 'percentage'){
 					   if($TripType == 'Inbound'){
@@ -536,7 +539,7 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 					   }else{
 							$markup = $agentmarkrow['alliMarkup'];
 					   }
-					  $MarkupPrice = ceil($AgentPrice + ($AgentPrice * ($markup/100))); 
+					  $MarkupPrice = ceil($AgentPrice + (($AgentPrice * ($markup/100))*$pxCount)); 
 					   
 				   }else{
 					   $MarkupPrice = $AgentPrice;
