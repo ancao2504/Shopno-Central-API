@@ -109,7 +109,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // echo $netCost;
   // echo ' <br/>';
   // echo $subagentCost;
-  
+  echo "$userAmount" ."-". "$subagentCost";
+  exit;
   $agentnewBalance=$userAmount-$subagentCost;
   if ($subagentCost> $userAmount) {
     echo("$userAmount-$subagentCost");

@@ -478,8 +478,10 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 } else {
                     $MarkupPrice = $AgentPrice;
                 }
+                
+                //if markup is greater than clientPrice make the markup price equal to client price
+               $MarkupPrice=($MarkupPrice>$totalFare)?$totalFare:$MarkupPrice;
 
-         
                 $ref = $var['legs'][0]['ref'];
                 $id = $ref - 1;
 
@@ -952,6 +954,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         "lastTicketTime" => "$timelimit",
                         "BasePrice" => "$baseFareAmount",
                         "Taxes" => "$totalTaxAmount",
+                        "netCost" => "$AgentPrice",
                         "price" => "$MarkupPrice",
                         "clientPrice" => "$totalFare",
                         "comission" => "$Commission",
@@ -1415,6 +1418,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         "lastTicketTime" => "$timelimit",
                         "BasePrice" => "$baseFareAmount",
                         "Taxes" => "$totalTaxAmount",
+                        "netCost" => "$AgentPrice",
                         "price" => "$MarkupPrice",
                         "clientPrice" => "$totalFare",
                         "comission" => "$Commission",
