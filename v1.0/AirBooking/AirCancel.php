@@ -188,6 +188,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       $SabreResponse = curl_exec($curl);
 
+
       curl_close($curl);
       $sql = "UPDATE `booking` SET `status`='Cancelled' where bookingId='$bookingId'";
 

@@ -433,11 +433,11 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 //Agent MarkUP
                 $agentMarksql = mysqli_query($conn, "SELECT dMarkup,iMarkup, dMarkupType,iMarkupType, alliMarkup,alldMarkup,alliMarkupType,alldMarkupType FROM agent WHERE agentId='$agentId' ");
                 $agentmarkrow = mysqli_fetch_array($agentMarksql, MYSQLI_ASSOC);
-
                 //Individual Markup
                 if (!empty($agentmarkrow) && (empty($agentmarkrow['alliMarkup']) && empty($agentmarkrow['alldMarkup']))) {
                     $imarkuptype =  $agentmarkrow['iMarkupType'];
                     $dmarkuptype = $agentmarkrow['dMarkupType'];
+
                     if ($imarkuptype == 'amount' || $dmarkuptype == 'amount') {
                         if ($TripType == 'Inbound') {
                             $markup =  $agentmarkrow['dMarkup'];
@@ -452,6 +452,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                             $markup = $agentmarkrow['iMarkup'];
                         }
                         $MarkupPrice = ceil($AgentPrice + (($AgentPrice * ($markup / 100))*$pxCount));
+                       
+                       
                     } else {
                         $MarkupPrice = $AgentPrice;
                     }
