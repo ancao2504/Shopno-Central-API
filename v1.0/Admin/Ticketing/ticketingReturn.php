@@ -79,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $BonusAmountadded = $bonusAmount + 100;
       $conn->query("UPDATE `agent` SET `bonus` = '$BonusAmountadded' where agentId = '$agentId'");
     }
+    
     if ($agentId != "") {
       $ledgerUpdate = "INSERT INTO `agent_ledger`(`agentId`,`returnMoney`, `lastAmount`, `transactionId`, `details`, `reference`, `actionBy`, `createdAt`)
          VALUES ('$agentId','$netCost','$newBalance','$bookingId','Return Money $Type Air Ticket $Route - $Airlines','$bookingId','$actionBy','$createdTime')";

@@ -1648,7 +1648,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         );
 
         $SabrerResponse = curl_exec($curl);
-        //echo $response;
+        
 
         curl_close($curl);
         $result = json_decode($SabrerResponse, true);
