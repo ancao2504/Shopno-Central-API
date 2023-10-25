@@ -11,7 +11,7 @@ include '../config.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$agentId = $_GET['agentId'];
+$agentId = $_POST['agentId'];
 
 $fileName  =  $_FILES['file']['name'];
 $tempPath  =  $_FILES['file']['tmp_name'];
@@ -25,7 +25,7 @@ if(empty($fileName)){
 	echo $errorMSG;
 }
 else{
-	$upload_path = "../../asset/Agent/$agentId/"; // set upload folder path 
+	$upload_path = "../../asset/Agent/$agentId/CompanyImg/"; // set upload folder path 
 	
 	if (!file_exists($upload_path)) {
     	mkdir($upload_path, 0777, true);
@@ -34,9 +34,9 @@ else{
 	$fileExt = strtolower(pathinfo($fileName,PATHINFO_EXTENSION)); // get image extension
 		
 	// valid image extensions
-	$valid_extensions = array('png', 'PNG'); 
+	$valid_extensions = array('png', 'PNG', 'jpg', 'JPG', 'jpeg', 'JPEG', 'webp', 'WEBP'); 
 
-    $renameFile ="companylogo.$fileExt";
+    $renameFile ="companylogo.webp";
 	
 					
 	// allow valid image file formats
