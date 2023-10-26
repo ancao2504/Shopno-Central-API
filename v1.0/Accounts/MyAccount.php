@@ -150,26 +150,50 @@ if (array_key_exists("agentId", $_GET)) {
         }
     } else if($action == 'updateimage')
     {
-        // if ($_SERVER["REQUEST_METHOD"] == "POST")
-        // {   
-        //     $files=[''];
-        //     $imagename = "file";
-        //     $acceptablesize = 5000000;
-        //     $folder = "Admin/Company";
-        //     $fileName = $_FILES["file"]["name"];
-        //     $newFileName = "appSliderImg1";
+        if ($_SERVER["REQUEST_METHOD"] == "POST")
+        {   
+            $files=['tinImg', 'nid', 'bankStatement'];
+            $fileKey=array_keys($_FILES)[0];
+            
+            if(!in_array($fileKey, $files))
+            {
+                echo json_encode(
+                    [
+                        "status" => "error",
+                        "message" => "File Name Mismatched"
+                    ]
+                );
+            }
 
+            $newFileName=$imagename = $fileKey;
+            $acceptablesize = 5000000;
+            $folder = "Agent/$AgentId/$fileKey";
+            $fileName = $_FILES[$fileKey]["name"];
+            
+            $fileUrl = uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
 
-        //     $fileUrl = uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
-        // }
-        // else
-        // {
-        //     echo json_encode(
-        //         [
-        //             "status" => "error",
-        //             "message" => "Wrong Request Method"
-        //         ]
-        //     );
-        // }
+            $updateQuery="UPDATE `agent` SET `$fileKey`='$fileUrl' WHERE `agentId`='$agentId';";
+            if($conn->query($updateQuery))
+            {
+                $response["status"] = "error";
+                $response["message"] = "$fileKey Updated Successfully";
+            }else
+            {
+                $response["status"] = "error";
+                $response["message"] = "$fileKey Updated Successfully";
+            }
+
+            echo json_encode($response);
+
+        }
+        else
+        {
+            echo json_encode(
+                [
+                    "status" => "error",
+                    "message" => "Wrong Request Method"
+                ]
+            );
+        }
     }
 }

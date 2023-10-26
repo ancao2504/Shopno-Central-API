@@ -174,7 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 `tinImg`,
 
-                `nidImg`,
+                `nid`,
 
                 `bankStatement`
 

@@ -42,7 +42,7 @@ function uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileNa
     $dirs = explode("/", $subString);
     $pathToAsset = str_replace($dirs, "..", $subString) . "/asset";
     ///////////
-    
+
     $tempname = $_FILES[$imagename]['tmp_name'];
     $filesize = $_FILES[$imagename]['size'];
 
@@ -98,9 +98,6 @@ function uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileNa
     }
 }
 
-
-
-
 function deletedata($id, $tablename)
 {
     global $conn;
@@ -125,3 +122,5 @@ function getErrorMsg()
         "message" => "data not found"
     ));
 }
+
+
