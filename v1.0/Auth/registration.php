@@ -1,6 +1,7 @@
 <?php
 
 include "../config.php";
+include "../functions.php";
 
 
 
@@ -17,12 +18,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-
-
-    $_POST = json_decode(file_get_contents('php://input'), true);
-
-
 
     $company_name = $_POST['companyname'];
 
@@ -126,6 +121,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else if (mysqli_num_rows($result) <= 0 && mysqli_num_rows($resultStaff) <= 0) {
 
+
+        $tinImagename = "tinImg";
+        $tinAcceptablesize = 5000000;
+        $tinFolder = "Agent/$AgentId/tinImg";
+        $tinFileName = $_FILES["tinImg"]["name"];
+        $tinNewFileName = "tinImg";
+
+        $bSImagename = "bankStatement";
+        $bSAcceptablesize = 5000000;
+        $bSFolder = "Agent/$AgentId/bankStatement";
+        $bSFileName = $_FILES["bankStatement"]["name"];
+        $bSNewFileName = "bankStatement";
+
+        $nidImagename = "nid";
+        $nidAcceptablesize = 5000000;
+        $nidFolder = "Agent/$AgentId/nid";
+        $nidFileName = $_FILES["nid"]["name"];
+        $nidNewFileName = "nid";
+
+        $tinUrl = uploadImage($tinImagename, $tinAcceptablesize, $tinFolder, $tinFileName, $tinNewFileName);
+        $bSUrl = uploadImage($bSImagename, $bSAcceptablesize, $bSFolder, $bSFileName, $bSNewFileName);
+        $nidUrl = uploadImage($nidImagename, $nidAcceptablesize, $nidFolder, $nidFileName, $nidNewFileName);
+
         $sql = "INSERT INTO `agent`(
 
                 `agentId`,
@@ -152,7 +170,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 `companyadd`,
 
-                `joinAt`
+                `joinAt`,
+
+                `tinImg`,
+
+                `nid`,
+
+                `bankStatement`
 
             )
 
@@ -182,7 +206,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 '$companyaddress',
 
-                '$createdAt'
+                '$createdAt',
+                
+                '$tinUrl',
+
+                '$nidUrl',
+
+                '$bSUrl'
 
             )";
 

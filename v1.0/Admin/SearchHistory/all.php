@@ -34,18 +34,18 @@ JOIN agent ON search_history.agentId = agent.agentId ORDER BY id DESC LIMIT 300"
   $return_arr = array();
 
   if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()){      
+    while ($row = $result->fetch_assoc()) {
       $response = $row;
       array_push($return_arr, $response);
     }
   }
 
   echo json_encode($return_arr);
-}else if(array_key_exists("agentId", $_GET)) {
-    
-    $agentId = $_GET["agentId"];
+} else if (array_key_exists("agentId", $_GET)) {
 
-    $sql = "SELECT
+  $agentId = $_GET["agentId"];
+
+  $sql = "SELECT
             search_history.id,
             agent.company,
             search_history.searchId,
@@ -65,17 +65,33 @@ JOIN agent ON search_history.agentId = agent.agentId ORDER BY id DESC LIMIT 300"
             search_history
         JOIN agent ON search_history.agentId = agent.agentId
         where agentId='$agentId' ORDER BY id DESC";
-    $result = $conn->query($sql);
+  $result = $conn->query($sql);
 
-    $return_arr = array();
+  $return_arr = array();
 
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()){
-            $response = $row;
-            array_push($return_arr, $response);
-        }
+  if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+      $response = $row;
+      array_push($return_arr, $response);
     }
-    
-    echo json_encode($return_arr); 
+  }
+
+  echo json_encode($return_arr);
+} else if (array_key_exists("b2b", $_GET)) {
+  $sql="SELECT
+    s.agentId,
+    SUM(CASE WHEN s.searchtype = 'oneway' THEN 1 ELSE 0 END) AS onewaySearchCount,
+    SUM(CASE WHEN s.searchtype = 'return' THEN 1 ELSE 0 END) AS roundwaySearchCount,
+    a.company AS company,
+    a.phone AS contact
+    FROM
+        search_history AS s, agent AS a
+    WHERE 
+      s.agentId=a.agentId
+    GROUP BY
+        s.agentId;";
   
+  $result = $conn->query($sql)->fetch_all(MYSQLI_ASSOC);
+
+  echo json_encode($result);
 }
