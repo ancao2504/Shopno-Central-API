@@ -98,6 +98,25 @@ function uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileNa
     }
 }
 
+function deleteFile($url){
+    $cwd = getcwd();
+    $rmCWD = "v1.0/admin/tourpackage/update";
+    $pathToAsset=str_replace($rmCWD,"",$cwd);
+    
+    $rmURL="https://shopno.api.flyfarint.com/";
+    $currentFoler = str_replace($rmURL,"",$url);
+
+    $currentPath="$pathToAsset"."$currentFoler";
+
+    if(file_exists($currentPath)){
+        unlink($currentPath);
+            
+    }
+
+    return 1;
+}
+
+
 function deletedata($id, $tablename)
 {
     global $conn;
