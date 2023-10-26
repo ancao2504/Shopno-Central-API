@@ -148,5 +148,28 @@ if (array_key_exists("agentId", $_GET)) {
             }
             echo json_encode($response);
         }
+    } else if($action == 'updateimage')
+    {
+        // if ($_SERVER["REQUEST_METHOD"] == "POST")
+        // {   
+        //     $files=[''];
+        //     $imagename = "file";
+        //     $acceptablesize = 5000000;
+        //     $folder = "Admin/Company";
+        //     $fileName = $_FILES["file"]["name"];
+        //     $newFileName = "appSliderImg1";
+
+
+        //     $fileUrl = uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
+        // }
+        // else
+        // {
+        //     echo json_encode(
+        //         [
+        //             "status" => "error",
+        //             "message" => "Wrong Request Method"
+        //         ]
+        //     );
+        // }
     }
 }
