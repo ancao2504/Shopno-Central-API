@@ -1,0 +1,40 @@
+<soapenv:Envelope xmlns:univ="http://www.travelport.com/schema/universal_v51_0" xmlns:com="http://www.travelport.com/schema/common_v51_0" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Header />
+  <soapenv:Body xmlns:univ="http://www.travelport.com/schema/universal_v51_0" xmlns:com="http://www.travelport.com/schema/common_v51_0">
+    <univ:AirCreateReservationReq xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:univ="http://www.travelport.com/schema/universal_v51_0" TraceId="Fly_Far_Tech" TargetBranch="P4218912" RuleName="COMM" RetainReservation="Both" RestrictWaitlist="true" xmlns="http://www.travelport.com/schema/common_v51_0">
+      <BillingPointOfSaleInfo xmlns="http://www.travelport.com/schema/common_v51_0" OriginApplication="UAPI" />
+      <BookingTraveler xmlns="http://www.travelport.com/schema/common_v51_0" Key="ADT0" TravelerType="ADT" Gender="M" Nationality="BD">
+        <BookingTravelerName Prefix="MR" First="SOHAN " Last="ISLAM" />
+        <SSR Type="DOCS" Status="HK" FreeText="P/BD/A3412023/BD/05Jan99/M/01Jan30/ISLAM/SOHAN " Carrier="WY" />
+      </BookingTraveler>
+      <ContinuityCheckOverride Key="1T" xmlns="http://www.travelport.com/schema/common_v51_0">true</ContinuityCheckOverride>
+      <AgencyContactInfo xmlns="http://www.travelport.com/schema/common_v51_0">
+        <PhoneNumber Location="DAC" Number="8809606912912" Text="Fly Far International" />
+      </AgencyContactInfo>
+      <AirPricingSolution Key="NoGTgeL3nDKAQQ31nQAAAA==" xmlns="http://www.travelport.com/schema/air_v51_0">
+        <AirSegment Key="OyMigecEuDKAMcPlfQAAAA==" Group="0" Carrier="WY" FlightNumber="316" ProviderCode="1G" Origin="DAC" Destination="MCT" DepartureTime="2023-05-10T09:35:00.000+06:00" ArrivalTime="2023-05-10T12:30:00.000+04:00" />
+        <AirSegment Key="OyMigecEuDKAOcPlfQAAAA==" Group="0" Carrier="WY" FlightNumber="689" ProviderCode="1G" Origin="MCT" Destination="JED" DepartureTime="2023-05-11T08:40:00.000+04:00" ArrivalTime="2023-05-11T10:55:00.000+03:00" />
+        <AirSegment Key="OyMigecEuDKAQcPlfQAAAA==" Group="1" Carrier="WY" FlightNumber="678" ProviderCode="1G" Origin="MED" Destination="MCT" DepartureTime="2023-05-20T02:20:00.000+03:00" ArrivalTime="2023-05-20T06:25:00.000+04:00" />
+        <AirSegment Key="OyMigecEuDKAScPlfQAAAA==" Group="1" Carrier="WY" FlightNumber="317" ProviderCode="1G" Origin="MCT" Destination="DAC" DepartureTime="2023-05-20T08:25:00.000+04:00" ArrivalTime="2023-05-20T15:05:00.000+06:00" />
+        <AirPricingInfo Key="NoGTgeL3nDKATQ31nQAAAA==" PricingMethod="Guaranteed" PlatingCarrier="WY" ProviderCode="1G">
+          <FareInfo Key="OyMigecEuDKA6ePlfQAAAA==" FareBasis="LEL3BD" PassengerTypeCode="ADT" Origin="DAC" Destination="MCT" EffectiveDate="2023-04-27T15:12:00.000+06:00"></FareInfo>
+          <FareInfo Key="OyMigecEuDKA6ePlfQAAAA==" FareBasis="LEL3BD" PassengerTypeCode="ADT" Origin="MCT" Destination="JED" EffectiveDate="2023-04-27T15:12:00.000+06:00"></FareInfo>
+          <FareInfo Key="OyMigecEuDKAIfPlfQAAAA==" FareBasis="NEL3BD" PassengerTypeCode="ADT" Origin="MED" Destination="MCT" EffectiveDate="2023-04-27T15:12:00.000+06:00"></FareInfo>
+          <FareInfo Key="OyMigecEuDKAIfPlfQAAAA==" FareBasis="NEL3BD" PassengerTypeCode="ADT" Origin="MCT" Destination="DAC" EffectiveDate="2023-04-27T15:12:00.000+06:00"></FareInfo>
+          <BookingInfo BookingCode="L" FareInfoRef="OyMigecEuDKA6ePlfQAAAA==" SegmentRef="OyMigecEuDKAMcPlfQAAAA==" />
+          <BookingInfo BookingCode="L" FareInfoRef="OyMigecEuDKA6ePlfQAAAA==" SegmentRef="OyMigecEuDKAOcPlfQAAAA==" />
+          <BookingInfo BookingCode="N" FareInfoRef="OyMigecEuDKAIfPlfQAAAA==" SegmentRef="OyMigecEuDKAQcPlfQAAAA==" />
+          <BookingInfo BookingCode="N" FareInfoRef="OyMigecEuDKAIfPlfQAAAA==" SegmentRef="OyMigecEuDKAScPlfQAAAA==" />
+          <PassengerType Code="ADT" BookingTravelerRef="ADT0" />
+        </AirPricingInfo>
+      </AirPricingSolution>
+      <ActionStatus xmlns="http://www.travelport.com/schema/common_v51_0" Type="TAW" TicketDate="2023-05-10T23:59:00.000+06:00" ProviderCode="1G" />
+      <AirPricingTicketingModifiers xmlns="http://www.travelport.com/schema/air_v51_0" ContinuityCheckOverride="true">
+        <AirPricingInfoRef Key="NoGTgeL3nDKATQ31nQAAAA==" />
+        <TicketingModifiers>
+          <Commission xmlns="http://www.travelport.com/schema/common_v51_0" Level="Fare" Type="PercentBase" Percentage="7.00" />
+        </TicketingModifiers>
+      </AirPricingTicketingModifiers>
+    </univ:AirCreateReservationReq>
+  </soapenv:Body>
+</soapenv:Envelope>

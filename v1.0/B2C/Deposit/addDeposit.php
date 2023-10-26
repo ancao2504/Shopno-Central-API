@@ -14,7 +14,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 // require("../vendor/autoload.php");
     if(array_key_exists('userId', $_GET) && array_key_exists('sender', $_GET) && array_key_exists('ref', $_GET) 
         && array_key_exists('receiver', $_GET) && array_key_exists('way', $_GET) && array_key_exists('method', $_GET) 
-        && array_key_exists('transactionId', $_GET) && array_key_exists('amount', $_GET) && array_key_exists('staffId', $_GET)){
+        && array_key_exists('transactionId', $_GET) && array_key_exists('amount', $_GET) && array_key_exists('staffId', $_GET)&& array_key_exists('code', $_GET) && array_key_exists('rate', $_GET) && array_key_exists('bdtamount', $_GET)){
         
         $userId = $_GET['userId'];    
         $sender = $_GET['sender'];
@@ -25,6 +25,9 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
         $amount = $_GET['amount'];
         $ckDate = $_GET['ckDate'];
         $ref = $_GET['ref'];
+        $currencyCode = $_GET['code'];
+        $currencyRate = $_GET['rate'];
+        $bdtAmount = $_GET['bdtamount'];
 
         $time = date("Y-m-d H:i:s");
         $DateTime = date("D d M Y h:i A");
@@ -152,6 +155,9 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 `chequeIssueDate`,
                 `attachment`,
                 `platform`,
+                `currencyCode`,
+                `currencyRate`,
+                `bdtAmount`,
                 `status`,
                 `depositBy`,
                 `createdAt`
@@ -170,6 +176,9 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 '$ckDate',
                 '$attachment',
                 'B2C',
+                '$currencyCode',
+                '$currencyRate',
+                '$bdtAmount',
                 'pending',
                 '$staffName',
                 '$time')";
