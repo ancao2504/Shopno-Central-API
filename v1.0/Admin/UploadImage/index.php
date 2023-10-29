@@ -56,7 +56,6 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
         '$fileUrl',
         'B2B',
         'true',
-
         '$actionAt'
     )";
 
@@ -109,9 +108,31 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
                 $fileUrl = $renameFile;
             }
 
-            $sql = "UPDATE popupimage SET
+            $getPopupImg="SELECT * FROM popupimage WHERE `platform`='B2B';";
+            $popupImg=$conn->query($getPopupImg)->fetch_assoc();
+            
+            if(empty($popupImg)) 
+            {
+                $sql = "INSERT INTO `popupimage`(
+                    `image`,
+                    `platform`,
+                    `status`,
+                    `actionAt`
+                    )
+                VALUES(
+                    '$fileUrl',
+                    'B2B',
+                    'true',
+                    '$actionAt'
+                )";
+
+            }else
+            {
+                $sql = "UPDATE popupimage SET
                 image = '$fileUrl'
                 WHERE id = '$id' AND platform='B2B'";
+            }
+
 
             if ($conn->query($sql) == true) {
                 $response['status'] = 'success';
@@ -271,5 +292,3 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
         $response = $conn->query("SELECT * FROM slideimage")->fetch_all(MYSQLI_ASSOC);
         echo json_encode($response);
     }
-
-?>
