@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $category = $_POST["category"];
     $title = $_POST["title"];
-    $description = $_POST["description"];
+    $description = str_replace("'","''", $_POST["description"]);
     $webFileName = $_FILES['webImage']['name'];
     $mobFileName = $_FILES['mobileImage']['name'];
 
