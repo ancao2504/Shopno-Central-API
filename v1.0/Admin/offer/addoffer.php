@@ -18,6 +18,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $webFileName = $_FILES['webImage']['name'];
     $mobFileName = $_FILES['mobileImage']['name'];
 
+
+    $title=str_replace("'","''", $title);
     $folder = "Admin/Offers";
     $size = 5000000;
     $time = date("dmYHis");
