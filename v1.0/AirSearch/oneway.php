@@ -272,27 +272,30 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $totalFare = $var['pricingInformation'][0]['fare']['totalFare']['totalPrice'];
 
                 $AgentPrice = FareRulesPolicy($comissionvalue, $FareCurrency, $Ait, $baseFareAmount, $totalTaxAmount) + $additional;
-                $Commission = $totalFare - $AgentPrice; // by default commission 
+                $Commission = ceil($totalFare - $AgentPrice); // by default commission 
+                $AgentPrice = ceil($AgentPrice);
 
                 // Currency
-                $checker = 0;
+                $count = 0;
                 $rate = 0;
                 $CountryCode = "BDT";
                 if(isset($country)){
+                    
                  $checker =$conn->query("SELECT * FROM currency WHERE country='$country' AND status='active'")->fetch_all(MYSQLI_ASSOC);
                         if(!empty($checker))
                         {
-                            $checker = 1;
+                            $count = 1;
                             $rate = $checker[0]['rate'];
-                            $code = $checker[0]['code'];
+                            $CountryCode = $checker[0]['code'];
                         }
                 }
 
                 $diff = 0;
                 $OtherCharges = 0;
-                if($checker == 1){
-                    $AgentPrice = str_replace(',','', number_format($AgentPrice / $rate, 2));
-                    $totalFare = str_replace(',','', number_format($totalFare / $rate, 2));
+               
+                if($count > 0){
+                    $AgentPrice = str_replace(',','', number_format($AgentPrice * $rate, 2));
+                    $totalFare = str_replace(',','', number_format($totalFare * $rate, 2));
 
                     if ($AgentPrice > $totalFare) {
                         $diff = $AgentPrice - $totalFare;
@@ -303,6 +306,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     }
                 }else{
 
+                  
+
                     //By Default
                     if ($AgentPrice > $totalFare) {
                         $diff = $AgentPrice - $totalFare;
@@ -310,8 +315,10 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $OtherCharges = $diff / $Pax;
                         $totalFare = $AgentPrice;
                     }
+                   
                 }
-               
+                
+                
 
                 if ($adult > 0 && $child > 0 && $infants > 0) {
 
@@ -539,7 +546,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 }
                 
                     //currency + markup
-                    if(!empty($checker)){
+                    if($count > 0){
                             $MarkupPrice = str_replace(',','', number_format($MarkupPrice / $rate, 2));
                     }
 

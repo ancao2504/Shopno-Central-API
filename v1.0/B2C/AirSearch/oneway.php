@@ -294,10 +294,10 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $diff = 0;
                 $OtherCharges = 0;
                 if($checker == 1){
-                    $AgentPrice = str_replace(',','', number_format($AgentPrice / $rate, 2));
-                    $totalFare = str_replace(',','', number_format($totalFare / $rate, 2));
-                    $baseFareAmount = str_replace(',','', number_format($baseFareAmount / $rate, 2));
-                    $totalTaxAmount = str_replace(',','', number_format($totalTaxAmount / $rate, 2));
+                    $AgentPrice = str_replace(',','', number_format($AgentPrice * $rate, 2));
+                    $totalFare = str_replace(',','', number_format($totalFare * $rate, 2));
+                    $baseFareAmount = str_replace(',','', number_format($baseFareAmount * $rate, 2));
+                    $totalTaxAmount = str_replace(',','', number_format($totalTaxAmount * $rate, 2));
 
                     if ($AgentPrice > $totalFare) {
                         $diff = $AgentPrice - $totalFare;

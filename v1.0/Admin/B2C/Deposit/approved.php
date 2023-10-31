@@ -34,6 +34,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sender = $data['sender'];
         $status = $data['status'];
         $reciever = $data['reciever'];
+        $currency = $data['currencyCode'];
+        $currencyRate = $data['currencyRate'];
+        $bdtAmount = $data['bdtAmount'];
         $chequeIssueDate = $data['chequeIssueDate'];
         $createdAt = date("Y-m-d H:i:s");
 
@@ -89,8 +92,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $createdTime = date("Y-m-d H:i:s");
 
-            $sql_query = "INSERT INTO `agent_ledger`(`userId`,`staffId`,`deposit`, `lastAmount`,`details`, `transactionId`,`platform`,`reference`,`createdAt`)
-                    VALUES ('$userId','$staffId','$amount','$newAmount','$amount TK Deposit By $staffName successfully','$transactionId','B2C','$depositId','$createdAt')";
+            $sql_query = "INSERT INTO `agent_ledger`(`userId`,`staffId`,`deposit`, `lastAmount`,`details`, `transactionId`,`currencyCode`,`currencyRate`,`bdtAmount`,`platform`,`reference`,`createdAt`, `actionBy`)
+            VALUES ('$userId','$staffId','$bdtAmount','$newAmount','$newAmount $currency Deposit By $staffName successfully','$transactionId','$currency','$currencyRate','$bdtAmount','B2C','$depositId','$createdAt', '$actionBy')";
 
             if ($conn->query($sql_query) === true) {
                 $conn->query("UPDATE deposit_request SET status='approved', approvedBy='$actionBy', actionAt='$createdTime'  WHERE userId='$userId' AND depositId='$depositId' ");
