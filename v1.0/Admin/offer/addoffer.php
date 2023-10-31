@@ -14,15 +14,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $category = $_POST["category"];
     $title = $_POST["title"];
-    $description = $_POST["description"];
+    $description = str_replace("'","''", $_POST["description"]);
     $webFileName = $_FILES['webImage']['name'];
     $mobFileName = $_FILES['mobileImage']['name'];
+
+
 
     $folder = "Admin/Offers";
     $size = 5000000;
     $time = date("dmYHis");
-    $webImgNewFileName = "web_$title";
-    $mobImgNewFileName = "mob_$title";
+    $webImgNewFileName = base64_encode("web_$title");
+    $mobImgNewFileName = base64_encode("mob_$title");
 
     $webImgURI = uploadImage("webImage", $size, $folder, $webFileName, $webImgNewFileName);
     $mobImgURI = uploadImage("mobileImage", $size, $folder, $mobFileName, $mobImgNewFileName);

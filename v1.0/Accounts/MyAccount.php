@@ -1,6 +1,7 @@
 <?php
 
 require '../config.php';
+require '../functions.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
@@ -24,9 +25,8 @@ if (array_key_exists("agentId", $_GET)) {
             $response = $row;
             if (!empty($Balance)) {
                 $response['balance'] = $Balance[0];
-
-            }else if(empty($Balance)){
-              $response['balance'] = 0;
+            } else if (empty($Balance)) {
+                $response['balance'] = 0;
             }
             array_push($return_arr, $response);
         }
@@ -60,7 +60,6 @@ if (array_key_exists("agentId", $_GET)) {
 
             echo json_encode($response);
         }
-
     } else if ($action == 'changepassword') {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -148,46 +147,55 @@ if (array_key_exists("agentId", $_GET)) {
             }
             echo json_encode($response);
         }
-    } else if($action == 'updateimage')
-    {
-        if ($_SERVER["REQUEST_METHOD"] == "POST")
-        {   
-            $files=['tinImg', 'nid', 'bankStatement'];
-            $fileKey=array_keys($_FILES)[0];
-            
-            if(!in_array($fileKey, $files))
-            {
+    } else if ($action == 'updateimage') {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $agentId=$_POST['agentId'];
+
+            $files = ['tinImg', 'nid', 'bankStatement'];
+            $fileKey = array_keys($_FILES)[0];
+
+            if (!in_array($fileKey, $files)) {
                 echo json_encode(
                     [
                         "status" => "error",
                         "message" => "File Name Mismatched"
                     ]
                 );
+                exit;
             }
-
-            $newFileName=$imagename = $fileKey;
-            $acceptablesize = 5000000;
-            $folder = "Agent/$AgentId/$fileKey";
-            $fileName = $_FILES[$fileKey]["name"];
+            $agentRow=$conn->query("SELECT `$fileKey` FROM `agent` WHERE `agentId` = '$agentId'")->fetch_assoc();
             
+            if(empty($agentRow))
+            {
+                echo json_encode(
+                    [
+                        "status" => "error",
+                        "message" => "Agent Not Found"
+                    ]
+                );
+                exit;
+            }
+            deleteFile($agentRow[$fileKey]);
+            $newFileName = $imagename = $fileKey;
+            $acceptablesize = 5000000;
+            $folder = "Agent/$agentId/$fileKey";
+            $fileName = $_FILES[$fileKey]["name"];
+
             $fileUrl = uploadImage($imagename, $acceptablesize, $folder, $fileName, $newFileName);
 
-            $updateQuery="UPDATE `agent` SET `$fileKey`='$fileUrl' WHERE `agentId`='$agentId';";
-            if($conn->query($updateQuery))
-            {
-                $response["status"] = "error";
+            $updateQuery = "UPDATE `agent` SET `$fileKey`='$fileUrl' WHERE `agentId`='$agentId';";
+
+            if ($conn->query($updateQuery)) {
+                $response["status"] = "success";
                 $response["message"] = "$fileKey Updated Successfully";
-            }else
-            {
+            } else {
                 $response["status"] = "error";
-                $response["message"] = "$fileKey Updated Successfully";
+                $response["message"] = "$fileKey Update Failed";
+                
             }
 
             echo json_encode($response);
-
-        }
-        else
-        {
+        } else {
             echo json_encode(
                 [
                     "status" => "error",
