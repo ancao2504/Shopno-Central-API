@@ -19,12 +19,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mobFileName = $_FILES['mobileImage']['name'];
 
 
-    $title=str_replace("'","''", $title);
+
     $folder = "Admin/Offers";
     $size = 5000000;
     $time = date("dmYHis");
-    $webImgNewFileName = "web_$title";
-    $mobImgNewFileName = "mob_$title";
+    $webImgNewFileName = base64_encode("web_$title");
+    $mobImgNewFileName = base64_encode("mob_$title");
 
     $webImgURI = uploadImage("webImage", $size, $folder, $webFileName, $webImgNewFileName);
     $mobImgURI = uploadImage("mobileImage", $size, $folder, $mobFileName, $mobImgNewFileName);
