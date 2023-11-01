@@ -35,6 +35,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sender = $data['sender'];
         $status = $data['status'];
         $reciever = $data['reciever'];
+        $currency = $data['currencyCode'];
+        $currencyRate = $data['currencyRate'];
+        $bdtAmount = $data['bdtAmount'];
+        
         $chequeIssueDate = $data['chequeIssueDate'];
         $createdAt = date("Y-m-d H:i:s");
 
@@ -58,9 +62,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             if (empty($staffdata) && !empty($agentId)) {
-                $Message = "Approved By: Flyway International";
+                $Message = "Approved By: Shopnon Tours Travels";
             } else if (!empty($staffdata) && !empty($agentId)) {
-                $Message = "Approved By: $actionBy, Flyway International";
+                $Message = "Approved By: $actionBy, Shopnon Tours Travels";
             }
 
             $DateTime = date("D d M Y h:i A");
@@ -90,8 +94,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $createdTime = date("Y-m-d H:i:s");
 
-            $sql_query = "INSERT INTO `agent_ledger`(`agentId`,`staffId`,`deposit`, `lastAmount`,`details`, `transactionId`,`platform`,`reference`,`createdAt`, `actionBy`)
-                    VALUES ('$agentId','$staffId','$amount','$newAmount','$amount TK Deposit By $staffName successfully','$transactionId','B2B','$depositId','$createdAt', '$actionBy')";
+            $sql_query = "INSERT INTO `agent_ledger`(`agentId`,`staffId`,`deposit`, `lastAmount`,`details`, `transactionId`,`currencyCode`,`currencyRate`,`bdtAmount`,`platform`,`reference`,`createdAt`, `actionBy`)
+                    VALUES ('$agentId','$staffId','$amount','$newAmount','$amount $currency Deposit By $staffName successfully','$transactionId','B2B','$depositId','$createdAt', '$actionBy')";
 
 
             //echo($newAmount);

@@ -336,7 +336,8 @@ if(array_key_exists("journeyfrom",$_GET) && array_key_exists("journeyto",$_GET) 
 				$totalFare = $var['pricingInformation'][0]['fare']['totalFare']['totalPrice'];
 
 				$AgentPrice = FareRulesPolicy($comissionvalue, $FareCurrency, $Ait, $baseFareAmount, $totalTaxAmount) + $additional;
-				$Commission = $totalFare - $AgentPrice;
+				$Commission = ceil($totalFare - $AgentPrice);
+				$AgentPrice = ceil($AgentPrice);
 
 				$diff = 0;
 				$OtherCharges = 0;

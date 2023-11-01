@@ -17,7 +17,7 @@ if(array_key_exists("get", $_GET)){
 }else if (array_key_exists("add", $_GET)) {
     $_POST = json_decode(file_get_contents("php://input"), true);
 
-    $countryCode = strtolower($_POST["countrycode"]);
+    $countryCode = str_replace(" ","", strtolower($_POST["countrycode"]));
     $conversionRate = $_POST["conversionrate"];
     $currency = $_POST["currency"];
     $flag = $_POST["flag"];
@@ -44,7 +44,7 @@ if(array_key_exists("get", $_GET)){
     $_POST = json_decode(file_get_contents("php://input"), true);
 
     $Id = $_POST["id"];
-    $countryCode = strtolower($_POST["countrycode"]);
+    $countryCode = str_replace(" ","", strtolower($_POST["countrycode"]));
     $conversionRate = $_POST["conversionrate"];
     $currency = $_POST["currency"];
     $flag = $_POST["flag"];

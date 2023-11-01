@@ -21,10 +21,12 @@ if (array_key_exists("userId", $_GET)) {
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
 
-            $Balance = $conn->query("SELECT lastAmount FROM `agent_ledger` where userId = '$Search' ORDER BY id DESC LIMIT 1")->fetch_assoc();
+            $Balance = $conn->query("SELECT lastAmount, currencyCode,currencyRate FROM `agent_ledger` where userId = '$Search' ORDER BY id DESC LIMIT 1")->fetch_assoc();
             $response = $row;
             if (!empty($Balance)) {
                 $response['balance'] = $Balance['lastAmount'];
+                $response['currencycode'] = $Balance['currencyCode'];
+                $response['currencyrate'] = $Balance['currencyRate'];
 
             }else if(empty($Balance)){
               $response['balance'] = 0;
