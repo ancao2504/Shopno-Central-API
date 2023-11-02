@@ -110,7 +110,6 @@ function deleteFile($url){
 
     if(file_exists($currentPath)){
         unlink($currentPath);
-            
     }
 
     return 1;
