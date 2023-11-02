@@ -17,15 +17,15 @@ if(array_key_exists("get", $_GET)){
 }else if (array_key_exists("add", $_GET)) {
     $_POST = json_decode(file_get_contents("php://input"), true);
 
-    $countryCode = str_replace(" ","", strtolower($_POST["countrycode"]));
+   $country = $_POST["country"];
     $conversionRate = $_POST["conversionrate"];
     $currency = $_POST["currency"];
     $flag = $_POST["flag"];
     $date = date("Y-m-d H:i:s");
 
 
-    if (isset($countryCode)) {
-        $sql = "INSERT INTO currency (code, rate, country, flag, status , created_at) VALUES ('$currency', '$conversionRate', '$countryCode','$flag','deactivate', '$date')";
+    if (isset($country)) {
+        $sql = "INSERT INTO currency (code, rate, country, flag, status , created_at) VALUES ('$currency', '$conversionRate', '$country','$flag','deactivate', '$date')";
 
         if ($conn->query($sql)) {
             echo json_encode([
@@ -44,13 +44,13 @@ if(array_key_exists("get", $_GET)){
     $_POST = json_decode(file_get_contents("php://input"), true);
 
     $Id = $_POST["id"];
-    $countryCode = str_replace(" ","", strtolower($_POST["countrycode"]));
+    $country =  $_POST["country"];
     $conversionRate = $_POST["conversionrate"];
     $currency = $_POST["currency"];
     $flag = $_POST["flag"];
     $date = date("Y-m-d H:i:s");
 
-    $sql = "UPDATE currency SET code='$currency', rate='$conversionRate', country='$countryCode', flag='$flag' WHERE id='$Id'";
+    $sql = "UPDATE currency SET code='$currency', rate='$conversionRate', country='$country', flag='$flag' WHERE id='$Id'";
 
         if ($conn->query($sql)) {
             echo json_encode([

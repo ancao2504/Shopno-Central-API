@@ -1492,7 +1492,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         "TravelItineraryAddInfo":{
                             "AgencyInfo":{
                             "Address":{
-                                "AddressLine":"Fly Far International",
+                                "AddressLine":"Shopno Trurs & Travels",
                                 "CityName":"Dhaka",
                                 "CountryCode":"BD",
                                 "PostalCode":"1215",

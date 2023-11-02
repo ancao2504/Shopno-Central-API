@@ -51,6 +51,11 @@ if($_SERVER["REQUEST_METHOD"] == 'POST'){
                         "message" => "amount 0"
                     ]);
                 }
+            }else {
+                echo json_encode([
+                    "status" => "error",
+                    "message"=> "user ledger is empty"
+                ]);
             }
             
         }else{
