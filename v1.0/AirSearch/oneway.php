@@ -22,7 +22,7 @@ if (!empty($controlrow)) {
 
 $Airportsql = "SELECT name, cityName,countryCode FROM airports WHERE";
 
-if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GET) && array_key_exists("departuredate", $_GET) && array_key_exists("adult", $_GET) && array_key_exists("child", $_GET) && array_key_exists("infant", $_GET) && array_key_exists("agentId", $_GET)&& array_key_exists("country", $_GET)) {
+if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GET) && array_key_exists("departuredate", $_GET) && array_key_exists("adult", $_GET) && array_key_exists("child", $_GET) && array_key_exists("infant", $_GET) && array_key_exists("agentId", $_GET)) {
     $From = $_GET['journeyfrom'];
     $To = $_GET['journeyto'];
     $Date = $_GET['departuredate'];
@@ -32,9 +32,9 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
     $infants = $_GET['infant'];
     $agentId = $_GET['agentId'];
     $country = $_GET['country'];
-    
-    $pxCount=(int)$adult+(int)$child+(int)$infants;
-  
+
+    $pxCount = (int)$adult + (int)$child + (int)$infants;
+
     // Trip Type
     $fromsql = mysqli_query($conn, "SELECT name, cityName, countryCode FROM airports WHERE code='$From' ");
     $fromrow = mysqli_fetch_array($fromsql, MYSQLI_ASSOC);
@@ -279,34 +279,33 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $count = 0;
                 $rate = 0;
                 $CountryCode = "BDT";
-                if(isset($country)){
-                    
-                 $checker =$conn->query("SELECT * FROM currency WHERE country='$country' AND status='active'")->fetch_all(MYSQLI_ASSOC);
-                        if(!empty($checker))
-                        {
-                            $count = 1;
-                            $rate = $checker[0]['rate'];
-                            $CountryCode = $checker[0]['code'];
-                        }
+                if (isset($country)) {
+
+                    $checker = $conn->query("SELECT * FROM currency WHERE country='$country' AND status='active'")->fetch_all(MYSQLI_ASSOC);
+                    if (!empty($checker)) {
+                        $count = 1;
+                        $rate = $checker[0]['rate'];
+                        $CountryCode = $checker[0]['code'];
+                    }
                 }
 
                 $diff = 0;
                 $OtherCharges = 0;
-               
-                if($count > 0){
-                    $AgentPrice = str_replace(',','', number_format($AgentPrice * $rate, 2));
-                    $totalFare = str_replace(',','', number_format($totalFare * $rate, 2));
+
+                if ($count > 0) {
+                    $AgentPrice = str_replace(',', '', number_format($AgentPrice * $rate, 2));
+                    $totalFare = str_replace(',', '', number_format($totalFare * $rate, 2));
 
                     if ($AgentPrice > $totalFare) {
                         $diff = $AgentPrice - $totalFare;
                         $Pax = $adult + $child + $infants;
                         $OtherCharges = $diff / $Pax;
                         $totalFare = $AgentPrice;
-                        $Commission = $totalFare - $AgentPrice; 
+                        $Commission = $totalFare - $AgentPrice;
                     }
-                }else{
+                } else {
 
-                  
+
 
                     //By Default
                     if ($AgentPrice > $totalFare) {
@@ -315,10 +314,9 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         $OtherCharges = $diff / $Pax;
                         $totalFare = $AgentPrice;
                     }
-                   
                 }
-                
-                
+
+
 
                 if ($adult > 0 && $child > 0 && $infants > 0) {
 
@@ -331,13 +329,13 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $infantBasePrice = $PriceInfo[2]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $infantTaxAmount = $PriceInfo[2]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
 
-                    if($checker == 1){
-                            $adultBasePrice = str_replace(',','', number_format($adultBasePrice/$rate, 2));
-                            $adultTaxAmount = str_replace(',','', number_format($adultTaxAmount/$rate, 2));
-                            $childBasePrice = str_replace(',','', number_format($childBasePrice/$rate, 2));
-                            $childTaxAmount = str_replace(',','', number_format($childTaxAmount/$rate, 2));
-                            $infantBasePrice = str_replace(',','', number_format($infantBasePrice/$rate, 2));
-                            $infantTaxAmount = str_replace(',','', number_format($infantTaxAmount/$rate, 2));
+                    if ($checker == 1) {
+                        $adultBasePrice = str_replace(',', '', number_format($adultBasePrice / $rate, 2));
+                        $adultTaxAmount = str_replace(',', '', number_format($adultTaxAmount / $rate, 2));
+                        $childBasePrice = str_replace(',', '', number_format($childBasePrice / $rate, 2));
+                        $childTaxAmount = str_replace(',', '', number_format($childTaxAmount / $rate, 2));
+                        $infantBasePrice = str_replace(',', '', number_format($infantBasePrice / $rate, 2));
+                        $infantTaxAmount = str_replace(',', '', number_format($infantTaxAmount / $rate, 2));
                     }
 
                     $PriceBreakDown = array(
@@ -377,12 +375,12 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $childBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $childTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
 
-                    if($checker == 1){
-                        $adultBasePrice = str_replace(',','', number_format($adultBasePrice/$rate, 2));
-                        $adultTaxAmount = str_replace(',','', number_format($adultTaxAmount/$rate, 2));
-                        $childBasePrice = str_replace(',','', number_format($childBasePrice/$rate, 2));
-                        $childTaxAmount = str_replace(',','', number_format($childTaxAmount/$rate, 2));
-                }
+                    if ($checker == 1) {
+                        $adultBasePrice = str_replace(',', '', number_format($adultBasePrice / $rate, 2));
+                        $adultTaxAmount = str_replace(',', '', number_format($adultTaxAmount / $rate, 2));
+                        $childBasePrice = str_replace(',', '', number_format($childBasePrice / $rate, 2));
+                        $childTaxAmount = str_replace(',', '', number_format($childTaxAmount / $rate, 2));
+                    }
 
                     $PriceBreakDown = array(
                         "0" => array(
@@ -411,12 +409,12 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
 
                     $infantBasePrice = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $infantTaxAmount = $PriceInfo[1]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
-                    if($checker == 1){
-                        $adultBasePrice = str_replace(',','', number_format($adultBasePrice/$rate, 2));
-                        $adultTaxAmount = str_replace(',','', number_format($adultTaxAmount/$rate, 2));
-                        $infantBasePrice = str_replace(',','', number_format($infantBasePrice/$rate, 2));
-                        $infantTaxAmount = str_replace(',','', number_format($infantTaxAmount/$rate, 2));
-                     }
+                    if ($checker == 1) {
+                        $adultBasePrice = str_replace(',', '', number_format($adultBasePrice / $rate, 2));
+                        $adultTaxAmount = str_replace(',', '', number_format($adultTaxAmount / $rate, 2));
+                        $infantBasePrice = str_replace(',', '', number_format($infantBasePrice / $rate, 2));
+                        $infantTaxAmount = str_replace(',', '', number_format($infantTaxAmount / $rate, 2));
+                    }
 
                     $PriceBreakDown = array(
                         "0" => array(
@@ -444,10 +442,9 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $adultBasePrice = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['equivalentAmount'];
                     $adultTaxAmount = $PriceInfo[0]['passengerInfo']['passengerTotalFare']['totalTaxAmount'];
 
-                    if($checker == 1){
-                        $adultBasePrice = str_replace(',','', number_format($adultBasePrice/$rate, 2));
-                        $adultTaxAmount = str_replace(',','', number_format($adultTaxAmount/$rate, 2));
-                        
+                    if ($checker == 1) {
+                        $adultBasePrice = str_replace(',', '', number_format($adultBasePrice / $rate, 2));
+                        $adultTaxAmount = str_replace(',', '', number_format($adultTaxAmount / $rate, 2));
                     }
 
                     $PriceBreakDown = array(
@@ -496,64 +493,38 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                     $nonRef = "Refundable";
                 }
 
-                //Agent MarkUP
-                $agentMarksql = mysqli_query($conn, "SELECT dMarkup,iMarkup, dMarkupType,iMarkupType, alliMarkup,alldMarkup,alliMarkupType,alldMarkupType FROM agent WHERE agentId='$agentId' ");
+                //Markup
+                $agentMarksql = mysqli_query($conn, "SELECT iMarkuptype, iMarkup, dMarkupType, dMarkup, alliMarkupType,alliMarkup,alldMarkupType,alldMarkup FROM agent WHERE agentId='$agentId' ");
                 $agentmarkrow = mysqli_fetch_array($agentMarksql, MYSQLI_ASSOC);
 
-                //Individual Markup
-                if (!empty($agentmarkrow) && (empty($agentmarkrow['alliMarkup']) && empty($agentmarkrow['alldMarkup']))) {
-                    $imarkuptype =  $agentmarkrow['iMarkupType'];
-                    $dmarkuptype = $agentmarkrow['dMarkupType'];
-                    if ($imarkuptype == 'amount' || $dmarkuptype == 'amount') {
-                        if ($TripType == 'Inbound') {
-                            $markup =  $agentmarkrow['dMarkup'];
-                        } else {
-                            $markup =  $agentmarkrow['iMarkup'];
-                        }
-                        $MarkupPrice = $AgentPrice + (((int) $markup)*$pxCount);
-                    } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
-                        if ($TripType == 'Inbound') {
-                            $markup = $agentmarkrow['dMarkup'];
-                        } else {
-                            $markup = $agentmarkrow['iMarkup'];
-                        }
-                        $MarkupPrice = ceil($AgentPrice + (($AgentPrice * ($markup / 100))*$pxCount));
-                    } else {
-                        $MarkupPrice = $AgentPrice;
-                    }
-                } else if (!empty($agentmarkrow) && (empty($agentmarkrow['dMarkup']) && empty($agentmarkrow['iMarkup']))) { // All Markup
-                    $imarkuptype = $agentmarkrow['alliMarkupType'];
-                    $dmarkuptype = $agentmarkrow['alldMarkupType'];
-                    if ($imarkuptype == 'amount' || $dmarkuptype == 'amount') {
-                        if ($TripType == 'Inbound') {
-                            $markup = $agentmarkrow['alldMarkup'];
-                        } else {
-                            $markup = $agentmarkrow['alliMarkup'];
-                        }
-                        $MarkupPrice = $AgentPrice + (((int) $markup)*$pxCount);
-                    } else if ($imarkuptype == 'percentage' || $dmarkuptype == 'percentage') {
-                        if ($TripType == 'Inbound') {
-                            $markup = $agentmarkrow['alldMarkup'];
-                        } else {
-                            $markup = $agentmarkrow['alliMarkup'];
-                        }
-                        $MarkupPrice = ceil($AgentPrice + (($AgentPrice * ($markup / 100))*$pxCount));
-                    } else {
-                        $MarkupPrice = $AgentPrice;
-                    }
-                } else {
-                    $MarkupPrice = $AgentPrice;
-                }
-                
-                    //currency + markup
-                    if($count > 0){
-                            $MarkupPrice = str_replace(',','', number_format($MarkupPrice / $rate, 2));
-                    }
 
+                switch (!empty($agentmarkrow)) {
+                        //inbound and individual
+                    case $TripType == 'Inbound' && !empty($agentmarkrow['dMarkup']):
+                        $markup = ($agentmarkrow['dMarkupType'] == "percentage") ? ($AgentPrice * ($agentmarkrow['dMarkup'] / 100)) : $agentmarkrow['dMarkup'];
+                        break;
+                        //outbound and individual
+                    case $TripType == 'Outbound' && empty($agentmarkrow['i_markup']):
+                        $markup = ($agentmarkrow['iMarkuptype'] == "percentage") ? ($AgentPrice * ($agentmarkrow['iMarkup'] / 100)) : $agentmarkrow['iMarkup'];
+                        break;
+                        //inbound and all
+                    case $TripType == 'Inbound' && empty($agentmarkrow['alldMarkup']):
+                        $markup = ($agentmarkrow['alldMarkupType'] == "percentage") ? ($AgentPrice * ($agentmarkrow['alldMarkup'] / 100)) : $agentmarkrow['alldMarkup'];
+                        break;
+                        //outbound and all
+                    case $TripType == 'Outbound' && empty($agentmarkrow['alliMarkup']):
+                        $markup = ($agentmarkrow['alliMarkupType'] == "percentage") ? ($AgentPrice * ($agentmarkrow['alliMarkup'] / 100)) : $agentmarkrow['alliMarkup'];
+                        break;
+                    default:
+                        $markup = 0;
+                        break;
+                }
+
+                $MarkupPrice = ceil($AgentPrice + ($markup * $pxCount));
                 //if markup is greater than clientPrice make the markup price equal to client price
-               $MarkupPrice=($MarkupPrice>$totalFare)?$totalFare:$MarkupPrice;
-               
-               
+                $MarkupPrice = ($MarkupPrice > $totalFare) ? $totalFare : $MarkupPrice;
+
+
 
                 $ref = $var['legs'][0]['ref'];
                 $id = $ref - 1;

@@ -515,7 +515,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                         } else {
                             $markup = $agentmarkrow['alliMarkup'];
                         }
-                        $MarkupPrice = str_replace(',', '', number_format($AgentPrice + (($AgentPrice * ($markup / 100))*$pxCount)));
+                        $MarkupPrice = str_replace(',', '', number_format($AgentPrice + (($AgentPrice * ((int)$markup / 100))*$pxCount)));
                     } else {
                         $MarkupPrice = $AgentPrice;
                     }
