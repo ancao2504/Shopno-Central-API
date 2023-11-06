@@ -272,7 +272,8 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $totalFare = $var['pricingInformation'][0]['fare']['totalFare']['totalPrice'];
 
                 $AgentPrice = FareRulesPolicy($comissionvalue, $FareCurrency, $Ait, $baseFareAmount, $totalTaxAmount) + $additional;
-                $Commission = $totalFare - $AgentPrice; // by default commission 
+                $Commission = ceil($totalFare - $AgentPrice); // by default commission 
+                $AgentPrice = ceil($AgentPrice); // by default commission 
 
                 // Currency
                 $checker = 0;
@@ -280,7 +281,7 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 $CountryCode = "BDT";
                 
                 if(isset($country)) {
-                    $result = $conn->query("SELECT * FROM currency WHERE country='$country' AND status='active'");
+                    $result = $conn->query("SELECT * FROM currency WHERE code='$country' AND status='active'");
                     
                     if ($result->num_rows > 0) {
                         $row = $result->fetch_assoc();
@@ -293,11 +294,11 @@ if (array_key_exists("journeyfrom", $_GET) && array_key_exists("journeyto", $_GE
                 
                 $diff = 0;
                 $OtherCharges = 0;
-                if($checker == 1){
-                    $AgentPrice = str_replace(',','', number_format($AgentPrice * $rate, 2));
-                    $totalFare = str_replace(',','', number_format($totalFare * $rate, 2));
-                    $baseFareAmount = str_replace(',','', number_format($baseFareAmount * $rate, 2));
-                    $totalTaxAmount = str_replace(',','', number_format($totalTaxAmount * $rate, 2));
+                if($checker > 1){
+                    $AgentPrice = str_replace(',','', number_format($AgentPrice / $rate, 2));
+                    $totalFare = str_replace(',','', number_format($totalFare / $rate, 2));
+                    $baseFareAmount = str_replace(',','', number_format($baseFareAmount / $rate, 2));
+                    $totalTaxAmount = str_replace(',','', number_format($totalTaxAmount / $rate, 2));
 
                     if ($AgentPrice > $totalFare) {
                         $diff = $AgentPrice - $totalFare;
