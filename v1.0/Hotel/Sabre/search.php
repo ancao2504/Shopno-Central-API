@@ -1,0 +1,314 @@
+<?php
+
+include '../../../config.php';
+include './utils.php';
+
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json; charset=UTF-8');
+header('Access-Control-Allow-Methods: OPTIONS, GET, POST, PUT, DELETE');
+header('Access-Control-Max-Age: 3600');
+header(
+    'Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With'
+);
+
+$allResponse = [];
+$FlightType;
+
+if (
+    array_key_exists('location', $_GET) &&
+    array_key_exists('checkin', $_GET) &&
+    array_key_exists('checkout', $_GET) &&
+    array_key_exists('adult', $_GET) &&
+    array_key_exists('child', $_GET) &&
+    array_key_exists('rooms', $_GET)
+) {
+    $location = $_GET['location'];
+    $checkin = $_GET['checkin'];
+    $checkout = $_GET['checkout'];
+    $adult = $_GET['adult'];
+    $child = $_GET['child'];
+    $rooms = $_GET['rooms'];
+    $countryCode = 'BD';
+    $travelerCountryCode = 'BD';
+
+    $url = 'https://api.cert.platform.sabre.com/v4.1.0/get/hotelavail';
+    // $url = 'https://api.platform.sabre.com/v4.1.0/get/hotelavail';
+    // $accessToken = getProdToken();
+    $accessToken = getCertToken();
+    // echo json_encode($accessToken);
+    $requestBody = sabreSearchRQ($location, $checkin, $checkout, $adult, $child, $rooms, $travelerCountryCode);
+
+    // echo $requestBody;
+
+    $result = searchHotel($url, $accessToken, $requestBody, $rooms, $adult, $child);
+
+    if (isset($result)) {
+
+        echo $result;
+
+    } else {
+
+        $response = [];
+        $response['status'] = 'error';
+        $response['message'] = 'Invalid Request';
+
+        echo json_encode($response);
+    }
+} else {
+
+    $response = [];
+    $response['status'] = 'error';
+    $response['message'] = 'Invalid Request';
+
+    echo json_encode($response);
+}
+
+function sabreSearchRQ($location, $checkin, $checkout, $adult, $child, $rooms, $travelerCountryCode){
+
+  // Create an array of room configurations based on the number of rooms
+  $room = [];
+
+  for ($i = 0; $i < $rooms; $i++) {
+    $room[] = [
+        'Index' => $i + 1,
+        'Adults' => intval($adult),
+        'Children' => intval($child),
+    ];
+
+    if (intval($child) !== 0) {
+        $room[$i]['ChildAges'] = "1";
+    }
+}
+
+  $requestBody = '{
+    "GetHotelAvailRQ": {
+      "SearchCriteria": {
+        "OffSet": 1,
+        "SortBy": "TotalRate",
+        "SortOrder": "ASC",
+        "PageSize": 20,
+        "TierLabels": false,
+        "GeoSearch": {
+          "GeoRef": {
+            "Radius": 20,
+            "UOM": "MI",
+            "RefPoint": {
+              "Value": "' . $location . '",
+              "ValueContext": "CODE",
+              "RefPointType": "6"
+            }
+          }
+        },
+        "RateInfoRef": {
+          "CurrencyCode": "BDT",
+          "BestOnly": "1",
+          "PrepaidQualifier": "IncludePrepaid",
+          "RefundableOnly": false,
+          "ConvertedRateInfoOnly": false,
+          "StayDateTimeRange": {
+            "StartDate": "'.$checkin.'",
+            "EndDate": "'.$checkout.'"
+          },
+          "Rooms": {
+            "Room": '.json_encode($room).'
+          },
+          "RateSource": ""
+        },
+        "ImageRef": {
+          "Type": "MEDIUM",
+          "LanguageCode": "EN"
+        }
+      }
+    }
+  }
+  ';
+
+  return $requestBody;
+
+}
+
+function searchHotel($url, $accessToken, $requestBody, $rooms, $adult, $child)
+{
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+          CURLOPT_URL => $url,
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => $requestBody,
+          CURLOPT_HTTPHEADER => [
+              'Content-Type: application/json',
+              'Accept: application/json',
+              'Authorization: Bearer ' . $accessToken,
+          ],
+      ]);
+
+        $response = curl_exec($curl);
+        // TODO: Check for cURL errors
+        if (curl_errno($curl)) {
+            echo 'cURL Error: ' . curl_error($curl);
+        }
+
+        // TODO:Check the HTTP response code
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        if ($httpCode != 200) {
+            echo 'HTTP Error: ' . $httpCode;
+        } else {
+            // TODO:Output the API response
+            //TODO: Making AfterSearch Start
+
+            $responseData = json_decode($response, true);
+
+            // TODO: Marking Search Result
+            if (
+                isset(
+                    $responseData['GetHotelAvailRS']['HotelAvailInfos'][
+                        'HotelAvailInfo'
+                    ]
+                )
+            ) {
+              //TODO: all hotel Information are in the journeyList
+                $journeyList =
+                    $responseData['GetHotelAvailRS']['HotelAvailInfos'][
+                        'HotelAvailInfo'
+                    ];
+
+                foreach ($journeyList as $singleHotel) {
+                    $hotelInfo = isset($singleHotel['HotelInfo'])?$singleHotel['HotelInfo']:"";
+                    $locationInfo = isset($hotelInfo['LocationInfo'])?$hotelInfo['LocationInfo']:"";
+                    $amenitiesInfo = isset($hotelInfo['Amenities']['Amenity'])?$hotelInfo['Amenities']['Amenity']:"";
+                    $securityFeatures = isset($hotelInfo['SecurityFeatures']['SecurityFeature'])?$hotelInfo['SecurityFeatures']['SecurityFeature']:"";
+                    $propertyTypeInfo = isset($hotelInfo['PropertyQualityInfo']['PropertyQuality'])?$hotelInfo['PropertyQualityInfo']['PropertyQuality']:"";
+                    $hotelRateInfo = isset($singleHotel["HotelRateInfo"])?$singleHotel["HotelRateInfo"]:"";
+                    $rateInfo = isset($hotelRateInfo['RateInfos'])?$hotelRateInfo["RateInfos"]:"";
+                    $roomInfo = isset($hotelRateInfo['Rooms'])?$hotelRateInfo["Rooms"]['Room']:"";
+                    $hotelImageInfo = isset($singleHotel["HotelImageInfo"])?$singleHotel["HotelImageInfo"]["ImageItem"]:[];
+
+                    $system = 'sabre';
+                    $uId = sha1(md5(time()) . '' . rand());
+                    $hotelCode =$hotelInfo['HotelCode'];
+                    $codeContext =$hotelInfo['CodeContext'];
+                    $chainCode =$hotelInfo['ChainCode'];
+                    $chainName =$hotelInfo['ChainName'];
+                    $brandCode =$hotelInfo['BrandCode'];
+                    $brandName =$hotelInfo['BrandName'];
+                    $distance =$hotelInfo['Distance'];
+                    $direction =$hotelInfo['Direction'];
+                    $logo =$hotelInfo['Logo'];
+                    $name = $hotelInfo['HotelName'];
+
+                    $location = flattenObject($locationInfo);
+
+                    $priceInfo = flattenObject($rateInfo['ConvertedRateInfo'][0]);
+                    $rating = $hotelInfo['SabreRating'];
+
+                    $amenities =convertKeysToCamelCase($amenitiesInfo) ;
+
+                    $imageInfo = isset($hotelImageInfo)?flattenObject($hotelImageInfo):"";
+
+                    
+                    $searchInfo = [
+                      'rooms'=>intval($rooms),
+                      'adult'=>intval($adult),
+                      'child'=>intVal($child),
+                    ];
+
+                    $allResponse[] = [
+                        'system' => $system,
+                        'uId' => $uId,
+                        'searchInfo'=>$searchInfo,
+                        'hotelCode'=>$hotelCode,
+                        'codeContext'=>$codeContext,
+                        'chainCode'=>$chainCode,
+                        'chainName'=>$chainName,
+                        'brandCode'=>$brandCode,
+                        'brandName'=>$brandName,
+                        'distance'=>$distance,
+                        'direction'=>$direction,
+                        'logo' => $logo,
+                        'name' => $name,
+                        'locationInfo' => $location,
+                        'priceInfo' => $priceInfo,
+                        'rating' => $rating,
+                        'amenities' => $amenities,
+                        'imageInfo' =>$imageInfo,
+                        'securityFeatures' => $securityFeatures,
+                        'propertyTypeInfo' => $propertyTypeInfo,
+                        'roomInfo' => $roomInfo,
+
+                    ];
+                }
+
+                //Todo: Returning Search Result
+                // $response = json_encode($journeyList);
+                if(isset($allResponse)){
+                  return json_encode($allResponse);
+                }else{
+                  $response = [];
+                  $response['status']= 'error';
+                  $response['message']= 'no result found';
+
+                  return json_encode($response);
+                }
+            } else {
+                return json_encode($responseData);
+            }
+        }
+
+        curl_close($curl);
+
+}
+
+
+function convertKeysToCamelCase($array) {
+  $result = [];
+
+  foreach ($array as $item) {
+      $camelCaseItem = [];
+
+      foreach ($item as $key => $value) {
+          // Convert the key to camelCase
+          $camelCaseKey = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
+
+          $camelCaseItem[$camelCaseKey] = $value;
+      }
+
+      $result[] = $camelCaseItem;
+  }
+
+  return $result;
+}
+
+function flattenObject($data, $prefix = '') {
+  $result = new stdClass();
+
+  foreach ($data as $key => $value) {
+      if (is_object($value) || is_array($value)) {
+          // If the value is an object or an array, recursively flatten it
+          $nestedData = flattenObject($value, $prefix . camelCase($key));
+          foreach ($nestedData as $nestedKey => $nestedValue) {
+              $result->{$nestedKey} = $nestedValue;
+          }
+      } else {
+          // If the value is a scalar, add it to the result object with camelCase key
+          $result->{camelCase($prefix . $key)} = $value;
+      }
+  }
+
+  return $result;
+}
+
+function camelCase($str) {
+  // Remove underscores and convert to camel case
+  $str = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $str))));
+  return $str;
+}
+
+?>
