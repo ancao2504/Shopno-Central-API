@@ -30,19 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $email,
         $bookingKey
     );
-    echo $requestBody;
+    // echo $requestBody;
 
-    // $result = sabreHotelBooking($accessToken, $requestBody);
+    $result = sabreHotelBooking($accessToken, $requestBody);
 
-    // if (isset($result)) {
-    //     echo $result;
-    // } else {
-    //     $response = [];
-    //     $response['status'] = 'error';
-    //     $response['message'] = 'Invalid Request';
+    if (isset($result)) {
+        echo $result;
+    } else {
+        $response = [];
+        $response['status'] = 'error';
+        $response['message'] = 'Invalid Request';
 
-    //     echo json_encode($response);
-    // }
+        echo json_encode($response);
+    }
 } else {
     $response = [];
     $response['status'] = 'error';
