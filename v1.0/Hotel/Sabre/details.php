@@ -1,6 +1,5 @@
 <?php
 
-include '../../../config.php';
 include './utils.php';
 
 header('Access-Control-Allow-Origin: *');
@@ -13,14 +12,26 @@ header(
 
 $FlightType;
 
-if (array_key_exists('code', $_GET)) {
+if (
+    array_key_exists('code', $_GET) &&
+    array_key_exists('checkin', $_GET) &&
+    array_key_exists('checkout', $_GET) &&
+    array_key_exists('adult', $_GET) &&
+    array_key_exists('child', $_GET) &&
+    array_key_exists('rooms', $_GET)
+) {
     $hotelCode = $_GET['code'];
-    $accessToken = getCertToken();
-    // $accessToken = getProdToken();
+    $checkin = $_GET['checkin'];
+    $checkout = $_GET['checkout'];
+    $adult = $_GET['adult'];
+    $child = $_GET['child'];
+    $rooms = $_GET['rooms'];
+    // $accessToken = getCertToken();
+    $accessToken = getProdToken();
 
-    $url = 'https://api.cert.platform.sabre.com/v3.0.0/get/hoteldetails';
+    $url = 'https://api.platform.sabre.com/v3.0.0/get/hoteldetails';
     // $url = 'https://api.platform.sabre.com/v3.0.0/get/hoteldetails';
-    $requestBody = sabreHotelDetailsRQ($hotelCode);
+    $requestBody = sabreHotelDetailsRQ($hotelCode, $checkin, $checkout, $adult, $child, $rooms);
 
     $result = getHotelDetails($url, $accessToken, $requestBody);
 
@@ -41,8 +52,24 @@ if (array_key_exists('code', $_GET)) {
     echo json_encode($response);
 }
 
-function sabreHotelDetailsRQ($hotelCode)
+function sabreHotelDetailsRQ($hotelCode, $checkin, $checkout, $adult, $child, $rooms)
 {
+
+    // Create an array of room configurations based on the number of rooms
+    $room = [];
+
+    for ($i = 0; $i < $rooms; $i++) {
+        $room[] = [
+            'Index' => $i + 1,
+            'Adults' => intval($adult),
+            'Children' => intval($child),
+        ];
+
+        if (intval($child) !== 0) {
+            $room[$i]['ChildAges'] = "1";
+        }
+    }
+
     $requestBody =
         '{
     "GetHotelDetailsRQ": {
@@ -62,25 +89,11 @@ function sabreHotelDetailsRQ($hotelCode)
           "ConvertedRateInfoOnly": true,
           "ShowNegotiatedRatesFirst": true,
           "StayDateTimeRange": {
-            "StartDate": "2023-12-01",
-            "EndDate": "2023-12-15"
+            "StartDate": "' . $checkin . '",
+            "EndDate": "' . $checkout . '"
           },
           "Rooms": {
-            "RoomSetTypes": {
-              "RoomSet": [
-                {
-                  "Type": "RoomView"
-                }
-              ]
-            },
-            "Room": [
-              {
-                "Index": 1,
-                "Adults": 1,
-                "Children": 0,
-                "ChildAges": ""
-              }
-            ]
+            "Room": ' . json_encode($room) . '
           }
         },
         "HotelContentRef": {
@@ -196,13 +209,10 @@ function getHotelDetails($url, $accessToken, $requestBody)
 
         $responseData = json_decode($response, true);
 
-        // return json_encode($responseData);
 
-        // TODO: Marking Search Result
+        // TODO: Marking Hotel Details
         if (
-            $responseData['GetHotelDetailsRS']['ApplicationResults'][
-                'status'
-            ] === 'Complete' &&
+            $responseData['GetHotelDetailsRS']['ApplicationResults']['status'] === 'Complete' &&
             isset($responseData['GetHotelDetailsRS']['HotelDetailsInfo'])
         ) {
             $system = 'sabre';
@@ -237,10 +247,8 @@ function getHotelDetails($url, $accessToken, $requestBody)
             $descriptions = [];
 
             if (isset($descriptiveInfo['Descriptions']['Description'])) {
-                foreach (
-                    $descriptiveInfo['Descriptions']['Description']
-                    as $description
-                ) {
+                foreach ($descriptiveInfo['Descriptions']['Description']
+                    as $description) {
                     $descriptions[] = [
                         'type' => $description['Text']['Type'],
                         'value' => $description['Text']['value'],
@@ -262,10 +270,8 @@ function getHotelDetails($url, $accessToken, $requestBody)
                     foreach ($singleRoomSet['Room'] as $key => $room) {
                         $bedTypes = [];
                         if (isset($room['BedTypeOptions']['BedTypes'])) {
-                            foreach (
-                                $room['BedTypeOptions']['BedTypes']
-                                as $singleBed
-                            ) {
+                            foreach ($room['BedTypeOptions']['BedTypes']
+                                as $singleBed) {
                                 if (isset($singleBed)) {
                                     $bedTypes[] = [
                                         'code' => isset($singleBed['Code'])
@@ -286,10 +292,8 @@ function getHotelDetails($url, $accessToken, $requestBody)
 
                         $ratePlans = [];
 
-                        foreach (
-                            $room['RatePlans']['RatePlan']
-                            as $ratePlan
-                        ) {
+                        foreach ($room['RatePlans']['RatePlan']
+                            as $ratePlan) {
                             $ratePlans[] = [
                                 'ratePlanName' => isset(
                                     $ratePlan['RatePlanName']
@@ -341,20 +345,14 @@ function getHotelDetails($url, $accessToken, $requestBody)
                                     ? $ratePlan['MealsIncluded']['MealPlanCode']
                                     : '',
                                 'mealPlanDescription' => isset(
-                                    $ratePlan['MealsIncluded'][
-                                        'MealPlanDescription'
-                                    ]
+                                    $ratePlan['MealsIncluded']['MealPlanDescription']
                                 )
-                                    ? $ratePlan['MealsIncluded'][
-                                        'MealPlanDescription'
-                                    ]
+                                    ? $ratePlan['MealsIncluded']['MealPlanDescription']
                                     : '',
                                 'startDate' => isset(
                                     $ratePlan['ConvertedRateInfo']['StartDate']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'StartDate'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['StartDate']
                                     : '',
                                 'endDate' => isset(
                                     $ratePlan['ConvertedRateInfo']['EndDate']
@@ -362,120 +360,72 @@ function getHotelDetails($url, $accessToken, $requestBody)
                                     ? $ratePlan['ConvertedRateInfo']['EndDate']
                                     : '',
                                 'amountBeforeTax' => isset(
-                                    $ratePlan['ConvertedRateInfo'][
-                                        'AmountBeforeTax'
-                                    ]
+                                    $ratePlan['ConvertedRateInfo']['AmountBeforeTax']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'AmountBeforeTax'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['AmountBeforeTax']
                                     : '',
                                 'amountAfterTax' => isset(
-                                    $ratePlan['ConvertedRateInfo'][
-                                        'AmountAfterTax'
-                                    ]
+                                    $ratePlan['ConvertedRateInfo']['AmountAfterTax']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'AmountAfterTax'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['AmountAfterTax']
                                     : '',
                                 'averageNightlyRate' => isset(
-                                    $ratePlan['ConvertedRateInfo'][
-                                        'AverageNightlyRate'
-                                    ]
+                                    $ratePlan['ConvertedRateInfo']['AverageNightlyRate']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'AverageNightlyRate'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['AverageNightlyRate']
                                     : '',
                                 'averageNightlyRateBeforeTax' => isset(
-                                    $ratePlan['ConvertedRateInfo'][
-                                        'AverageNightlyRateBeforeTax'
-                                    ]
+                                    $ratePlan['ConvertedRateInfo']['AverageNightlyRateBeforeTax']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'AverageNightlyRateBeforeTax'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['AverageNightlyRateBeforeTax']
                                     : '',
                                 'currencyCode' => isset(
-                                    $ratePlan['ConvertedRateInfo'][
-                                        'CurrencyCode'
-                                    ]
+                                    $ratePlan['ConvertedRateInfo']['CurrencyCode']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'CurrencyCode'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['CurrencyCode']
                                     : '',
                                 'taxInclusive' => isset(
-                                    $ratePlan['ConvertedRateInfo'][
-                                        'TaxInclusive'
-                                    ]
+                                    $ratePlan['ConvertedRateInfo']['TaxInclusive']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'TaxInclusive'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['TaxInclusive']
                                     : '',
                                 'amount' => isset(
-                                    $ratePlan['ConvertedRateInfo']['Taxes'][
-                                        'Amount'
-                                    ]
+                                    $ratePlan['ConvertedRateInfo']['Taxes']['Amount']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo']['Taxes'][
-                                        'Amount'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['Taxes']['Amount']
                                     : '',
                                 'taxCurrencyCode' => isset(
-                                    $ratePlan['ConvertedRateInfo']['Taxes'][
-                                        'CurrencyCode'
-                                    ]
+                                    $ratePlan['ConvertedRateInfo']['Taxes']['CurrencyCode']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo']['Taxes'][
-                                        'CurrencyCode'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['Taxes']['CurrencyCode']
                                     : '',
                                 'refundable' => isset(
-                                    $ratePlan['ConvertedRateInfo'][
-                                        'CancelPenalties'
-                                    ]['CancelPenalty'][0]['Refundable']
+                                    $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Refundable']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'CancelPenalties'
-                                    ]['CancelPenalty'][0]['Refundable']
+                                    ? $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Refundable']
                                     : '',
                                 'absoluteDeadline' => isset(
-                                    $ratePlan['ConvertedRateInfo'][
-                                        'CancelPenalties'
-                                    ]['CancelPenalty'][0]['Deadline'][
-                                        'AbsoluteDeadline'
-                                    ]
+                                    $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Deadline']['AbsoluteDeadline']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'CancelPenalties'
-                                    ]['CancelPenalty'][0]['Deadline'][
-                                        'AbsoluteDeadline'
-                                    ]
+                                    ? $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Deadline']['AbsoluteDeadline']
                                     : '',
                                 'guaranteesAccepted' => isset(
-                                    $ratePlan['ConvertedRateInfo']['Guarantee'][
-                                        'GuaranteesAccepted'
-                                    ]['GuaranteeAccepted']
+                                    $ratePlan['ConvertedRateInfo']['Guarantee']['GuaranteesAccepted']['GuaranteeAccepted']
                                 )
-                                    ? $ratePlan['ConvertedRateInfo'][
-                                        'Guarantee'
-                                    ]['GuaranteesAccepted']['GuaranteeAccepted']
+                                    ? $ratePlan['ConvertedRateInfo']['Guarantee']['GuaranteesAccepted']['GuaranteeAccepted']
                                     : '',
                             ];
                         }
 
                         $roomSet[] = [
                             'roomIndex' => $key + 1,
-                            'roomType' => $room['RoomType'],
-                            'roomTypeCode' => $room['RoomTypeCode'],
+                            'roomType' => isset($room['RoomType']) ? $room['RoomType'] : "",
+                            'roomTypeCode' => isset($room['RoomTypeCode']) ? $room['RoomTypeCode'] : "",
                             'bedType' => $bedTypes,
                             'roomName' =>
-                                $room['RoomDescription']['Name'],
+                            $room['RoomDescription']['Name'],
                             'roomNameText' =>
-                                $room['RoomDescription']['Text'][0],
+                            $room['RoomDescription']['Text'][0],
                             'ratePlan' => isset($ratePlans)
                                 ? (object) call_user_func_array(
                                     'array_merge',
@@ -504,40 +454,24 @@ function getHotelDetails($url, $accessToken, $requestBody)
                             ? $propertyInfo['Floors']
                             : '',
                         'propertyType' => isset(
-                            $propertyInfo['PropertyTypeInfo'][
-                                'PropertyType'
-                            ][0]['Description']
+                            $propertyInfo['PropertyTypeInfo']['PropertyType'][0]['Description']
                         )
-                            ? $propertyInfo['PropertyTypeInfo'][
-                                'PropertyType'
-                            ][0]['Description']
+                            ? $propertyInfo['PropertyTypeInfo']['PropertyType'][0]['Description']
                             : '',
                         'checkInTime' => isset(
-                            $propertyInfo['Policies']['Policy'][0]['Text'][
-                                'value'
-                            ]
+                            $propertyInfo['Policies']['Policy'][0]['Text']['value']
                         )
-                            ? $propertyInfo['Policies']['Policy'][0]['Text'][
-                                'value'
-                            ]
+                            ? $propertyInfo['Policies']['Policy'][0]['Text']['value']
                             : '',
                         'checkOutTime' => isset(
-                            $propertyInfo['Policies']['Policy'][1]['Text'][
-                                'value'
-                            ]
+                            $propertyInfo['Policies']['Policy'][1]['Text']['value']
                         )
-                            ? $propertyInfo['Policies']['Policy'][1]['Text'][
-                                'value'
-                            ]
+                            ? $propertyInfo['Policies']['Policy'][1]['Text']['value']
                             : '',
                         'propertyQuality' => isset(
-                            $propertyInfo['PropertyQualityInfo'][
-                                'PropertyQuality'
-                            ][0]['Description']
+                            $propertyInfo['PropertyQualityInfo']['PropertyQuality'][0]['Description']
                         )
-                            ? $propertyInfo['PropertyQualityInfo'][
-                                'PropertyQuality'
-                            ][0]['Description']
+                            ? $propertyInfo['PropertyQualityInfo']['PropertyQuality'][0]['Description']
                             : '',
                     ]
                     : '',
@@ -610,8 +544,9 @@ function getHotelDetails($url, $accessToken, $requestBody)
             //Todo: Returning Search Result
             // $response = json_encode($allResponse);
             // $response = json_encode($rateInfos['ConvertedRateInfo']);
-            $response = json_encode($roomSets);
+            // $response = json_encode($roomSets);
             // $response = json_encode($propertyInfo);
+            $response = json_encode($responseData);
             return $response;
         } else {
             return json_encode($responseData);
@@ -669,5 +604,3 @@ function camelCase($str)
     $str = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $str))));
     return $str;
 }
-
-?>
