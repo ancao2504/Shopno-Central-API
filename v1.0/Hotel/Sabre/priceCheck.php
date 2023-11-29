@@ -1,6 +1,5 @@
 <?php
 
-include '../../../config.php';
 include './utils.php';
 
 header("Access-Control-Allow-Origin: *");
@@ -15,11 +14,11 @@ $FlightType;
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_POST = json_decode(file_get_contents('php://input'), true);
     $rateKey = $_POST['key'];
-    $pcc = '14KK';
+    $pcc = '27YK';
     // $url = 'https://api.cert.platform.sabre.com/v3.0.0/hotel/pricecheck';
     $url = 'https://api.platform.sabre.com/v3.0.0/hotel/pricecheck';
     // $accessToken = getToken();
-    $accessToken = getCertToken();
+    $accessToken = getProdToken();
     $requestBody = sabrePriceRQ($rateKey);
 
     $result = priceCheck($requestBody, $accessToken, $url);
@@ -92,7 +91,7 @@ function priceCheck($requestBody, $accessToken, $url)
         $response['status'] = 'error';
         $response['code'] = $httpCode;
         $response['message'] = 'Invalid Request';
-    
+
         echo json_encode($response);
     } else {
         // TODO:Output the API response
@@ -159,5 +158,3 @@ function camelCase($str)
     $str = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $str))));
     return $str;
 }
-
-?>

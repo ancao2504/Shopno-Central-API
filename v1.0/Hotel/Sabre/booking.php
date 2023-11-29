@@ -1,6 +1,5 @@
 <?php
 
-include '../../../config.php';
 include './utils.php';
 
 header('Access-Control-Allow-Origin: *');
@@ -19,10 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $phone = $_POST['phone'];
     $bookingKey = $_POST['bookingKey'];
     $email = $_POST['email'];
-    // $pcc = '14KK';
-    $pcc = 'D4FL';
+    $pcc = '27YK';
     // $accessToken = getToken();
-    $accessToken = getCertToken();
+    $accessToken = getProdToken();
 
     $requestBody = sabreRequestBody(
         $pcc,
@@ -34,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     );
     // echo $requestBody;
 
-   $result = sabreHotelBooking($accessToken, $requestBody);
+    $result = sabreHotelBooking($accessToken, $requestBody);
 
     if (isset($result)) {
         echo $result;
@@ -61,8 +59,10 @@ function sabreRequestBody(
     $email,
     $bookingKey
 ) {
-    // $agencyName = 'Fly Far International';
-    $agencyName = 'RTC Tours & Travel';
+    $agencyName = 'Shopno Tours & Travel';
+    $cityName = $paymentInfo['cityName'];
+    $countryCode = $paymentInfo['countryCode'];
+
     $paymentType = $paymentInfo['paymentType'];
     $cardCode = $paymentInfo['cardCode'];
     $cardNumber = $paymentInfo['cardNumber'];
@@ -75,22 +75,19 @@ function sabreRequestBody(
     $csc = $paymentInfo['csc'];
     $address = $paymentInfo['address'];
     $streetNumber = $paymentInfo['streetNumber'];
-    $cityName = $paymentInfo['cityName'];
     $stateCode = $paymentInfo['stateCode'];
     $cityCode = $paymentInfo['cityCode'];
     $postalCode = $paymentInfo['postalCode'];
-    $countryCode = $paymentInfo['countryCode'];
 
     $personArray = [];
     foreach ($roomInfo as $guests) {
         foreach ($guests['guest'] as $key => $guest) {
             $personArray[] = [
-                'NameNumber' =>
-                    ($guest['type'] === 'ADT'
-                        ? '1'
-                        : ($guest['type'] === 'CNN'
-                            ? '2'
-                            : '3')) .
+                'NameNumber' => ($guest['type'] === 'ADT'
+                    ? '1'
+                    : ($guest['type'] === 'CNN'
+                        ? '2'
+                        : '3')) .
                     '.' .
                     ($key + 1),
                 'NameReference' => $guest['type'] . '_' . ($key + 1),
@@ -327,5 +324,3 @@ function sabreHotelBooking($accessToken, $requestBody)
 
     return json_encode($responseData);
 }
-
-?>
