@@ -1,15 +1,15 @@
 <?php
 
-include '../../../config.php';
-
-
-
 function getProdToken()
 {
-    $SABRE_ID = $_ENV['SABRE_ID'];
-    $SABRE_PASSWORD = $_ENV['SABRE_PASSWORD'];
-    $SABRE_AUTH_ENDPOINT = $_ENV['SABRE_AUTH_ENDPOINT'];
-    $SABRE_PCC = $_ENV['SABRE_PCC'];
+    // $SABRE_ID = $_ENV['SABRE_ID'];
+    // $SABRE_PASSWORD = $_ENV['SABRE_PASSWORD'];
+    // $SABRE_AUTH_ENDPOINT = $_ENV['SABRE_AUTH_ENDPOINT'];
+    // $SABRE_PCC = $_ENV['SABRE_PCC'];
+    $SABRE_ID = '351640';
+    $SABRE_PASSWORD = 'spt5164';
+    $SABRE_AUTH_ENDPOINT = 'https://api.platform.sabre.com/v2/auth/token';
+    $SABRE_PCC = '27YK';
 
     $Client_ID_RAW = "V1:$SABRE_ID:$SABRE_PCC:AA";
 
