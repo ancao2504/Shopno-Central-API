@@ -52,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $uId = sha1(md5(time()) . '' . rand());
         $refundable = 'refundable';
         $netCost = 200000;
+        $name = $guestInfo[0]['fName'] . ' ' . $guestInfo[0]['lName'];
 
         addPax($conn, $guestInfo);
         saveBooking($conn, $guestInfo, $bookingPnr, $agentId, $staffId, $subAgentId, $userId, $adultCount, $childCount, $rooms, $checkIn, $checkOut, $platform, $uId, $phone, $email, $refundable, $name, $netCost);
@@ -363,7 +364,7 @@ function saveBooking($conn, $guestInfo, $bookingPnr, $agentId, $staffId, $subAge
 
 
 
-        $createdTime = date("Y-m-d H:i:s");
+        $bookedAt = date("Y-m-d H:i:s");
         $sql = "INSERT INTO `hotel_booking` (
                           `uid`,
                           `bookingId`,
@@ -383,9 +384,10 @@ function saveBooking($conn, $guestInfo, $bookingPnr, $agentId, $staffId, $subAge
                           `checkin`
                           `checkout`,
                           `netCost`,
+                          `bookedAt`
                           )
 
-  VALUES('$uId','$bookingId','$userId','$agentId','$staffId','$subAgentId','$email','$phone','$name','$refundable','$bookingPnr','$platform','$adultCount','$childCount','$checkIn','$checkOut','$netCost')";
+  VALUES('$uId','$bookingId','$userId','$agentId','$staffId','$subAgentId','$email','$phone','$name','$refundable','$bookingPnr','$platform','$adultCount','$childCount','$rooms','$checkIn','$checkOut','$netCost',$bookedAt)";
 
         if ($conn->query($sql) === true) {
             addPax($conn, $guestInfo);
@@ -419,7 +421,7 @@ function addPax($conn, $guestInfo)
         $email = $guest['email'];
 
 
-        $query = "INSERT INTO `passengers_hotel` (`paxId`, `type`, `fName`, `lName`, `phone`, `email`) 
+        $query = "INSERT INTO `hotel_passengers` (`paxId`, `type`, `fName`, `lName`, `phone`, `email`) 
             VALUES ('$paxId', '$type', '$fName', '$lName', '$phone', '$email')";
 
         if ($conn->query($query) === TRUE) {
