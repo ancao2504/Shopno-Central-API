@@ -13,7 +13,7 @@ header(
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_POST = json_decode(file_get_contents('php://input'), true);
 
-    $roomInfo = $_POST['roomInfo'];
+    $guestInfo = $_POST['guestInfo'];
     $paymentInfo = $_POST['paymentInfo'];
     $phone = $_POST['phone'];
     $bookingKey = $_POST['bookingKey'];
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $requestBody = sabreRequestBody(
         $pcc,
-        $roomInfo,
+        $guestInfo,
         $paymentInfo,
         $phone,
         $email,
@@ -53,15 +53,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 function sabreRequestBody(
     $pcc,
-    $roomInfo,
+    $guestInfo,
     $paymentInfo,
     $phone,
     $email,
     $bookingKey
 ) {
+    //TODO: agency Information
     $agencyName = 'Shopno Tours & Travel';
-    $cityName = $paymentInfo['cityName'];
-    $countryCode = $paymentInfo['countryCode'];
+    $cityName = 'Dhaka';
+    $countryCode = 'BD';
+    $postalCode = '1215';
+    $streetNumber = 'Dhaka, Bangladesh';
+    $stateCode = 'BD';
 
     $paymentType = $paymentInfo['paymentType'];
     $cardCode = $paymentInfo['cardCode'];
@@ -74,57 +78,52 @@ function sabreRequestBody(
     $holderEmail = $paymentInfo['holderEmail'];
     $csc = $paymentInfo['csc'];
     $address = $paymentInfo['address'];
-    $streetNumber = $paymentInfo['streetNumber'];
-    $stateCode = $paymentInfo['stateCode'];
     $cityCode = $paymentInfo['cityCode'];
-    $postalCode = $paymentInfo['postalCode'];
+
 
     $personArray = [];
-    foreach ($roomInfo as $guests) {
-        foreach ($guests['guest'] as $key => $guest) {
-            $personArray[] = [
-                'NameNumber' => ($guest['type'] === 'ADT'
-                    ? '1'
-                    : ($guest['type'] === 'CNN'
-                        ? '2'
-                        : '3')) .
-                    '.' .
-                    ($key + 1),
-                'NameReference' => $guest['type'] . '_' . ($key + 1),
-                'PassengerType' => $guest['type'],
-                'GivenName' => $guest['fName'],
-                'Surname' => $guest['lName'],
-            ];
-        }
+    foreach ($guestInfo as $key => $guest) {
+
+        $personArray[] = [
+            'NameNumber' => ($guest['type'] === 'ADT'
+                ? '1'
+                : ($guest['type'] === 'CNN'
+                    ? '2'
+                    : '3')) .
+                '.' .
+                ($key + 1),
+            'NameReference' => $guest['type'] . '_' . ($key + 1),
+            'PassengerType' => $guest['type'],
+            'GivenName' => $guest['fName'],
+            'Surname' => $guest['lName'],
+        ];
     }
 
     $roomArray = [];
 
-    foreach ($roomInfo as $key => $room) {
-        $guests = $room['guest'];
 
-        $formattedGuests = [];
-        foreach ($guests as $index => $guest) {
-            $formattedGuests[] = [
-                'Contact' => [
-                    'Phone' => $guest['phone'],
-                ],
-                'FirstName' => $guest['fName'],
-                'LastName' => $guest['lName'],
-                'Index' => $index + 1,
-                'LeadGuest' => true,
-                'Type' => 10,
-                'Email' => $guest['email'],
-            ];
-        }
-
-        $roomArray[] = [
-            'Guests' => [
-                'Guest' => $formattedGuests,
+    $formattedGuests = [];
+    foreach ($guestInfo as $index => $guest) {
+        $formattedGuests[] = [
+            'Contact' => [
+                'Phone' => $guest['phone'],
             ],
-            'RoomIndex' => $key + 1,
+            'FirstName' => $guest['fName'],
+            'LastName' => $guest['lName'],
+            'Index' => $index + 1,
+            'LeadGuest' => $index === 0 ? true : false,
+            'Type' => $guest['type'] === 'ADT' ? 10 : 8,
+            'Email' => $guest['email'],
         ];
     }
+
+    $roomArray[] = [
+        'Guests' => [
+            'Guest' => $formattedGuests,
+        ],
+        'RoomIndex' => 1,
+    ];
+
 
     $requestBody =
         '{
