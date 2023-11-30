@@ -53,11 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     );
 
     // echo $requestBody;
-    // $result = sabreHotelBooking($accessToken, $requestBody);
+    $result = sabreHotelBooking($accessToken, $requestBody);
 
-    $filePath = './test.json';
-    $jsonData = file_get_contents($filePath);
-    $result = json_decode($jsonData, true);
+    // $filePath = './test.json';
+    // $jsonData = file_get_contents($filePath);
+    $result = json_decode($result, true);
     $bookingPnr = $result['CreatePassengerNameRecordRS']['ItineraryRef']['ID'];
 
     if (!empty($bookingPnr)) {
