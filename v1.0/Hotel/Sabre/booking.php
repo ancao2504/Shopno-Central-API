@@ -35,34 +35,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $email,
         $bookingKey
     );
-    // echo $requestBody;
+    echo $requestBody;
 
-    $result = sabreHotelBooking($accessToken, $requestBody);
+    // $result = sabreHotelBooking($accessToken, $requestBody);
 
-    if (isset($result)) {
-        echo $result;
-        $bookingPnr = "123";
-        $adultCount = 1;
-        $childCount = 1;
-        $totalPax = $adultCount + $childCount;
-        $rooms = 1;
-        $checkIn = '2023-12-01';
-        $checkOut = '2023-12-03';
-        $platform = 'B2B';
-        $uId = sha1(md5(time()) . '' . rand());
-        $refundable = 'refundable';
-        $netCost = 200000;
-        $name = $guestInfo[0]['fName'] . ' ' . $guestInfo[0]['lName'];
+    // if (isset($result)) {
+    //     echo $result;
+    //     $bookingPnr = "123";
+    //     $adultCount = 1;
+    //     $childCount = 1;
+    //     $totalPax = $adultCount + $childCount;
+    //     $rooms = 1;
+    //     $checkIn = '2023-12-01';
+    //     $checkOut = '2023-12-03';
+    //     $platform = 'B2B';
+    //     $uId = sha1(md5(time()) . '' . rand());
+    //     $refundable = 'refundable';
+    //     $netCost = 200000;
+    //     $name = $guestInfo[0]['fName'] . ' ' . $guestInfo[0]['lName'];
 
-        addPax($conn, $guestInfo);
-        saveBooking($conn, $guestInfo, $bookingPnr, $agentId, $staffId, $subAgentId, $userId, $adultCount, $childCount, $rooms, $checkIn, $checkOut, $platform, $uId, $phone, $email, $refundable, $name, $netCost);
-    } else {
-        $response = [];
-        $response['status'] = 'error';
-        $response['message'] = 'Booking Failed';
+    //     // addPax($conn, $guestInfo);
+    //     // saveBooking($conn, $guestInfo, $bookingPnr, $agentId, $staffId, $subAgentId, $userId, $adultCount, $childCount, $rooms, $checkIn, $checkOut, $platform, $uId, $phone, $email, $refundable, $name, $netCost);
+    // } else {
+    //     $response = [];
+    //     $response['status'] = 'error';
+    //     $response['message'] = 'Booking Failed';
 
-        echo json_encode($response);
-    }
+    //     echo json_encode($response);
+    // }
 } else {
     $response = [];
     $response['status'] = 'error';
@@ -105,14 +105,8 @@ function sabreRequestBody(
     foreach ($guestInfo as $key => $guest) {
 
         $personArray[] = [
-            'NameNumber' => ($guest['type'] === 'ADT'
-                ? '1'
-                : ($guest['type'] === 'CNN'
-                    ? '2'
-                    : '3')) .
-                '.' .
-                ($key + 1),
-            'NameReference' => $guest['type'] . '_' . ($key + 1),
+            'NameNumber' => ($key+1).'.1',
+            'NameReference' => "",
             'PassengerType' => $guest['type'],
             'GivenName' => $guest['fName'],
             'Surname' => $guest['lName'],
@@ -148,6 +142,7 @@ function sabreRequestBody(
     $requestBody =
         '{
         "CreatePassengerNameRecordRQ":{
+            "targetCity": "'.$pcc.'",
            "haltOnAirPriceError":true,
            "TravelItineraryAddInfo":{
               "AgencyInfo":{

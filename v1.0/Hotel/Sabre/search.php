@@ -33,10 +33,13 @@ if (
 
   $url = 'https://api.platform.sabre.com/v4.1.0/get/hotelavail';
   // $url = 'https://api.platform.sabre.com/v4.1.0/get/hotelavail';
+
   $accessToken = getProdToken();
   // $accessToken = getCertToken();
   // echo json_encode($accessToken);
   $requestBody = sabreSearchRQ($location, $checkin, $checkout, $adult, $child, $rooms);
+
+  // echo $requestBody;
 
   $result = searchHotel($url, $accessToken, $requestBody, $rooms, $adult, $child);
 
@@ -47,7 +50,7 @@ if (
 
     $response = [];
     $response['status'] = 'error';
-    $response['message'] = 'Invalid Request';
+    $response['message'] = 'No results found';
 
     echo json_encode($response);
   }
