@@ -11,6 +11,7 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 if (array_key_exists("bookingId",$_GET)){
     $BookingID = $_GET['bookingId'];
+    $accessToken = getProdToken();
 
     $curl = curl_init();
 
@@ -32,7 +33,7 @@ if (array_key_exists("bookingId",$_GET)){
     CURLOPT_HTTPHEADER => array(
         'Content-Type: application/json',
         'Conversation-ID: 2021.01.DevStudio',
-        "Authorization: Bearer $access_token"
+        "Authorization: Bearer $accessToken"
     ),
     ));
 

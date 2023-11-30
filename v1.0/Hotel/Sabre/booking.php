@@ -52,47 +52,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $bookingKey
     );
 
-    // echo $requestBody;
-    $result = sabreHotelBooking($accessToken, $requestBody);
+    echo $requestBody;
+    // $result = sabreHotelBooking($accessToken, $requestBody);
+
+    // echo $result;
 
     // $filePath = './test.json';
     // $jsonData = file_get_contents($filePath);
-    $result = json_decode($result, true);
-    $bookingPnr = $result['CreatePassengerNameRecordRS']['ItineraryRef']['ID'];
+    // $result = json_decode($result, true);
+    // $bookingPnr = $result['CreatePassengerNameRecordRS']['ItineraryRef']['ID'];
 
-    if (!empty($bookingPnr)) {
-        // echo $result;
-        // echo $requestBody
-        // addPax($conn, $guestInfo);
-        saveBooking(
-            $conn,
-            $guestInfo,
-            $bookingPnr,
-            $agentId,
-            $staffId,
-            $subAgentId,
-            $userId,
-            $adultCount,
-            $childCount,
-            $rooms,
-            $checkIn,
-            $checkOut,
-            $platform,
-            $uId,
-            $phone,
-            $email,
-            $refundable,
-            $guestPassengerName,
-            $netCost,
-            $system
-        );
-    } else {
-        $response = [];
-        $response['status'] = 'error';
-        $response['message'] = 'Booking Failed';
+    // if (!empty($bookingPnr)) {
+    //     // echo $result;
+    //     // echo $requestBody
+    //     // addPax($conn, $guestInfo);
+    //     saveBooking(
+    //         $conn,
+    //         $guestInfo,
+    //         $bookingPnr,
+    //         $agentId,
+    //         $staffId,
+    //         $subAgentId,
+    //         $userId,
+    //         $adultCount,
+    //         $childCount,
+    //         $rooms,
+    //         $checkIn,
+    //         $checkOut,
+    //         $platform,
+    //         $uId,
+    //         $phone,
+    //         $email,
+    //         $refundable,
+    //         $guestPassengerName,
+    //         $netCost,
+    //         $system
+    //     );
+    // } else {
+    //     $response = [];
+    //     $response['status'] = 'error';
+    //     $response['message'] = 'Booking Failed';
 
-        echo json_encode($response);
-    }
+    //     echo json_encode($response);
+    // }
 } else {
     $response = [];
     $response['status'] = 'error';
