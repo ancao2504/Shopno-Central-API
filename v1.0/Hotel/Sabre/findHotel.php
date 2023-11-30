@@ -25,7 +25,7 @@ if (array_key_exists('all', $_GET)) {
     }
 } else if (array_key_exists('query', $_GET)) {
     $query= $_GET['query'];
-    $queryRes = mysqli_query($conn, "SELECT * FROM airport_lists WHERE CITY_NAME='$query' OR POI_NAME='$query' ");
+    $queryRes = mysqli_query($conn, "SELECT * FROM airport_lists WHERE VENDOR_CODE='$query' OR POI_NAME='$query' OR CITY_NAME='$query' OR COUNTRY_CODE='$query' OR LATITUDE='$query' OR LONGITUDE='$query'  ");
 
     if ($queryRes) {
 
