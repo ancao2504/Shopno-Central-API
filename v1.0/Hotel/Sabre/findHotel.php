@@ -9,25 +9,11 @@ header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 if (array_key_exists('all', $_GET)) {
-    $countryList = mysqli_query($conn, "SELECT * FROM airport_lists");
+    $queryRes = mysqli_query($conn, "SELECT * FROM airport_lists");
 
-    if ($countryList) {
+    if ($queryRes) {
         $queryResult = mysqli_fetch_all($countryList, MYSQLI_ASSOC);
 
-        // Initialize an array to store the final result with cities
-        // $result = [];
-
-        // Loop through each country
-        // foreach ($countryData as $country) {
-        //     $id = $country['id'];
-        //     $cityList = mysqli_query($conn, "SELECT * FROM city_list WHERE ref = '$id'");
-            
-        //     if ($cityList) {
-        //         $cityData = mysqli_fetch_all($cityList, MYSQLI_ASSOC);
-        //         $country['cities'] = $cityData;
-        //         $result[] = $country; // Add the country with cities to the result
-        //     }
-        // }
 
         echo json_encode($queryResult);
     } else {
@@ -38,27 +24,12 @@ if (array_key_exists('all', $_GET)) {
         echo json_encode($response);
     }
 } else if (array_key_exists('query', $_GET)) {
-    $query= $_GET['country'];
+    $query= $_GET['query'];
     $queryRes = mysqli_query($conn, "SELECT * FROM airport_lists WHERE CITY_NAME='$query' OR POI_NAME='$query' ");
 
     if ($queryRes) {
 
-        $queryResult = mysqli_fetch_all($countryList, MYSQLI_ASSOC);
-
-        // Initialize an array to store the final result with cities
-        // $result = [];
-
-        // Loop through each country
-        // foreach ($countryData as $country) {
-        //     $id = $country['id'];
-        //     $cityList = mysqli_query($conn, "SELECT * FROM city_list WHERE ref = '$id'");
-            
-        //     if ($cityList) {
-        //         $cityData = mysqli_fetch_all($cityList, MYSQLI_ASSOC);
-        //         $country['cities'] = $cityData;
-        //         $result[] = $country; // Add the country with cities to the result
-        //     }
-        // }
+        $queryResult = mysqli_fetch_all($queryRes, MYSQLI_ASSOC);
 
         echo json_encode($queryResult);
     } else {
@@ -71,7 +42,7 @@ if (array_key_exists('all', $_GET)) {
 } else {
     $response = [
         "status" => "error",
-        "message" => "Invalid Request"
+        "message" => "No Data Found."
     ];
     echo json_encode($response);
 }
