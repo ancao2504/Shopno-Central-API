@@ -1,0 +1,683 @@
+{
+    "CreatePassengerNameRecordRS": {
+        "ApplicationResults": {
+            "status": "Complete",
+            "Success": [
+                {
+                    "timeStamp": "2023-11-30T10:23:48.780Z"
+                }
+            ],
+            "Warning": [
+                {
+                    "type": "BusinessLogic",
+                    "timeStamp": "2023-11-30T10:23:41.490Z",
+                    "SystemSpecificResults": [
+                        {
+                            "Message": [
+                                {
+                                    "code": "WARN.SWS.HOST.ERROR_IN_RESPONSE",
+                                    "content": "TravelItineraryAddInfoLLSRQ: .FRMT.NOT ENT BGNG WITH"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "ItineraryRef": {
+            "ID": "FIEJBP"
+        },
+        "TravelItineraryRead": {
+            "TravelItinerary": {
+                "CustomerInfo": {
+                    "ContactNumbers": {
+                        "ContactNumber": [
+                            {
+                                "LocationCode": "DAC",
+                                "Phone": "8801925785592-H-1.1",
+                                "RPH": "001",
+                                "Id": "7"
+                            }
+                        ]
+                    },
+                    "PersonName": [
+                        {
+                            "WithInfant": "false",
+                            "NameNumber": "01.01",
+                            "PassengerType": "ADT",
+                            "RPH": "1",
+                            "elementId": "pnr-3.1",
+                            "GivenName": "SOHAN",
+                            "Surname": "ISLAM"
+                        },
+                        {
+                            "WithInfant": "false",
+                            "NameNumber": "02.01",
+                            "PassengerType": "ADT",
+                            "RPH": "2",
+                            "elementId": "pnr-5.2",
+                            "GivenName": "SYED",
+                            "Surname": "AFRIDI"
+                        }
+                    ]
+                },
+                "ItineraryInfo": {
+                    "ReservationItems": {
+                        "Item": [
+                            {
+                                "RPH": "1",
+                                "Hotel": {
+                                    "DayOfWeekInd": "5",
+                                    "NumberInParty": "01",
+                                    "NumberOfUnits": "1",
+                                    "SegmentNumber": "0001",
+                                    "Status": "HK",
+                                    "Type": "HHL",
+                                    "IsPast": false,
+                                    "Id": "14",
+                                    "BasicPropertyInfo": {
+                                        "ChainCode": "7B",
+                                        "HotelCityCode": "DAC",
+                                        "HotelCode": "0",
+                                        "HotelName": "HOTEL AMIR S RESIDENCE",
+                                        "Address": {
+                                            "AddressLine": [
+                                                "SHAHID LATIF ROAD HOUSE NUMBER"
+                                            ],
+                                            "CountryCode": "BD"
+                                        },
+                                        "CancelPenalty": [
+                                            {
+                                                "PolicyCode": "06P"
+                                            }
+                                        ],
+                                        "ConfirmationNumber": [
+                                            "4291595225-"
+                                        ]
+                                    },
+                                    "Customer": {
+                                        "ReserveUnderName": [
+                                            "ISLAM SOHAN"
+                                        ]
+                                    },
+                                    "Guarantee": "VI4XXXXXXXXXXX4242EXP 12 24-ISLAM",
+                                    "POS": {
+                                        "Source": {
+                                            "RequestorID": [
+                                                "42342576"
+                                            ]
+                                        }
+                                    },
+                                    "RoomRates": {
+                                        "Commission": {
+                                            "NonCommission": false,
+                                            "content": ""
+                                        },
+                                        "Rate": {
+                                            "Amount": "14.50",
+                                            "CurrencyCode": "USD",
+                                            "RoomTypeCode": "null",
+                                            "HotelTotalPricing": {
+                                                "ApproximateTotal": {
+                                                    "AmountAndCurrency": "14.50 USD"
+                                                },
+                                                "Disclaimer": [
+                                                    {
+                                                        "Id": "DS1",
+                                                        "content": "INCLUDES TAX"
+                                                    },
+                                                    {
+                                                        "Id": "DS2",
+                                                        "content": "EXCLUDES SURCHARGES"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "TimeSpan": {
+                                        "Duration": "001",
+                                        "End": "12-02",
+                                        "Start": "12-01"
+                                    }
+                                },
+                                "Product": {
+                                    "ProductBase": {
+                                        "SegmentReference": 14
+                                    },
+                                    "ProductDetails": {
+                                        "productCategory": "AGTLCSSEGMENT",
+                                        "productType": "HHL",
+                                        "vendorCode": "7B",
+                                        "statusCode": "HK",
+                                        "startPoint": "DAC",
+                                        "startDateTime": "2023-12-01T00:00:00",
+                                        "endPoint": "DAC",
+                                        "endDateTime": "2023-12-02T00:00:00",
+                                        "ProductName": {
+                                            "type": "HHL",
+                                            "content": "Lodging"
+                                        },
+                                        "Lodging": {
+                                            "ResGlobalInfo": {
+                                                "BookingInfo": {
+                                                    "Status": "39",
+                                                    "InfoSource": "113",
+                                                    "RateKey": "y0NC2bN/07B/32rwconI9flduzjkrLJAcUloRaEz6EyJqtpb4n4DGE0vE58m+AJT/OWGbv6eRi1PQLxJaC2Aa7+dOXLWvJBcFaoCNmm9cE8PlnQ7X66db84z30PtfSCr7itWyszl5CYlOpTQOOsy3JswgWHN4FRPKQJQBiOEd2yC0dKmQwM3ny+kHHJvMpPKKCPwtAuP22I4PCa7fnekbzQJJhoB86huE8zdJhc3bzy5AoULGTySxSlznwtLDhdRfz3wLvCQ4Z8o/g/LcK5ZFWTCZB919wN60pA3gGX0zMA028FcrSxix1waL6+PCQsxxPDUbn7A8Yomp1yRMADe0lAN3q6wJzIQaDi8HJDU69mxAEFEfLkdlsZFrBYf8Ejig9RESzbeZx/T2O1eFMOW9KuUBeFTJvl4BVbW34dS5FIjtZ46zA+HTr82jIDRnRNEd33ACzZSNv5o8yYi3MCOcc7vwTf/G6jzIOa0atLeHJWB+Hnqj0P6K2KgCOFQxXlyOkAfTTolbFG2pOE3xTJJXg==",
+                                                    "PartialCancelAllowed": false,
+                                                    "BookingKey": "a6fb2669-8cfe-400e-be8c-b2beaf31d771",
+                                                    "HotelReservationIds": {
+                                                        "HotelReservation": [
+                                                            {
+                                                                "Id": "4291595225",
+                                                                "Type": 40
+                                                            },
+                                                            {
+                                                                "Id": "FIEJBP011701339822IATA42342576",
+                                                                "Type": 16
+                                                            },
+                                                            {
+                                                                "Id": "FIEJBP",
+                                                                "Type": 24
+                                                            },
+                                                            {
+                                                                "Id": "5709",
+                                                                "Type": 18
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "HotelInfo": {
+                                                    "HotelCode": "100484817",
+                                                    "CodeContext": "GLOBAL",
+                                                    "GlobalChainCode": "7B",
+                                                    "HotelName": "Hotel Amir's Residence",
+                                                    "BrandCode": "10000",
+                                                    "SabreRating": "3.0",
+                                                    "BrandName": "undefined",
+                                                    "SupplierChainCode": "7B",
+                                                    "SourceHotelCode": "0000",
+                                                    "LocationInfo": {
+                                                        "Latitude": "23.85816",
+                                                        "Longitude": "90.40659",
+                                                        "Address": {
+                                                            "AddressLine1": "Shahid Latif Road House Number 95 Near Kosai Bazar Rail Crossing",
+                                                            "CityName": {
+                                                                "CityCode": "DAC",
+                                                                "content": "Dhaka"
+                                                            },
+                                                            "PostalCode": "1230",
+                                                            "CountryName": {
+                                                                "Code": "BD",
+                                                                "content": "Bangladesh"
+                                                            }
+                                                        }
+                                                    },
+                                                    "Amenities": {
+                                                        "Amenity": [
+                                                            {
+                                                                "Code": 268,
+                                                                "Description": "All public areas non-smoking"
+                                                            },
+                                                            {
+                                                                "Code": 42,
+                                                                "Description": "Free Parking"
+                                                            },
+                                                            {
+                                                                "Code": 5,
+                                                                "Description": "Air conditioning"
+                                                            },
+                                                            {
+                                                                "Code": 64,
+                                                                "Description": "On-Site parking"
+                                                            },
+                                                            {
+                                                                "Code": 68,
+                                                                "Description": "Parking"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "PropertyTypeInfo": {
+                                                        "PropertyType": [
+                                                            {
+                                                                "Code": 20,
+                                                                "Description": "Hotel"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                "StayDateRange": {
+                                                    "StartDate": "2023-12-01",
+                                                    "EndDate": "2023-12-02"
+                                                },
+                                                "Total": {
+                                                    "AmountAfterTax": 14.5,
+                                                    "AmountBeforeTax": 14.5,
+                                                    "CurrencyCode": "USD"
+                                                },
+                                                "Commission": {
+                                                    "CommissionIndicator": true,
+                                                    "Percent": 7.8,
+                                                    "Amount": 1.13,
+                                                    "CurrencyCode": "USD",
+                                                    "Type": "Amount"
+                                                }
+                                            },
+                                            "Rooms": {
+                                                "NumberOfRooms": 1,
+                                                "Room": [
+                                                    {
+                                                        "RoomTypeCode": "Single Room - Booking.com rate",
+                                                        "RoomType": "Single Room - Booking.com rate",
+                                                        "SegmentNumber": 1,
+                                                        "RoomViewCode": "3",
+                                                        "NonSmoking": true,
+                                                        "RoomIndex": 1,
+                                                        "Guests": {
+                                                            "Count": 1,
+                                                            "Guest": [
+                                                                {
+                                                                    "Type": 10,
+                                                                    "Email": "sohan@flyfar.tech",
+                                                                    "Index": 1,
+                                                                    "LeadGuest": true,
+                                                                    "FirstName": "SOHAN",
+                                                                    "LastName": "ISLAM",
+                                                                    "Contact": {
+                                                                        "Phone": "01744988083"
+                                                                    }
+                                                                }
+                                                            ]
+                                                        },
+                                                        "RoomDescription": {
+                                                            "Name": "Single Room - Booking.com rate",
+                                                            "Text": "The air-conditioned single room provides a flat-screen TV with cable channels, a wardrobe, a sofa, a tiled floor as well as city views. The unit offers 1 bed."
+                                                        },
+                                                        "BookingStatus": "HK",
+                                                        "RatePlan": {
+                                                            "RatePlanName": "Single Room - Booking.com rate",
+                                                            "PrepaidIndicator": false,
+                                                            "RatePlanDescription": {
+                                                                "Text": [
+                                                                    "Single Room - Booking.com rate"
+                                                                ]
+                                                            },
+                                                            "RatePlanInclusions": {
+                                                                "RatePlanInclusionDescription": [
+                                                                    {
+                                                                        "Name": "Free High Speed Internet Connection",
+                                                                        "Code": 222
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "MealsIncluded": {
+                                                                "MealIncluded": [
+                                                                    {
+                                                                        "Breakfast": false,
+                                                                        "Lunch": false,
+                                                                        "Dinner": false,
+                                                                        "MealPlanCode": "14"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "RateInfo": {
+                                                                "AmountBeforeTax": 14.5,
+                                                                "AmountAfterTax": 14.5,
+                                                                "CurrencyCode": "USD",
+                                                                "NightlyRate": 14.5,
+                                                                "AdditionalFeesInclusive": false,
+                                                                "TaxInclusive": true,
+                                                                "AdditionalDetails": {
+                                                                    "AdditionalDetail": [
+                                                                        {
+                                                                            "Code": 32,
+                                                                            "Text": [
+                                                                                "INCLUDES TAX",
+                                                                                "EXCLUDES SURCHARGES"
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "Code": 8,
+                                                                            "CurrencyCode": "USD",
+                                                                            "Text": [
+                                                                                "This property will not accommodate hen, stag or similar parties."
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "Code": 29,
+                                                                            "CurrencyCode": "USD",
+                                                                            "Text": [
+                                                                                "No prepayment is needed."
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "CancelPenalties": {
+                                                                    "CancelPenalty": [
+                                                                        {
+                                                                            "Refundable": true,
+                                                                            "Deadline": {
+                                                                                "AbsoluteDeadline": "2023-12-01T18:00:00"
+                                                                            },
+                                                                            "AmountPercent": {
+                                                                                "Amount": 14.5,
+                                                                                "CurrencyCode": "USD"
+                                                                            },
+                                                                            "PenaltyDescription": {
+                                                                                "Text": "You may cancel free of charge until 18:00 on the day of arrival. You will be charged the total price of the reservation if you cancel after 18:00 on the day of arrival."
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "Guarantee": {
+                                                                    "GuaranteeType": "GUAR",
+                                                                    "GuaranteesAccepted": {
+                                                                        "GuaranteeAccepted": [
+                                                                            {
+                                                                                "GuaranteeTypeCode": 5,
+                                                                                "PaymentCards": {
+                                                                                    "PaymentCard": [
+                                                                                        {
+                                                                                            "CardCode": "IK",
+                                                                                            "content": "MASTER CARD"
+                                                                                        },
+                                                                                        {
+                                                                                            "CardCode": "VI",
+                                                                                            "content": "VISA"
+                                                                                        },
+                                                                                        {
+                                                                                            "CardCode": "MC",
+                                                                                            "content": "MASTER CARD"
+                                                                                        },
+                                                                                        {
+                                                                                            "CardCode": "VS",
+                                                                                            "content": "VISA"
+                                                                                        },
+                                                                                        {
+                                                                                            "CardCode": "CA",
+                                                                                            "content": "MASTERCARD"
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                },
+                                                                "Commission": {
+                                                                    "CommissionIndicator": true,
+                                                                    "Percent": 7.8,
+                                                                    "Amount": 1.13,
+                                                                    "CurrencyCode": "USD",
+                                                                    "Type": "Amount"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            },
+                                            "PaymentInformation": {
+                                                "Type": "GUARANTEE",
+                                                "FormOfPaymentReference": {
+                                                    "newRef": "1"
+                                                }
+                                            },
+                                            "POS": {
+                                                "Source": {
+                                                    "AgencyName": "Shopno Tours & Travel",
+                                                    "ISOCountryCode": "BD",
+                                                    "PseudoCityCode": "27YK",
+                                                    "RequestorID": {
+                                                        "Type": 5,
+                                                        "Id": "42342576",
+                                                        "IdContext": "IATA"
+                                                    },
+                                                    "AgencyAddress": {
+                                                        "AddressLine1": "Shopno Tours & Travel",
+                                                        "AddressLine2": "Dhaka",
+                                                        "CityName": {
+                                                            "CityCode": "BD",
+                                                            "content": ""
+                                                        },
+                                                        "PostalCode": "1215",
+                                                        "CountryName": {
+                                                            "Code": "BD",
+                                                            "content": ""
+                                                        }
+                                                    },
+                                                    "AgencyContact": {
+                                                        "Mobile": "8801925785592"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                "ItineraryRef": {
+                    "AirExtras": false,
+                    "ID": "FIEJBP",
+                    "InhibitCode": "U",
+                    "PartitionID": "AA",
+                    "PrimeHostID": "1B",
+                    "Source": {
+                        "AAA_PseudoCityCode": "27YK",
+                        "CreateDateTime": "2023-11-30T04:23",
+                        "CreationAgent": "AWS",
+                        "HomePseudoCityCode": "27YK",
+                        "PseudoCityCode": "27YK",
+                        "ReceivedFrom": "SABRE API",
+                        "LastUpdateDateTime": "2023-11-30T04:23",
+                        "SequenceNumber": "1"
+                    }
+                },
+                "SpecialServiceInfo": [
+                    {
+                        "RPH": "001",
+                        "Type": "GFX",
+                        "Id": "8",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 100484817         D SINGLE ROOM - BOOKING.COM RA"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "002",
+                        "Type": "GFX",
+                        "Id": "9",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 100484817         C YOU MAY CANCEL FREE OF CHARG"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "003",
+                        "Type": "GFX",
+                        "Id": "10",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 100484817         D THE AIR-CONDITIONED SINGLE R"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "004",
+                        "Type": "GFX",
+                        "Id": "11",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 100484817         D OOM PROVIDES A FLAT-SCREEN T"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "005",
+                        "Type": "GFX",
+                        "Id": "12",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 100484817         TP 14.50 USD APPROX. TTL PRICE"
+                            ]
+                        }
+                    },
+                    {
+                        "RPH": "006",
+                        "Type": "GFX",
+                        "Id": "13",
+                        "Service": {
+                            "SSR_Code": "OSI",
+                            "Airline": {
+                                "Code": "7B"
+                            },
+                            "Text": [
+                                "HHL 100484817         TD INCLUDES TAX"
+                            ]
+                        }
+                    }
+                ],
+                "OpenReservationElements": {
+                    "OpenReservationElement": [
+                        {
+                            "id": "8",
+                            "type": "SRVC",
+                            "elementId": "pnr-8",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 100484817         D SINGLE ROOM - BOOKING.COM RA",
+                                "FullText": "7B HHL 100484817         D SINGLE ROOM - BOOKING.COM RA"
+                            }
+                        },
+                        {
+                            "id": "9",
+                            "type": "SRVC",
+                            "elementId": "pnr-9",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 100484817         C YOU MAY CANCEL FREE OF CHARG",
+                                "FullText": "7B HHL 100484817         C YOU MAY CANCEL FREE OF CHARG"
+                            }
+                        },
+                        {
+                            "id": "10",
+                            "type": "SRVC",
+                            "elementId": "pnr-10",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 100484817         D THE AIR-CONDITIONED SINGLE R",
+                                "FullText": "7B HHL 100484817         D THE AIR-CONDITIONED SINGLE R"
+                            }
+                        },
+                        {
+                            "id": "11",
+                            "type": "SRVC",
+                            "elementId": "pnr-11",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 100484817         D OOM PROVIDES A FLAT-SCREEN T",
+                                "FullText": "7B HHL 100484817         D OOM PROVIDES A FLAT-SCREEN T"
+                            }
+                        },
+                        {
+                            "id": "12",
+                            "type": "SRVC",
+                            "elementId": "pnr-12",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 100484817         TP 14.50 USD APPROX. TTL PRICE",
+                                "FullText": "7B HHL 100484817         TP 14.50 USD APPROX. TTL PRICE"
+                            }
+                        },
+                        {
+                            "id": "13",
+                            "type": "SRVC",
+                            "elementId": "pnr-13",
+                            "ServiceRequest": {
+                                "airlineCode": "7B",
+                                "serviceType": "OSI",
+                                "ssrType": "GFX",
+                                "FreeText": "HHL 100484817         TD INCLUDES TAX",
+                                "FullText": "7B HHL 100484817         TD INCLUDES TAX"
+                            }
+                        }
+                    ]
+                },
+                "AssociationMatrices": {
+                    "AssociationMatrix": [
+                        {
+                            "Name": "PssIDType",
+                            "Parent": {
+                                "ref": "pnr-14"
+                            },
+                            "Child": [
+                                {
+                                    "ref": "pnr-8"
+                                },
+                                {
+                                    "ref": "pnr-9"
+                                },
+                                {
+                                    "ref": "pnr-10"
+                                },
+                                {
+                                    "ref": "pnr-11"
+                                },
+                                {
+                                    "ref": "pnr-12"
+                                },
+                                {
+                                    "ref": "pnr-13"
+                                },
+                                {
+                                    "ref": "pnr-or-3"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "Links": [
+        {
+            "rel": "self",
+            "href": "https://api.platform.sabre.com/v2.5.0/passenger/records?mode=create"
+        },
+        {
+            "rel": "linkTemplate",
+            "href": "https://api.platform.sabre.com/<version>/passenger/records?mode=<mode>"
+        }
+    ]
+}

@@ -260,180 +260,173 @@ function getHotelDetails($url, $accessToken, $requestBody)
             $rateInfos = isset($hotelRateInfo['RateInfos'])
                 ? $hotelRateInfo['RateInfos']
                 : '';
-            $roomSets = isset($hotelRateInfo['RoomSets']['RoomSet'])
-                ? $hotelRateInfo['RoomSets']['RoomSet']
-                : [];
+            $roomSets = [];
+            if(isset($hotelRateInfo['Rooms']['Room'])){
+                $roomSets =  $hotelRateInfo['Rooms']['Room'];
+
+            }elseif(isset($hotelRateInfo['RoomSets']['RoomSet'])){
+                $roomSets =  $hotelRateInfo['RoomSets']['RoomSet'];
+            }else{
+                $roomSets =  [];
+            }
             $roomSet = [];
 
             if (isset($roomSets)) {
-                foreach ($roomSets as $singleRoomSet) {
-                    foreach ($singleRoomSet['Room'] as $key => $room) {
-                        $bedTypes = [];
-                        if (isset($room['BedTypeOptions']['BedTypes'])) {
-                            foreach ($room['BedTypeOptions']['BedTypes']
-                                as $singleBed) {
-                                if (isset($singleBed)) {
-                                    $bedTypes[] = [
-                                        'code' => isset($singleBed['Code'])
-                                            ? $singleBed['Code']
-                                            : '',
-                                        'description' => isset(
-                                            $singleBed['Description']
-                                        )
-                                            ? $singleBed['Description']
-                                            : '',
-                                        'count' => isset($singleBed['Count'])
-                                            ? $singleBed['Count']
-                                            : '',
-                                    ];
+                foreach ($roomSets as $key=>$singleRoomSet) {
+             
+                            $bedTypes = [];
+                            if (isset($singleRoomSet['BedTypeOptions']['BedTypes'])) {
+                                foreach ($singleRoomSet['BedTypeOptions']['BedTypes'][0]['BedType']
+                                    as $singleBedTypes) {
+                                        $bedTypes[] = flattenObject($singleBedTypes);
                                 }
                             }
-                        }
+    
+                            $ratePlans = [];
+    
+                            foreach ($singleRoomSet['RatePlans']['RatePlan']
+                                as $ratePlan) {
 
-                        $ratePlans = [];
-
-                        foreach ($room['RatePlans']['RatePlan']
-                            as $ratePlan) {
-                            $ratePlans[] = [
-                                'ratePlanName' => isset(
-                                    $ratePlan['RatePlanName']
-                                )
-                                    ? $ratePlan['RatePlanName']
-                                    : '',
-                                'ratePlanCode' => isset(
-                                    $ratePlan['RatePlanCode']
-                                )
-                                    ? $ratePlan['RatePlanCode']
-                                    : '',
-                                'prepaidIndicator' => isset(
-                                    $ratePlan['PrepaidIndicator']
-                                )
-                                    ? $ratePlan['PrepaidIndicator']
-                                    : '',
-                                'limitedAvailability' => isset(
-                                    $ratePlan['LimitedAvailability']
-                                )
-                                    ? $ratePlan['LimitedAvailability']
-                                    : '',
-                                'rateSource' => isset($ratePlan['RateSource'])
-                                    ? $ratePlan['RateSource']
-                                    : '',
-                                'rateKey' => isset($ratePlan['RateKey'])
-                                    ? $ratePlan['RateKey']
-                                    : '',
-                                'productCode' => isset($ratePlan['ProductCode'])
-                                    ? $ratePlan['ProductCode']
-                                    : '',
-                                'breakfast' => isset(
-                                    $ratePlan['MealsIncluded']['Breakfast']
-                                )
-                                    ? $ratePlan['MealsIncluded']['Breakfast']
-                                    : '',
-                                'lunch' => isset(
-                                    $ratePlan['MealsIncluded']['Lunch']
-                                )
-                                    ? $ratePlan['MealsIncluded']['Lunch']
-                                    : '',
-                                'dinner' => isset(
-                                    $ratePlan['MealsIncluded']['Dinner']
-                                )
-                                    ? $ratePlan['MealsIncluded']['Dinner']
-                                    : '',
-                                'mealPlanCode' => isset(
-                                    $ratePlan['MealsIncluded']['MealPlanCode']
-                                )
-                                    ? $ratePlan['MealsIncluded']['MealPlanCode']
-                                    : '',
-                                'mealPlanDescription' => isset(
-                                    $ratePlan['MealsIncluded']['MealPlanDescription']
-                                )
-                                    ? $ratePlan['MealsIncluded']['MealPlanDescription']
-                                    : '',
-                                'startDate' => isset(
-                                    $ratePlan['ConvertedRateInfo']['StartDate']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['StartDate']
-                                    : '',
-                                'endDate' => isset(
-                                    $ratePlan['ConvertedRateInfo']['EndDate']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['EndDate']
-                                    : '',
-                                'amountBeforeTax' => isset(
-                                    $ratePlan['ConvertedRateInfo']['AmountBeforeTax']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['AmountBeforeTax']
-                                    : '',
-                                'amountAfterTax' => isset(
-                                    $ratePlan['ConvertedRateInfo']['AmountAfterTax']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['AmountAfterTax']
-                                    : '',
-                                'averageNightlyRate' => isset(
-                                    $ratePlan['ConvertedRateInfo']['AverageNightlyRate']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['AverageNightlyRate']
-                                    : '',
-                                'averageNightlyRateBeforeTax' => isset(
-                                    $ratePlan['ConvertedRateInfo']['AverageNightlyRateBeforeTax']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['AverageNightlyRateBeforeTax']
-                                    : '',
-                                'currencyCode' => isset(
-                                    $ratePlan['ConvertedRateInfo']['CurrencyCode']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['CurrencyCode']
-                                    : '',
-                                'taxInclusive' => isset(
-                                    $ratePlan['ConvertedRateInfo']['TaxInclusive']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['TaxInclusive']
-                                    : '',
-                                'amount' => isset(
-                                    $ratePlan['ConvertedRateInfo']['Taxes']['Amount']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['Taxes']['Amount']
-                                    : '',
-                                'taxCurrencyCode' => isset(
-                                    $ratePlan['ConvertedRateInfo']['Taxes']['CurrencyCode']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['Taxes']['CurrencyCode']
-                                    : '',
-                                'refundable' => isset(
-                                    $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Refundable']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Refundable']
-                                    : '',
-                                'absoluteDeadline' => isset(
-                                    $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Deadline']['AbsoluteDeadline']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Deadline']['AbsoluteDeadline']
-                                    : '',
-                                'guaranteesAccepted' => isset(
-                                    $ratePlan['ConvertedRateInfo']['Guarantee']['GuaranteesAccepted']['GuaranteeAccepted']
-                                )
-                                    ? $ratePlan['ConvertedRateInfo']['Guarantee']['GuaranteesAccepted']['GuaranteeAccepted']
-                                    : '',
+                                $ratePlans[] = [
+                                    'ratePlanName' => isset(
+                                        $ratePlan['RatePlanName']
+                                    )
+                                        ? $ratePlan['RatePlanName']
+                                        : '',
+                                    'ratePlanCode' => isset(
+                                        $ratePlan['RatePlanCode']
+                                    )
+                                        ? $ratePlan['RatePlanCode']
+                                        : '',
+                                    'prepaidIndicator' => isset(
+                                        $ratePlan['PrepaidIndicator']
+                                    )
+                                        ? $ratePlan['PrepaidIndicator']
+                                        : '',
+                                    'limitedAvailability' => isset(
+                                        $ratePlan['LimitedAvailability']
+                                    )
+                                        ? $ratePlan['LimitedAvailability']
+                                        : '',
+                                    'rateSource' => isset($ratePlan['RateSource'])
+                                        ? $ratePlan['RateSource']
+                                        : '',
+                                    'rateKey' => isset($ratePlan['RateKey'])
+                                        ? $ratePlan['RateKey']
+                                        : '',
+                                    'productCode' => isset($ratePlan['ProductCode'])
+                                        ? $ratePlan['ProductCode']
+                                        : '',
+                                    'breakfast' => isset(
+                                        $ratePlan['MealsIncluded']['Breakfast']
+                                    )
+                                        ? $ratePlan['MealsIncluded']['Breakfast']
+                                        : '',
+                                    'lunch' => isset(
+                                        $ratePlan['MealsIncluded']['Lunch']
+                                    )
+                                        ? $ratePlan['MealsIncluded']['Lunch']
+                                        : '',
+                                    'dinner' => isset(
+                                        $ratePlan['MealsIncluded']['Dinner']
+                                    )
+                                        ? $ratePlan['MealsIncluded']['Dinner']
+                                        : '',
+                                    'mealPlanCode' => isset(
+                                        $ratePlan['MealsIncluded']['MealPlanCode']
+                                    )
+                                        ? $ratePlan['MealsIncluded']['MealPlanCode']
+                                        : '',
+                                    'mealPlanDescription' => isset(
+                                        $ratePlan['MealsIncluded']['MealPlanDescription']
+                                    )
+                                        ? $ratePlan['MealsIncluded']['MealPlanDescription']
+                                        : '',
+                                    'startDate' => isset(
+                                        $ratePlan['ConvertedRateInfo']['StartDate']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['StartDate']
+                                        : '',
+                                    'endDate' => isset(
+                                        $ratePlan['ConvertedRateInfo']['EndDate']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['EndDate']
+                                        : '',
+                                    'amountBeforeTax' => isset(
+                                        $ratePlan['ConvertedRateInfo']['AmountBeforeTax']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['AmountBeforeTax']
+                                        : '',
+                                    'amountAfterTax' => isset(
+                                        $ratePlan['ConvertedRateInfo']['AmountAfterTax']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['AmountAfterTax']
+                                        : '',
+                                    'averageNightlyRate' => isset(
+                                        $ratePlan['ConvertedRateInfo']['AverageNightlyRate']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['AverageNightlyRate']
+                                        : '',
+                                    'averageNightlyRateBeforeTax' => isset(
+                                        $ratePlan['ConvertedRateInfo']['AverageNightlyRateBeforeTax']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['AverageNightlyRateBeforeTax']
+                                        : '',
+                                    'currencyCode' => isset(
+                                        $ratePlan['ConvertedRateInfo']['CurrencyCode']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['CurrencyCode']
+                                        : '',
+                                    'taxInclusive' => isset(
+                                        $ratePlan['ConvertedRateInfo']['TaxInclusive']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['TaxInclusive']
+                                        : '',
+                                    'amount' => isset(
+                                        $ratePlan['ConvertedRateInfo']['Taxes']['Amount']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['Taxes']['Amount']
+                                        : '',
+                                    'taxCurrencyCode' => isset(
+                                        $ratePlan['ConvertedRateInfo']['Taxes']['CurrencyCode']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['Taxes']['CurrencyCode']
+                                        : '',
+                                    'refundable' => isset(
+                                        $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Refundable']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Refundable']
+                                        : '',
+                                    'absoluteDeadline' => isset(
+                                        $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Deadline']['AbsoluteDeadline']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['CancelPenalties']['CancelPenalty'][0]['Deadline']['AbsoluteDeadline']
+                                        : '',
+                                    'guaranteesAccepted' => isset(
+                                        $ratePlan['ConvertedRateInfo']['Guarantee']['GuaranteesAccepted']['GuaranteeAccepted']
+                                    )
+                                        ? $ratePlan['ConvertedRateInfo']['Guarantee']['GuaranteesAccepted']['GuaranteeAccepted']
+                                        : '',
+                                ];
+                            }
+    
+                            $roomSet[] = [
+                                'roomIndex' => $key + 1,
+                                'roomType' => isset($room['RoomType']) ? $singleRoomSet['RoomType'] : "",
+                                'roomTypeCode' => isset($room['RoomTypeCode']) ? $singleRoomSet['RoomTypeCode'] : "",
+                                'bedType' => $bedTypes,
+                                'roomName' =>
+                                $singleRoomSet['RoomDescription']['Name'],
+                                'roomNameText' =>
+                                $singleRoomSet['RoomDescription']['Text'][0],
+                                'amenities' => isset($singleRoomSet['Amenities'])?convertKeysToCamelCase($singleRoomSet['Amenities']['Amenity']):[],
+                                'ratePlan' => isset($ratePlans)
+                                    ? (object) call_user_func_array(
+                                        'array_merge',
+                                        $ratePlans
+                                    )
+                                    : [],
                             ];
-                        }
-
-                        $roomSet[] = [
-                            'roomIndex' => $key + 1,
-                            'roomType' => isset($room['RoomType']) ? $room['RoomType'] : "",
-                            'roomTypeCode' => isset($room['RoomTypeCode']) ? $room['RoomTypeCode'] : "",
-                            'bedType' => $bedTypes,
-                            'roomName' =>
-                            $room['RoomDescription']['Name'],
-                            'roomNameText' =>
-                            $room['RoomDescription']['Text'][0],
-                            'ratePlan' => isset($ratePlans)
-                                ? (object) call_user_func_array(
-                                    'array_merge',
-                                    $ratePlans
-                                )
-                                : [],
-                        ];
-                    }
                 }
             } else {
                 $roomSet = [];
@@ -542,11 +535,9 @@ function getHotelDetails($url, $accessToken, $requestBody)
             ];
 
             //Todo: Returning Search Result
-            // $response = json_encode($allResponse);
-            // $response = json_encode($rateInfos['ConvertedRateInfo']);
-            // $response = json_encode($roomSets);
-            // $response = json_encode($propertyInfo);
-            $response = json_encode($responseData);
+            $response = json_encode($allResponse);
+            
+
             return $response;
         } else {
             return json_encode($responseData);

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_POST = json_decode(file_get_contents('php://input'), true);
     $rateKey = $_POST['key'];
     $pcc = '27YK';
-    // $url = 'https://api.cert.platform.sabre.com/v3.0.0/hotel/pricecheck';
+    
     $url = 'https://api.platform.sabre.com/v3.0.0/hotel/pricecheck';
     // $accessToken = getToken();
     $accessToken = getProdToken();
