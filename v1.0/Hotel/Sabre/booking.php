@@ -54,12 +54,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     );
 
     // echo $requestBody;
-    // $result = sabreHotelBooking($accessToken, $requestBody);
+    // echo $accessToken;
+
+    $result = sabreHotelBooking($accessToken, $requestBody);
 
     // echo $result;
 
-    $filePath = './test.json';
-    $result = file_get_contents($filePath);
+    // $filePath = './test.json';
+    // $result = file_get_contents($filePath);
+
     $response = json_decode($result, true);
     $bookingPnr = isset(
         $response['CreatePassengerNameRecordRS']['ItineraryRef']['ID']
@@ -97,6 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $hotelCode,
             $paymentInfo
         );
+
     } else {
         $response = [];
         $response['status'] = 'error';
@@ -127,7 +131,7 @@ function sabreRequestBody($pcc, $guestInfo, $paymentInfo, $phone, $bookingKey)
     $cardCode = $paymentInfo['cardCode'];
     $cardNumber = $paymentInfo['cardNumber'];
     $expiryDate = $paymentInfo['expiryDate'];
-    $expiryMonth = date('m', strtotime($expiryDate));
+    $expiryMonth = ltrim(date('n', strtotime($expiryDate)), '0');
     $expiryYear = date('Y', strtotime($expiryDate));
     $holderFName = $paymentInfo['holderFName'];
     $holderLName = $paymentInfo['holderLName'];
