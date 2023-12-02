@@ -1,17 +1,17 @@
 <?php
 
-// TODO:INCLUDE NECESSARY FILES
+// TODO: INCLUDE NECESSARY FILES
 include '../../config.php';
 include './utils.php';
 
-// TODO:SET HEADERS
+// TODO: SET HEADERS
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: OPTIONS,GET,POST,PUT,DELETE");
+header("Access-Control-Allow-Methods: OPTIONS, GET, POST, PUT, DELETE");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// TODO:CHECK IF 'BOOKING ID' EXISTS IN THE GET REQUEST
+// TODO: CHECK IF 'BOOKING ID' EXISTS IN THE GET REQUEST
 if (isset($_GET['bookingId'])) {
     $bookingId = $_GET['bookingId'];
     $accessToken = getProdToken();
@@ -19,66 +19,84 @@ if (isset($_GET['bookingId'])) {
     $bookingResult = mysqli_query($conn, $query);
 
     if ($bookingResult) {
-        $bookingData = mysqli_fetch_assoc($bookingResult);
-        $pnr = $bookingData['pnr'];
+        if (mysqli_num_rows($bookingResult) > 0) {
+            $bookingData = mysqli_fetch_assoc($bookingResult);
+            $pnr = $bookingData['pnr'];
 
-        // TODO:INITIALIZE CURL
-        $curl = curl_init();
+            // TODO: INITIALIZE CURL
+            $curl = curl_init();
 
-        // TODO:SET CURL OPTIONS
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.platform.sabre.com/v1/trip/orders/cancelBooking',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode(array(
-                "confirmationId" => $pnr,
-                "retrieveBooking" => true,
-                "cancelAll" => true,
-                "errorHandlingPolicy" => "ALLOW_PARTIAL_CANCEL"
-            )),
-            CURLOPT_HTTPHEADER => array(
-                'Content-Type: application/json',
-                'Conversation-ID: 2021.01.DevStudio',
-                "Authorization: Bearer $accessToken"
-            ),
-        ));
+            // TODO: SET CURL OPTIONS
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.platform.sabre.com/v1/trip/orders/cancelBooking',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => json_encode(array(
+                    "confirmationId" => $pnr,
+                    "retrieveBooking" => true,
+                    "cancelAll" => true,
+                    "errorHandlingPolicy" => "ALLOW_PARTIAL_CANCEL"
+                )),
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    'Conversation-ID: 2021.01.DevStudio',
+                    "Authorization: Bearer $accessToken"
+                ),
+            ));
 
-        // todo:EXECUTE cURL request
-        $response = curl_exec($curl);
+            // TODO: EXECUTE cURL request
+            $response = curl_exec($curl);
 
-        // TODO:CLOSE CURL RESOURCE
-        curl_close($curl);
+            // TODO: CLOSE CURL RESOURCE
+            curl_close($curl);
 
-        if ($response === false) {
-            // todo:HANDLE cURL error
+            if ($response === false) {
+                // TODO: HANDLE cURL error
+                $errMessage = array(
+                    'status' => 'error',
+                    'message' => 'cURL error: ' . curl_error($curl)
+                );
+                echo json_encode($errMessage);
+            } else {
+                // TODO: CHECK RESPONSE CODE
+                $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                if ($httpCode >= 200 && $httpCode < 300) {
+                    // Success response
+                    $conn->query("UPDATE `hotel_booking`
+                    SET `status`='Cancelled' where `uid` = '$bookingId'");
+                    echo $response;
+                } else {
+                    // Error in API response
+                    $errMessage = array(
+                        'status' => 'error',
+                        'message' => 'Error: ' . $httpCode . ' - ' . $response
+                    );
+                    echo json_encode($errMessage);
+                }
+            }
+        } else {
+            // TODO: HANDLE NO DATA FOUND FOR BOOKING ID
             $errMessage = array(
                 'status' => 'error',
-                'message' => 'cURL error: ' . curl_error($curl)
+                'message' => 'No data found for this BookingID'
             );
             echo json_encode($errMessage);
-        } else {
-            // TODO:OUTPUT THE RESPONSE
-
-            $conn->query("UPDATE `hotel_booking`
-            SET `status`='Cancelled' where `uid` = '$bookingId'");
-
-            echo $response;
         }
     } else {
-        // todo:HANDLE database error
+        // TODO: HANDLE DATABASE QUERY ERROR
         $errMessage = array(
             'status' => 'error',
-            'message' => 'Invalid BookingID or Database Error'
+            'message' => 'Database Error: ' . mysqli_error($conn)
         );
         echo json_encode($errMessage);
     }
 } else {
-    // TODO:HANDLE MISSING 'BOOKING ID' ERROR
+    // TODO: HANDLE MISSING 'BOOKING ID' ERROR
     $errMessage = array(
         'status' => 'error',
         'message' => 'Missing BookingID in request'
