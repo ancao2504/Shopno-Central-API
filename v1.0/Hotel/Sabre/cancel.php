@@ -22,8 +22,11 @@ if (isset($_GET['bookingId'])) {
         if (mysqli_num_rows($bookingResult) > 0) {
             $bookingData = mysqli_fetch_assoc($bookingResult);
             $pnr = $bookingData['pnr'];
+            $id = $bookingData['bookingId'];
+            $status = $bookingData['status'];
 
-            // TODO: INITIALIZE CURL
+            if($status!=="Cancelled"){
+              // TODO: INITIALIZE CURL
             $curl = curl_init();
 
             // TODO: SET CURL OPTIONS
@@ -69,15 +72,25 @@ if (isset($_GET['bookingId'])) {
                     // Success response
                     $conn->query("UPDATE `hotel_booking`
                     SET `status`='Cancelled' where `uid` = '$bookingId'");
-                    echo $response;
+                    $successMessage=[];
+                    $successMessage['status'] = "success";
+                    $successMessage['BookingId'] = "$id";
+                    $successMessage['message'] = "Booking Cancelled Confirm";
+                    echo json_encode($successMessage);
                 } else {
                     // Error in API response
                     $errMessage = array(
                         'status' => 'error',
-                        'message' => 'Error: ' . $httpCode . ' - ' . $response
+                        'message' => 'Booking Cancel Failed: ' . $httpCode . ' - ' . $response
                     );
                     echo json_encode($errMessage);
                 }
+            }
+            }else{
+              $errMessage=[];
+              $errMessage['status'] = "error";
+              $errMessage['message'] = "Booking Cancelled Already";
+              echo json_encode($successMessage);
             }
         } else {
             // TODO: HANDLE NO DATA FOUND FOR BOOKING ID
