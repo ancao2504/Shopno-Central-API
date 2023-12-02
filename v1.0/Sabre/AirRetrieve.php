@@ -55,12 +55,12 @@ curl_setopt_array($curl, array(
   CURLOPT_FOLLOWLOCATION => true,
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => 'POST',
-  CURLOPT_POSTFIELDS =>'{
-    "confirmationId": "'.$BookingID.'",
-    "retrieveBooking": true,
-    "cancelAll": true,
-    "errorHandlingPolicy": "ALLOW_PARTIAL_CANCEL"
-}',
+  CURLOPT_POSTFIELDS => json_encode(array(
+	"confirmationId" => $BookingID,
+	"retrieveBooking" => true,
+	"cancelAll" => true,
+	"errorHandlingPolicy" => "ALLOW_PARTIAL_CANCEL"
+)),
   CURLOPT_HTTPHEADER => array(
     'Content-Type: application/json',
     'Conversation-ID: 2021.01.DevStudio',
