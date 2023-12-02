@@ -14,29 +14,29 @@ header(
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_POST = json_decode(file_get_contents('php://input'), true);
 
-    $guestInfo = $_POST['guestInfo'];
-    $paymentInfo = $_POST['paymentInfo'];
-    $agentId = isset($_POST['agentId']) ? $_POST['agentId'] : '';
-    $staffId = isset($_POST['staffId']) ? $_POST['staffId'] : '';
-    $subAgentId = isset($_POST['subAgentId']) ? $_POST['subAgentId'] : '';
-    $userId = isset($_POST['userId']) ? $_POST['userId'] : '';
+    $guestInfo = isset($_POST['guestInfo'])?$_POST['guestInfo']:[];
+    $paymentInfo = isset($_POST['paymentInfo'])?$_POST['paymentInfo']:[];
+    $agentId = isset($_POST['agentId']) ? $_POST['agentId'] : "";
+    $staffId = isset($_POST['staffId']) ? $_POST['staffId'] : "";
+    $subAgentId = isset($_POST['subAgentId']) ? $_POST['subAgentId'] : "";
+    $userId = isset($_POST['userId']) ? $_POST['userId'] : "";
     $system = isset($_POST['system']) ? $_POST['system']:"";
-    $phone = $_POST['phone'];
-    $bookingKey = $_POST['bookingKey'];
-    $email = $_POST['email'];
-    $adultCount = $_POST['adultCount'];
-    $childCount = $_POST['childCount'];
+    $phone = isset($_POST['phone'])?$_POST['phone']:"";
+    $bookingKey = isset($_POST['bookingKey'])?$_POST['bookingKey']:"";
+    $email = isset($_POST['email'])?$_POST['email']:"";
+    $adultCount = isset($_POST['adultCount'])?$_POST['adultCount']:"";
+    $childCount = isset($_POST['childCount'])?$_POST['childCount']:"";
     $totalPax = $adultCount + $childCount;
-    $rooms = $_POST['rooms'];
-    $checkIn = $_POST['checkIn'];
-    $checkOut = $_POST['checkOut'];
-    $platform = $_POST['platform'];
-    $refundable = $_POST['refundable'];
+    $rooms = isset($_POST['rooms'])?$_POST['rooms']:"";
+    $checkIn = isset($_POST['checkIn'])?$_POST['checkIn']:"";
+    $checkOut = isset($_POST['checkOut'])?$_POST['checkOut']:"";
+    $platform = isset($_POST['platform'])?$_POST['platform']:"";
+    $refundable = isset($_POST['refundable'])?$_POST['refundable']:"";
     $uId = sha1(md5(time()) . '' . rand());
-    $netCost = $_POST['netCost'];
-    $hotelName = $_POST['hotelName'];
-    $hotelCode = $_POST['hotelCode'];
-    $guestPassengerName = $_POST['guestPassengerName'];
+    $netCost = isset($_POST['netCost'])?$_POST['netCost']:0;
+    $hotelName = isset($_POST['hotelName'])?$_POST['hotelName']:"";
+    $hotelCode = isset($_POST['hotelCode'])?$_POST['hotelCode']:"";
+    $guestPassengerName = isset($_POST['guestPassengerName'])?$_POST['guestPassengerName']:"";
 
     $pcc = '27YK';
 
@@ -48,53 +48,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $guestInfo,
         $paymentInfo,
         $phone,
-        $email,
         $bookingKey
     );
 
-    echo $requestBody;
+    // echo $requestBody;
     // $result = sabreHotelBooking($accessToken, $requestBody);
 
     // echo $result;
 
-    // $filePath = './test.json';
-    // $jsonData = file_get_contents($filePath);
-    // $result = json_decode($result, true);
-    // $bookingPnr = $result['CreatePassengerNameRecordRS']['ItineraryRef']['ID'];
+    $filePath = './test.json';
+    $result = file_get_contents($filePath);
+    $response = json_decode($result, true);
+    $bookingPnr = isset($response['CreatePassengerNameRecordRS']['ItineraryRef']['ID'])?$response['CreatePassengerNameRecordRS']['ItineraryRef']['ID']:"";
 
-    // if (!empty($bookingPnr)) {
-    //     // echo $result;
-    //     // echo $requestBody
-    //     // addPax($conn, $guestInfo);
-    //     saveBooking(
-    //         $conn,
-    //         $guestInfo,
-    //         $bookingPnr,
-    //         $agentId,
-    //         $staffId,
-    //         $subAgentId,
-    //         $userId,
-    //         $adultCount,
-    //         $childCount,
-    //         $rooms,
-    //         $checkIn,
-    //         $checkOut,
-    //         $platform,
-    //         $uId,
-    //         $phone,
-    //         $email,
-    //         $refundable,
-    //         $guestPassengerName,
-    //         $netCost,
-    //         $system
-    //     );
-    // } else {
-    //     $response = [];
-    //     $response['status'] = 'error';
-    //     $response['message'] = 'Booking Failed';
+    if (!empty($bookingPnr)) {
+        // echo $result;
+        // echo $requestBody
+        
+        saveBooking(
+            $conn,
+            $guestInfo,
+            $bookingPnr,
+            $agentId,
+            $staffId,
+            $subAgentId,
+            $userId,
+            $adultCount,
+            $childCount,
+            $totalPax,
+            $rooms,
+            $checkIn,
+            $checkOut,
+            $platform,
+            $uId,
+            $phone,
+            $email,
+            $refundable,
+            $guestPassengerName,
+            $netCost,
+            $system
+        );
 
-    //     echo json_encode($response);
-    // }
+    } else {
+        $response = [];
+        $response['status'] = 'error';
+        $response['message'] = 'Booking Failed';
+
+        echo json_encode($response);
+    }
 } else {
     $response = [];
     $response['status'] = 'error';
@@ -108,7 +109,6 @@ function sabreRequestBody(
     $guestInfo,
     $paymentInfo,
     $phone,
-    $email,
     $bookingKey
 ) {
     //TODO: agency Information
@@ -412,6 +412,7 @@ function saveBooking(
     $userId,
     $adultCount,
     $childCount,
+    $totalPax,
     $rooms,
     $checkIn,
     $checkOut,
@@ -424,58 +425,54 @@ function saveBooking(
     $netCost,
     $system
 ) {
+
     if (!empty($bookingPnr)) {
         $bookingId = '';
-        $query =
-            'SELECT id, bookingId FROM hotel_booking ORDER BY bookingId DESC LIMIT 1';
+        $query = 'SELECT id, bookingId FROM hotel_booking ORDER BY id DESC LIMIT 1';
         $result = $conn->query($query);
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $number = (int) filter_var(
-                    $row['bookingId'],
-                    FILTER_SANITIZE_NUMBER_INT
-                );
-                $newnumber = $number + 1;
-                $bookingId = "STHB$newnumber";
-            }
+        
+        if ($result && $result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $number = (int) filter_var($row['bookingId'], FILTER_SANITIZE_NUMBER_INT);
+            $newnumber = $number + 1;
+            $bookingId = "STHB$newnumber";
         } else {
-            $bookingId = 'STHB1';
+            $bookingId = 'STHB1000';
         }
 
-        $bookedAt = date('Y-m-d H:i:s');
+        $bookedAt = (new DateTime())->format('Y-m-d\TH:i:s');
         $status = "Booked";
-        // Assuming $conn is your database connection object
 
         $sql = "INSERT INTO `hotel_booking` (
-    `uid`,
-    `bookingId`,
-    `userId`,
-    `agentId`,
-    `staffId`,
-    `subagentId`,
-    `email`,
-    `phone`,
-    `name`,
-    `refundable`,
-    `pnr`,
-    `platform`,
-    `adultCount`,
-    `childCount`,
-    `rooms`,
-    `checkin`,
-    `checkout`,
-    `netCost`,
-    `bookedAt`,
-    `status`,
-    `system`
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)";
+            `uid`,
+            `bookingId`,
+            `userId`,
+            `agentId`,
+            `staffId`,
+            `subagentId`,
+            `email`,
+            `phone`,
+            `name`,
+            `refundable`,
+            `pnr`,
+            `platform`,
+            `adultCount`,
+            `childCount`,
+            `pax`,
+            `rooms`,
+            `checkin`,
+            `checkout`,
+            `netCost`,
+            `bookedAt`,
+            `status`,
+            `system`
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $stmt = $conn->prepare($sql);
 
         if ($stmt) {
-            // Bind parameters to the prepared statement
             $stmt->bind_param(
-                'ssssssssssssssssssiii',
+                'ssssssssssssssssssssss',
                 $uId,
                 $bookingId,
                 $userId,
@@ -490,6 +487,7 @@ function saveBooking(
                 $platform,
                 $adultCount,
                 $childCount,
+                $totalPax,
                 $rooms,
                 $checkIn,
                 $checkOut,
@@ -499,9 +497,8 @@ function saveBooking(
                 $system
             );
 
-            // Execute the prepared statement
             if ($stmt->execute()) {
-                addPax($conn, $guestInfo);
+                addPax($conn,$bookingId,$bookingPnr, $guestInfo);
 
                 $response['status'] = 'success';
                 $response['BookingId'] = $bookingId;
@@ -509,49 +506,67 @@ function saveBooking(
                 $response['message'] = 'Booking Successfully';
                 echo json_encode($response);
             } else {
-                // Handle execution errors
                 echo 'Error executing the statement: ' . $stmt->error;
+                $response['status'] = 'error';
+                $response['message'] = 'Booking Failed';
+                $response['error_details'] = $stmt->error;
+                echo json_encode($response);
             }
 
-            // Close the statement
             $stmt->close();
         } else {
-            // Handle statement preparation error
-            echo 'Error preparing the statement: ' . $conn->error;
+            $response['status'] = 'error';
+            $response['message'] = 'Booking Failed';
+            echo json_encode($response);
         }
     }
 }
-function addPax($conn, $guestInfo)
+
+function addPax($conn, $bookingPnr, $bookingId, $guestInfo)
 {
+    $response = []; // Initialize an empty response array
+
     foreach ($guestInfo as $index => $guest) {
         $paxId = '';
-        $result = $conn->query(
-            'SELECT * FROM hotel_passengers ORDER BY id DESC LIMIT 1'
-        );
+        $lastPaxId = '';
+
+        $stmt = $conn->prepare('SELECT paxId FROM hotel_passengers ORDER BY id DESC LIMIT 1');
+        $stmt->execute();
+        $result = $stmt->get_result();
+
         if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $outputString = preg_replace('/[^0-9]/', '', $row['paxId']);
-                $number = (int) $outputString + 1;
-                $paxId = "STHP$number";
-            }
+            $row = $result->fetch_assoc();
+            $lastPaxId = $row['paxId'];
+            $number = preg_replace('/[^0-9]/', '', $lastPaxId);
+            $paxId = "STHP" . ($number + 1);
         } else {
             $paxId = 'STHP1000';
         }
+
         $type = $guest['type'];
         $fName = $guest['fName'];
         $lName = $guest['lName'];
         $phone = $guest['phone'];
         $email = $guest['email'];
 
-        $query = "INSERT INTO `hotel_passengers` (`paxId`, `type`, `fName`, `lName`, `phone`, `email`) 
-            VALUES ('$paxId', '$type', '$fName', '$lName', '$phone', '$email')";
+        $createdAt = (new DateTime())->format('Y-m-d\TH:i:s');
 
-        if ($conn->query($query) === true) {
-            $response['status'] = 'success';
-            $response['message'] = 'Traveler Added Successfully';
+        // Use prepared statements to prevent SQL injection
+        $stmt = $conn->prepare("INSERT INTO `hotel_passengers` (`paxId`, `bookingId`, `pnr`, `type`, `fName`, `lName`, `phone`, `email`, `createdAt`) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+    $stmt->bind_param("sssssssss", $paxId, $bookingId, $bookingPnr, $type, $fName, $lName, $phone, $email, $createdAt);
+        
+        if ($stmt->execute()) {
+            $response[$index]['status'] = 'success';
+            $response[$index]['message'] = 'Traveler Added Successfully';
         } else {
-            $response['status'] = 'error';
-            $response['message'] = 'Traveler Added Failed';
+            $response[$index]['status'] = 'error';
+            $response[$index]['message'] = 'Traveler Added Failed';
         }
     }
+
+    return $response;
 }
+
+
