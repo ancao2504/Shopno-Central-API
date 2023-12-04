@@ -9,45 +9,51 @@ header(
     'Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With'
 );
 
-if (array_key_exists('ccode', $_GET) && array_key_exists('hcode', $_GET)) {
+if (array_key_exists('ccode', $_GET) && array_key_exists('hcode', $_GET)&&array_key_exists('ccontext', $_GET)) {
 
     $categoryCode = $_GET['ccode']; //TODO: category code
     $hotelCode = $_GET['hcode']; //TODO: hotel code
+    $ccontext = $_GET['ccontext']; //TODO: hotel code
     $accessToken = getProdToken(); //TODO: return token
-    $requestBody = getImageRQ($categoryCode, $hotelCode); //TODO: return 
+    $requestBody = getImageRQ($categoryCode, $hotelCode, $ccontext); //TODO: return
 
-    echo $requestBody;
+    // echo $accessToken;
+    // echo $requestBody;
 
-    // if (isset($requestBody)) {
-    //     getImage($requestBody, $accessToken);
-    // } else {
-    //     $errMessage['status'] = 'error';
-    //     $errMessage['message'] = 'Invalid Request';
+    if (isset($requestBody)) {
+        getImage($requestBody, $accessToken);
+    } else {
+        $errMessage['status'] = 'error';
+        $errMessage['message'] = 'Invalid Request';
 
-    //     echo json_encode($errMessage);
-    // }
+        echo json_encode($errMessage);
+    }
 } else {
-
     $errMessage['status'] = 'error';
     $errMessage['message'] = 'Invalid Request';
 
     echo json_encode($errMessage);
 }
 
-function getImageRQ($categoryCode, $hotelCode)
+// "CategoryCode": '.$categoryCode.',
+
+function getImageRQ($categoryCode, $hotelCode, $ccontext)
 {
-    $requestBody = '{
+    $requestBody =
+        '{
         "GetHotelImageRQ": {
           "ImageRef": {
-            "CategoryCode": ' . $categoryCode . ',
+
             "LanguageCode": "EN",
             "Type": "ORIGINAL"
           },
           "HotelRefs": {
             "HotelRef": [
               {
-                "HotelCode": ' . $hotelCode . ',
-                "CodeContext": "Sabre"
+                "HotelCode": "' .
+        $hotelCode .
+        '",
+                "CodeContext": "'.$ccontext.'"
               }
             ]
           }
@@ -58,47 +64,48 @@ function getImageRQ($categoryCode, $hotelCode)
 
 function getImage($requestBody, $accessToken)
 {
+    $url = 'https://api.platform.sabre.com/v1.0.0/shop/hotels/image?mode=image';
 
-    $curl = curl_init();
-
-    curl_setopt_array($curl, [
-        CURLOPT_URL => 'https://api.cert.platform.sabre.com/v1.0.0/shop/hotels/image',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => $requestBody,
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'Conversation-ID: 2021.01.DevStudio',
-            'Authorization: Bearer ' . $accessToken,
-        ],
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_POST, true);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Accept: application/json',
+        'Authorization: Bearer ' . $accessToken,
     ]);
-
-    // echo $accessToken;
+    curl_setopt($curl, CURLOPT_POSTFIELDS, $requestBody);
 
     $response = curl_exec($curl);
 
-    // Check for cURL errors
-    if (curl_errno($curl)) {
-        echo 'cURL Error: ' . curl_error($curl);
-    }
+    $responseData = json_decode($response, true);
 
-    // Check the HTTP response code
+
+    // TODO:Check the HTTP response code
     $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
     if ($httpCode != 200) {
-        echo 'HTTP Error: ' . $httpCode;
+        $response = [];
+        $response['status'] = 'error';
+        $response['code'] = $httpCode;
+        $response['message'] = 'Invalid Request';
+
+        echo json_encode($response);
     } else {
-        // Decode the response
+        // TODO:Output the API response
+        //TODO: Making Modify
+
         $responseData = json_decode($response, true);
 
-        if ($responseData === null) {
-            echo 'JSON Decode Error';
+        $HotelImageInfos =$responseData['GetHotelImageRS']['HotelImageInfos']['HotelImageInfo'];
+
+        // TODO: Modify Result
+        if (isset($HotelImageInfos)) {
+            $simpleArrayOfObjects = [];
+            foreach ($HotelImageInfos as $item) {
+                $simpleArrayOfObjects[] = (object)$item;
+            }
+            echo json_encode($simpleArrayOfObjects);
         } else {
             echo json_encode($responseData);
         }
