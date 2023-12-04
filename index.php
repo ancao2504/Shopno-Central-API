@@ -1,5 +1,5 @@
 <?php
 
-header("Location: https://shopnotour.com/");
+// header("Location: https://shopnotour.com/");
 
 ?>
