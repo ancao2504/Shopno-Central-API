@@ -289,7 +289,20 @@ function searchHotel(
                 $name = isset($hotelInfo['HotelName'])
                     ? $hotelInfo['HotelName']
                     : '';
-                $location = flattenObject($locationInfo);
+                    $location = [
+                      'latitude' => isset($locationInfo['Latitude']) ? $locationInfo['Latitude'] : '',
+                      'longitude' => isset($locationInfo['Longitude']) ? $locationInfo['Longitude'] : '',
+                      'addressLine1' => isset($locationInfo['Address']['AddressLine1']) ? $locationInfo['Address']['AddressLine1'] : '',
+                      'addressLine2' => isset($locationInfo['Address']['AddressLine2']) ? $locationInfo['Address']['AddressLine2'] : '',
+                      'cityCode' => isset($locationInfo['Address']['CityName']['CityCode']) ? $locationInfo['Address']['CityName']['CityCode'] : '',
+                      'cityName' => isset($locationInfo['Address']['CityName']['value']) ? $locationInfo['Address']['CityName']['value'] : '',
+                      'postalCode' => isset($locationInfo['Address']['PostalCode']) ? $locationInfo['Address']['PostalCode'] : '',
+                      'countryName' => isset($locationInfo['Address']['CountryName']['Code']) ? $locationInfo['Address']['CountryName']['Code'] : '',
+                      'countryCode' => isset($locationInfo['Address']['CountryName']['value']) ? $locationInfo['Address']['CountryName']['value'] : '',
+                      'phone' => isset($locationInfo['Contact']['Phone']) ? $locationInfo['Contact']['Phone'] : '',
+                      'fax' => isset($locationInfo['Contact']['Fax']) ? $locationInfo['Contact']['Fax'] : '',
+                  ];
+                  
                 $priceInfo = flattenObject($rateInfo['ConvertedRateInfo'][0]);
                 $rating = isset($hotelInfo['SabreRating'])
                     ? $hotelInfo['SabreRating']
@@ -350,6 +363,52 @@ function searchHotel(
     }
 
     curl_close($curl);
+}
+
+// Function to create a single object with error handling
+function createSingleObject($locationInfo)
+{
+    $singleObject = [];
+
+    // Check if essential keys are present
+    if (
+        isset($locationInfo['Latitude']) &&
+        isset($locationInfo['Longitude']) &&
+        isset($locationInfo['Address']) &&
+        isset($locationInfo['Contact'])
+    ) {
+        $singleObject['Latitude'] = $locationInfo['Latitude'];
+        $singleObject['Longitude'] = $locationInfo['Longitude'];
+
+        $address = $locationInfo['Address'];
+        if (
+            isset($address['AddressLine1']) &&
+            isset($address['AddressLine2']) &&
+            isset($address['CityName']['CityCode']) &&
+            isset($address['CityName']['value']) &&
+            isset($address['PostalCode']) &&
+            isset($address['CountryName']['Code']) &&
+            isset($address['CountryName']['value'])
+        ) {
+            $singleObject['Address'] = $address;
+        } else {
+            // Handle missing address information error
+            $singleObject['Address'] = 'Incomplete Address Information';
+        }
+
+        $contact = $locationInfo['Contact'];
+        if (isset($contact['Phone']) && isset($contact['Fax'])) {
+            $singleObject['Contact'] = $contact;
+        } else {
+            // Handle missing contact information error
+            $singleObject['Contact'] = 'Incomplete Contact Information';
+        }
+    } else {
+        // Handle missing essential keys error
+        $singleObject = 'Incomplete Location Information';
+    }
+
+    return $singleObject;
 }
 
 function convertKeysToCamelCase($array)
