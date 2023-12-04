@@ -9,19 +9,71 @@ header(
     'Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With'
 );
 
-if (array_key_exists('ccode', $_GET) && array_key_exists('hcode', $_GET)&&array_key_exists('ccontext', $_GET)) {
+if (array_key_exists('hcode', $_GET) && array_key_exists('ccontext', $_GET)) {
 
-    $categoryCode = $_GET['ccode']; //TODO: category code
     $hotelCode = $_GET['hcode']; //TODO: hotel code
     $ccontext = $_GET['ccontext']; //TODO: hotel code
     $accessToken = getProdToken(); //TODO: return token
-    $requestBody = getImageRQ($categoryCode, $hotelCode, $ccontext); //TODO: return
+    $requestBody = getImageRQ($hotelCode, $ccontext); //TODO: return
 
     // echo $accessToken;
     // echo $requestBody;
 
     if (isset($requestBody)) {
-        getImage($requestBody, $accessToken);
+        $result = getImage($requestBody, $accessToken);
+
+        $HotelImageInfos = count($result['GetHotelImageRS']['HotelImageInfos']) !== 0 ? $result['GetHotelImageRS']['HotelImageInfos']['HotelImageInfo'] : [];
+
+        // TODO: Modify Result
+        if (count($HotelImageInfos) !== 0) {
+            $response = [];
+
+            foreach ($HotelImageInfos as $hotelImageInfo) {
+                $hotelInfo = $hotelImageInfo['HotelInfo'];
+                $hotelCode = $hotelInfo['HotelCode'];
+                $codeContext = $hotelInfo['CodeContext'];
+                $chainCode = $hotelInfo['ChainCode'];
+                $marketer = $hotelInfo['Marketer'];
+
+                $imageItem = $hotelInfo['ImageItem'];
+                $image = isset($imageItem['Image']) ? [
+                    'url' => $imageItem['Image']['Url'],
+                    'type' => $imageItem['Image']['Type'],
+                    'height' => $imageItem['Image']['Height'],
+                    'width' => $imageItem['Image']['Width'],
+                ] : "";
+                $category = isset($imageItem['Category']) ? [
+                    'categoryCode' => $imageItem['Category']['CategoryCode'],
+                    'language' => $imageItem['Category']['Description']['Text'][0]['Language'],
+                    'content' => $imageItem['Category']['Description']['Text'][0]['content'],
+                ] : "";
+                $additionalInfo = isset($imageItem['AdditionalInfo']) ? [
+                    'type' => $imageItem['AdditionalInfo']['Info'][0]['Type'],
+                    'description' => $imageItem['AdditionalInfo']['Info'][0]['Description'][0]
+                ] : "";
+
+                $response[] = [
+                    'hotelCode' => $hotelCode,
+                    'codeContext' => $codeContext,
+                    'chainCode' => $chainCode,
+                    'marketer' => $marketer,
+                    'image' => $image,
+                    'category' => $category,
+                    'additionalInfo' => $additionalInfo,
+                ];
+            };
+
+
+
+
+            echo json_encode($response);
+        } else {
+            $response = [];
+            $response['status'] = 'error';
+            $response['message'] = 'No Image found';
+
+            echo json_encode($response);
+        }
     } else {
         $errMessage['status'] = 'error';
         $errMessage['message'] = 'Invalid Request';
@@ -35,15 +87,17 @@ if (array_key_exists('ccode', $_GET) && array_key_exists('hcode', $_GET)&&array_
     echo json_encode($errMessage);
 }
 
+
+
+
 // "CategoryCode": '.$categoryCode.',
 
-function getImageRQ($categoryCode, $hotelCode, $ccontext)
+function getImageRQ($hotelCode, $ccontext)
 {
     $requestBody =
         '{
         "GetHotelImageRQ": {
           "ImageRef": {
-            "CategoryCode": '.$categoryCode.',
             "LanguageCode": "EN",
             "Type": "ORIGINAL"
           },
@@ -53,7 +107,7 @@ function getImageRQ($categoryCode, $hotelCode, $ccontext)
                 "HotelCode": "' .
         $hotelCode .
         '",
-                "CodeContext": "'.$ccontext.'"
+                "CodeContext": "' . $ccontext . '"
               }
             ]
           }
@@ -97,19 +151,28 @@ function getImage($requestBody, $accessToken)
 
         $responseData = json_decode($response, true);
 
-        $HotelImageInfos =$responseData['GetHotelImageRS']['HotelImageInfos']['HotelImageInfo'];
-
-        // TODO: Modify Result
-        if (isset($HotelImageInfos)) {
-            $simpleArrayOfObjects = [];
-            foreach ($HotelImageInfos as $item) {
-                $simpleArrayOfObjects[] = (object)$item;
-            }
-            echo json_encode($simpleArrayOfObjects);
-        } else {
-            echo json_encode($responseData);
-        }
+        return $responseData;
     }
 
     curl_close($curl);
+}
+
+function flattenObject($data, $prefix = '')
+{
+    $result = new stdClass();
+
+    foreach ($data as $key => $value) {
+        if (is_object($value) || is_array($value)) {
+            // If the value is an object or an array, recursively flatten it
+            $nestedData = flattenObject($value, $prefix . camelCase($key));
+            foreach ($nestedData as $nestedKey => $nestedValue) {
+                $result->{$nestedKey} = $nestedValue;
+            }
+        } else {
+            // If the value is a scalar, add it to the result object with camelCase key
+            $result->{camelCase($prefix . $key)} = $value;
+        }
+    }
+
+    return $result;
 }
