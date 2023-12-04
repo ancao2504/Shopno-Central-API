@@ -43,7 +43,7 @@ function getImageRQ($categoryCode, $hotelCode, $ccontext)
         '{
         "GetHotelImageRQ": {
           "ImageRef": {
-
+            "CategoryCode": '.$categoryCode.',
             "LanguageCode": "EN",
             "Type": "ORIGINAL"
           },
