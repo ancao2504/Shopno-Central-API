@@ -26,7 +26,6 @@ if (array_key_exists('hcode', $_GET) && array_key_exists('ccontext', $_GET)) {
 
         // TODO: Modify Result
         if (count($HotelImageInfos) !== 0) {
-            $response = [];
 
             foreach ($HotelImageInfos as $hotelImageInfo) {
                 $hotelInfo = $hotelImageInfo['HotelInfo'];
@@ -35,7 +34,7 @@ if (array_key_exists('hcode', $_GET) && array_key_exists('ccontext', $_GET)) {
                 $chainCode = $hotelInfo['ChainCode'];
                 $marketer = $hotelInfo['Marketer'];
 
-                $imageItem = $hotelInfo['ImageItem'];
+                $imageItem = isset($hotelImageInfo['ImageItem']) ? $hotelImageInfo['ImageItem'] : "";
                 $image = isset($imageItem['Image']) ? [
                     'url' => $imageItem['Image']['Url'],
                     'type' => $imageItem['Image']['Type'],
@@ -48,11 +47,11 @@ if (array_key_exists('hcode', $_GET) && array_key_exists('ccontext', $_GET)) {
                     'content' => $imageItem['Category']['Description']['Text'][0]['content'],
                 ] : "";
                 $additionalInfo = isset($imageItem['AdditionalInfo']) ? [
-                    'type' => $imageItem['AdditionalInfo']['Info'][0]['Type'],
-                    'description' => $imageItem['AdditionalInfo']['Info'][0]['Description'][0]
+                    'type' => isset($imageItem['AdditionalInfo']['Info'][0]['Type']) ? $imageItem['AdditionalInfo']['Info'][0]['Type'] : "",
+                    'description' => isset($imageItem['AdditionalInfo']['Info'][0]['Description']) ? $imageItem['AdditionalInfo']['Info'][0]['Description'] : ""
                 ] : "";
 
-                $response[] = [
+                $response = [
                     'hotelCode' => $hotelCode,
                     'codeContext' => $codeContext,
                     'chainCode' => $chainCode,
