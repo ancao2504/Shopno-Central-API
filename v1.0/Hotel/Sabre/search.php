@@ -32,7 +32,6 @@ if (
     $travelerCountryCode = 'BD';
 
     $url = 'https://api.platform.sabre.com/v4.1.0/get/hotelavail';
-    // $url = 'https://api.platform.sabre.com/v4.1.0/get/hotelavail';
 
     $accessToken = getProdToken();
     // $accessToken = getCertToken();
