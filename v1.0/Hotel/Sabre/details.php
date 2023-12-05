@@ -259,7 +259,7 @@ function getHotelDetails($url, $accessToken, $requestBody)
             }
             $rateInfos = isset($hotelRateInfo['RateInfos'])
                 ? $hotelRateInfo['RateInfos']
-                : '';
+                : [];
             $roomSets = [];
             if (isset($hotelRateInfo['Rooms']['Room'])) {
                 $roomSets =  $hotelRateInfo['Rooms']['Room'];
@@ -534,8 +534,8 @@ function getHotelDetails($url, $accessToken, $requestBody)
                 'shortDescription' => isset($descriptions) ? $descriptions : '',
                 'rateInfos' => isset($rateInfos['ConvertedRateInfo'])
                     ? convertKeysToCamelCase($rateInfos['ConvertedRateInfo'])
-                    : '',
-                'roomSet' => isset($roomSet) ? $roomSet : '',
+                    : [],
+                'roomSet' => isset($roomSet) ? $roomSet : [],
             ];
 
             //Todo: Returning Search Result
