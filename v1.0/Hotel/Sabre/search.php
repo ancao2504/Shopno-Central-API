@@ -297,8 +297,8 @@ function searchHotel(
                       'cityCode' => isset($locationInfo['Address']['CityName']['CityCode']) ? $locationInfo['Address']['CityName']['CityCode'] : '',
                       'cityName' => isset($locationInfo['Address']['CityName']['value']) ? $locationInfo['Address']['CityName']['value'] : '',
                       'postalCode' => isset($locationInfo['Address']['PostalCode']) ? $locationInfo['Address']['PostalCode'] : '',
-                      'countryName' => isset($locationInfo['Address']['CountryName']['Code']) ? $locationInfo['Address']['CountryName']['Code'] : '',
-                      'countryCode' => isset($locationInfo['Address']['CountryName']['value']) ? $locationInfo['Address']['CountryName']['value'] : '',
+                      'countryCode' => isset($locationInfo['Address']['CountryName']['Code']) ? $locationInfo['Address']['CountryName']['Code'] : '',
+                      'countryName' => isset($locationInfo['Address']['CountryName']['value']) ? $locationInfo['Address']['CountryName']['value'] : '',
                       'phone' => isset($locationInfo['Contact']['Phone']) ? $locationInfo['Contact']['Phone'] : '',
                       'fax' => isset($locationInfo['Contact']['Fax']) ? $locationInfo['Contact']['Fax'] : '',
                   ];
