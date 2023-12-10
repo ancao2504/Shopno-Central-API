@@ -99,7 +99,7 @@ if (array_key_exists("all", $_GET)) {
         while ($row = $result->fetch_assoc()) {
             $userId = $row['userId'];
 
-            $userQuery = $conn->query("SELECT * FROM user WHERE userId='$userId'");
+            $userQuery = $conn->query("SELECT * FROM `agent` WHERE userId='$userId'");
             $userData = $userQuery->fetch_assoc();
 
             if ($userData) {
@@ -234,7 +234,7 @@ if (array_key_exists("all", $_GET)) {
         while ($row = $result->fetch_assoc()) {
             $userId = $row['userId'];
 
-            $userQuery = $conn->query("SELECT * FROM user WHERE `userId`='$userId'");
+            $userQuery = $conn->query("SELECT * FROM `agent` WHERE `userId`='$userId'");
             $userData = $userQuery->fetch_assoc();
 
             if ($agentData) {

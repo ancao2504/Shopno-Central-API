@@ -20,7 +20,7 @@ if (isset($_GET['bookingId'])) {
 
     if ($bookingResult) {
         $bookingData = mysqli_fetch_assoc($bookingResult);
-        $pnr = $bookingData['pnr'];
+        $pnr = $bookingData['pnr']??"";
 
         // TODO:INITIALIZE CURL
         $curl = curl_init();
