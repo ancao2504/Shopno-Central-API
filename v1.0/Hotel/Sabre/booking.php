@@ -515,8 +515,8 @@ function saveBooking(
             );
 
             if ($stmt->execute()) {
-                addPax($conn, $agentId, $bookingId, $bookingPnr, $guestInfo);
-                savePaymentInfo($conn, $bookingId, $agentId, $paymentInfo);
+                addPax($conn, $agentId, $userId, $bookingId, $bookingPnr, $guestInfo);
+                savePaymentInfo($conn, $bookingId, $agentId, $userId, $paymentInfo);
 
                 $response['status'] = 'success';
                 $response['BookingId'] = $bookingId;
@@ -540,7 +540,7 @@ function saveBooking(
     }
 }
 
-function addPax($conn, $agentId, $bookingPnr, $bookingId, $guestInfo)
+function addPax($conn, $agentId, $userId, $bookingId, $bookingPnr, $guestInfo)
 {
     $response = []; // Initialize an empty response array
 
@@ -572,13 +572,14 @@ function addPax($conn, $agentId, $bookingPnr, $bookingId, $guestInfo)
         $createdAt = (new DateTime())->format('Y-m-d\TH:i:s');
 
         // Use prepared statements to prevent SQL injection
-        $stmt = $conn->prepare("INSERT INTO `hotel_passengers` (`paxId`, `agentId`, `bookingId`, `pnr`, `type`, `fName`, `lName`, `phone`, `email`, `createdAt`) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)");
+        $stmt = $conn->prepare("INSERT INTO `hotel_passengers` (`paxId`, `agentId`, `userId`, `bookingId`, `pnr`, `type`, `fName`, `lName`, `phone`, `email`, `createdAt`) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
         $stmt->bind_param(
-            'ssssssssss',
+            'sssssssssss',
             $paxId,
             $agentId,
+            $userId,
             $bookingId,
             $bookingPnr,
             $type,
@@ -602,7 +603,7 @@ function addPax($conn, $agentId, $bookingPnr, $bookingId, $guestInfo)
 }
 
 // TODO:Function to insert data into HOTEL_PAYMENT_INFO
-function savePaymentInfo($conn, $bookingId, $agentId, $paymentInfo)
+function savePaymentInfo($conn, $bookingId, $agentId, $userId, $paymentInfo)
 {
     $response = [];
 
@@ -669,12 +670,12 @@ function savePaymentInfo($conn, $bookingId, $agentId, $paymentInfo)
 
     //TODO: PREPARE SQL STATEMENT TO INSERT DATA USING PREPARED STATEMENTS
     $sql = "INSERT INTO `hotel_payment_info` 
-            (`paymentType`, `cardCode`,`cardNumber`, `expiryDate`, `holderFName`, `holderLName`, `holderEmail`, `holderPhone`, `csc`, `address`, `cityName`, `streetNumber`, `stateCode`, `cityCode`, `postalCode`, `countryCode`, `paymentId`, `bookingId`, `agentId`, `createdAt`) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            (`paymentType`, `cardCode`,`cardNumber`, `expiryDate`, `holderFName`, `holderLName`, `holderEmail`, `holderPhone`, `csc`, `address`, `cityName`, `streetNumber`, `stateCode`, `cityCode`, `postalCode`, `countryCode`, `paymentId`, `bookingId`, `agentId`, `userId`, `createdAt`) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param(
-        'ssssssssssssssssssss',
+        'sssssssssssssssssssss',
         $paymentType,
         $cardCode,
         $cardNumber,
@@ -694,6 +695,7 @@ function savePaymentInfo($conn, $bookingId, $agentId, $paymentInfo)
         $paymentId,
         $bookingId,
         $agentId,
+        $userId,
         $createdAt
     );
 
