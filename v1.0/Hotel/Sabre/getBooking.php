@@ -154,10 +154,10 @@ if (array_key_exists("all", $_GET)) {
                 $bookedBy = $userData['name']??"";
             }
 
-            $passengerQuery = $conn->query("SELECT * FROM hotel_passengers WHERE agentId='$agentId'");
+            $passengerQuery = $conn->query("SELECT * FROM hotel_passengers WHERE `bookingId` = '$bookingId' AND agentId='$agentId'");
             $passengerInfo = $passengerQuery->fetch_assoc();
 
-            $paymentInfoQuery = $conn->query("SELECT * FROM hotel_payment_info WHERE agentId='$agentId'");
+            $paymentInfoQuery = $conn->query("SELECT * FROM hotel_payment_info WHERE `bookingId` = '$bookingId' AND agentId='$agentId'");
             $paymentInfo = $paymentInfoQuery->fetch_assoc();
 
             $response = $row;
@@ -195,10 +195,10 @@ if (array_key_exists("all", $_GET)) {
                 $bookedBy = $agentData['name'];
             }
 
-            $passengerQuery = $conn->query("SELECT * FROM hotel_passengers WHERE agentId='$agentId'");
+            $passengerQuery = $conn->query("SELECT * FROM hotel_passengers WHERE `bookingId` = '$bookingId' AND agentId='$agentId'");
             $passengerInfo = $passengerQuery->fetch_assoc();
 
-            $paymentInfoQuery = $conn->query("SELECT * FROM hotel_payment_info WHERE agentId='$agentId'");
+            $paymentInfoQuery = $conn->query("SELECT * FROM hotel_payment_info WHERE `bookingId` = '$bookingId' AND agentId='$agentId'");
             $paymentInfo = $paymentInfoQuery->fetch_assoc();
 
             $response = $row;
@@ -236,10 +236,10 @@ if (array_key_exists("all", $_GET)) {
                 $bookedBy = $userData['name'];
             }
 
-            $passengerQuery = $conn->query("SELECT * FROM hotel_passengers WHERE `userId`='$userId'");
+            $passengerQuery = $conn->query("SELECT * FROM hotel_passengers WHERE `bookingId` = '$bookingId' AND `userId`='$userId'");
             $passengerInfo = $passengerQuery->fetch_assoc();
 
-            $paymentInfoQuery = $conn->query("SELECT * FROM hotel_payment_info WHERE `userId`='$userId'");
+            $paymentInfoQuery = $conn->query("SELECT * FROM hotel_payment_info WHERE `bookingId` = '$bookingId' AND `userId`='$userId'");
             $paymentInfo = $paymentInfoQuery->fetch_assoc();
 
             $response = $row;
