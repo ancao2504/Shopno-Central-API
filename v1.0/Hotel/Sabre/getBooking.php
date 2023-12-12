@@ -144,17 +144,10 @@ if (array_key_exists("all", $_GET)) {
             $agentQuery = $conn->query("SELECT * FROM `agent` WHERE `agentId`='$agentId'");
             $agentData = $agentQuery->fetch_assoc();
 
-            $userQuery = $conn->query("SELECT * FROM `user` WHERE `userId`='$userId'");
-            $userData = $userQuery->fetch_assoc();
-
             if ($agentData) {
                 $companyName = $agentData['company']??"";
                 $companyPhone = $agentData['phone']??"";
                 $bookedBy = $agentData['name']??"";
-            }elseif($userData) {
-                $companyName = $userData['company']??"";
-                $companyPhone = $userData['phone']??"";
-                $bookedBy = $userData['name']??"";
             }else{
                 $companyName = "";
                 $companyPhone = "";
